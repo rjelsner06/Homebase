@@ -586,6 +586,17 @@ dialog.mailx{width:calc(100vw - 24px);max-width:none;height:calc(100dvh - 24px);
 @container (max-height:200px){#t-import .il{display:none}#t-import .is{display:inline}#t-import .drop svg{width:22px;height:22px}}
 /* calendar */
 .vs{display:none}
+#cal-x{display:none}
+@container (max-width:419px){#cal-x{display:inline-flex}}
+@container (max-height:359px){#cal-x{display:inline-flex}}
+#dlg-calx{width:min(1200px,calc(100vw - 32px));height:min(900px,calc(100vh - 48px));max-height:none;background:transparent;box-shadow:none;overflow:visible}
+#dlg-calx > #t-cal{height:100%;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+#dlg-calx #cal-x{display:inline-flex}
+#dlg-calx #cal-body{flex:1 0 auto;display:flex;flex-direction:column;gap:12px}
+#dlg-calx .wk{flex:1}
+#dlg-calx .wk-col{min-height:420px}
+/* clock in a small square: centered, time on top, AM/PM under it */
+@container (max-width:180px){#t-clock{justify-content:center;align-items:center;text-align:center;gap:4px}#t-clock .clk-mid{display:flex;flex-direction:column;align-items:center}.hw #t-clock .time{font-size:clamp(22px,min(34cqh,31cqw),80px);line-height:.95}#t-clock .time small{display:block;font-size:.34em;margin:2px 0 0;letter-spacing:.04em}#t-clock .date{font-size:clamp(11px,10cqw,16px)}#t-clock .clock-foot{display:none}}
 #t-cal .cal-title{font-size:22px;text-transform:none;letter-spacing:-.01em;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;display:block}
 #t-cal .cal-head{min-width:0}
 .hw #t-cal{gap:10px}
@@ -937,6 +948,94 @@ html.hs-editing header.top .tabs,html.hs-editing header.top .actions,html.hs-edi
 @container (max-height:118px){#t-weather h2{display:none}#t-weather .wx-temp{font-size:30px}}
 @container (max-width:260px){.inbox-w h2 .tag{display:none}.inbox-w .hw-role{display:none}}
 @media (max-width:560px){.etop{gap:6px;padding:8px 10px}.etop h2{display:none}.etop .btn.small{padding:5px 9px}.etop .seg button{padding:5px 10px}}
+
+/* ===== round 8: links row, link pop-up, daily facts, reminders, sync ===== */
+:root{--h-facts:#B7791F}
+:root[data-theme="dark"]{--h-facts:#FACC15}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--h-facts:#FACC15}}
+/* links row: small rounded chips under the header; scrolls sideways when they don't fit */
+.linkrow{display:flex;gap:8px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-top:-6px;padding:2px 2px 4px}
+.linkrow::-webkit-scrollbar{display:none}
+html.hs-editing .linkrow{display:none}
+.lk{flex:none;display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 13px 0 10px;border-radius:10px;border:1px solid var(--line);background:color-mix(in srgb,var(--tile) 88%,transparent);color:var(--ink);font-weight:600;font-size:13.5px;cursor:pointer;white-space:nowrap;max-width:220px;box-shadow:0 1px 2px rgba(23,32,43,.05);transition:border-color .15s,background .15s}
+.lk:hover{border-color:color-mix(in srgb,var(--accent) 55%,var(--line));background:var(--tile)}
+.lk:active{transform:translateY(1px)}
+.lk-t{overflow:hidden;text-overflow:ellipsis}
+.lk-ic{display:inline-grid;place-items:center;width:18px;height:18px;font-size:15px;line-height:1;flex:none;color:var(--accent)}
+.lk-ic svg{width:16px;height:16px}
+.lk-ic img{width:16px;height:16px;border-radius:3px}
+.lk-ext{font-size:11px;color:var(--muted);margin-left:-2px}
+@media (max-width:560px){.lk{height:32px;font-size:13px;padding:0 11px 0 9px}}
+/* link pop-up */
+dialog.linkx{width:calc(100vw - 24px);max-width:1280px;height:calc(100dvh - 24px);max-height:none;padding:0;overflow:hidden}
+.lx{display:flex;flex-direction:column;height:100%}
+.lx-top{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line);min-width:0}
+.lx-top .lk-ic{width:22px;height:22px;font-size:18px}
+.lx-top .lk-ic svg,.lx-top .lk-ic img{width:19px;height:19px}
+.lx-tt{display:flex;flex-direction:column;min-width:0;flex:1;line-height:1.2}
+.lx-tt b{font-family:var(--f-display);font-size:17px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lx-tt span{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lx-hint{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;padding:8px 12px;background:var(--warn-soft);font-size:13.5px;border-bottom:1px solid var(--line)}
+.lx-hint span{flex:1 1 260px}
+.lx-body{flex:1;min-height:0;position:relative;background:var(--bg)}
+.lx-body iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#fff}
+.lx-body iframe#lx-lifts{background:transparent}
+@media (max-width:700px){
+  dialog.linkx{width:100vw;height:100dvh;max-width:none;border-radius:0;margin:0;inset:0}
+  .lx-top{padding-top:max(10px,env(safe-area-inset-top,0px))}
+  .lx-tab-l{display:none}
+}
+/* Settings → Links and the link editor */
+.st-h{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.st-h .btn{width:30px;height:30px;padding:0;justify-content:center;font-size:18px;line-height:1}
+.lk-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.lk-li{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.lk-li:last-child{border-bottom:0}
+.lk-m{display:flex;flex-direction:column;min-width:0}
+.lk-m b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lk-m small{color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lk-b{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+@media (max-width:520px){.lk-li{grid-template-columns:22px minmax(0,1fr)}.lk-b{grid-column:1 / 3;justify-content:flex-start}}
+.le-icons{display:grid;grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:5px}
+.le-i{height:38px;border:1px solid var(--line);background:var(--tile-2);border-radius:10px;cursor:pointer;font-size:18px;display:grid;place-items:center;color:var(--ink);padding:0}
+.le-i.wide{grid-column:span 2}
+.le-i .lk-ic{color:var(--ink)}
+.le-i[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--tile))}
+.le-i .note{font-size:12px}
+/* Daily facts widget and dialog */
+.facts-w{--hue:var(--h-facts);cursor:pointer}
+.fx-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;min-height:0}
+.fx-list > li:not(.fit-more){display:flex;flex-direction:column;gap:2px}
+.fx-tp{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--hue,var(--h-facts))}
+.fx-tx{font-size:14px;line-height:1.4}
+.fx-when{font-size:11.5px;letter-spacing:0;text-transform:none;font-weight:500}
+.fx-foot{margin-top:auto}
+.fx-nav{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.fx-nav b{font-family:var(--f-display);font-size:17px}
+.fx-full{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px}
+.fx-full li{border-left:3px solid var(--h-facts);padding-left:12px}
+.fx-full p{margin:2px 0 0;font-size:15.5px;line-height:1.5}
+.fx-topics button small{opacity:.7}
+@container (max-height:200px){.facts-w .fx-tx{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}}
+/* Reminders */
+.rm-topic{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.rm-topic code{word-break:break-all;font-size:12.5px}
+.rm-defs{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px 14px}
+.rm-def{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.rm-def select{border:1px solid var(--line);background:var(--tile-2);border-radius:8px;padding:4px 8px;font-size:13px;min-width:0}
+#d-rem .rm-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+#d-rem .rm-h b{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+#d-rem .chips button small{opacity:.7}
+#d-rem select,#d-rem input{border:1px solid var(--line);background:var(--tile);border-radius:10px;padding:6px 10px;font-size:13.5px}
+/* Sync */
+#sy-box{display:flex;flex-direction:column;gap:10px}
+#sy-box .note{margin:0}
+.sy-status{display:flex;gap:10px;align-items:flex-start}
+.sy-dot{width:10px;height:10px;border-radius:50%;background:var(--ok);margin-top:6px;flex:none}
+.sy-dot[data-s="saving"],.sy-dot[data-s="syncing"],.sy-dot[data-s="connecting"]{background:var(--warn)}
+.sy-dot[data-s="error"],.sy-dot[data-s="offline"]{background:var(--bad)}
+.sy-form{display:flex;flex-direction:column;gap:10px}
+dialog#dlg-choice{width:min(460px,calc(100vw - 32px))}
 </style>
 <script>/* set the theme before first paint (same rules as the Settings module) */
 try{var s=(JSON.parse(localStorage.getItem("homebase.settings.v1")||"{}").theme)||{},m=s.mode||"auto",t;
@@ -965,6 +1064,7 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
       <button class="btn primary" id="btn-add" type="button">+ Add item</button>
     </div>
   </header>
+  <nav class="linkrow" id="linkrow" aria-label="Links" hidden></nav>
 
   <!-- ===== HOME ===== -->
   <main id="pg-home" data-pagebox="home">
@@ -1018,6 +1118,7 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
             <button class="btn small ghost" id="prev" type="button" aria-label="Previous">‹</button>
             <button class="btn small" id="today" type="button">Today</button>
             <button class="btn small ghost" id="next" type="button" aria-label="Next">›</button>
+            <button class="btn icon sm" id="cal-x" type="button" aria-label="Open the calendar larger" title="Open larger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg></button>
           </div>
         </div>
       </div>
@@ -1184,6 +1285,11 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
         <div class="field" id="d-lec-f"><label for="d-lec">Lecture #</label><input id="d-lec" type="number" min="1" step="1" inputmode="numeric"></div>
       </div>
       <label class="switch"><input type="checkbox" id="d-flag"><span>Flagged</span></label>
+      <div class="box" id="d-rem">
+        <div class="rm-h"><b>Reminders</b><span class="note" id="d-rem-n"></span></div>
+        <div class="chips" id="d-rem-list"></div>
+        <div class="cp-row"><select id="d-rem-add" aria-label="Add a reminder"></select><input type="datetime-local" id="d-rem-at" aria-label="Reminder date and time" hidden><button type="button" class="btn small primary" id="d-rem-ok" hidden>Add</button></div>
+      </div>
       <div class="box" id="d-rep">
         <div id="d-rep-series" hidden>
           <p class="note" id="d-rep-info"></p>
@@ -1237,10 +1343,19 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
   <form class="dlg" method="dialog">
     <div class="dlg-h"><h3 id="st-h">Settings</h3><button class="x" type="button" data-close aria-label="Close">×</button></div>
     <div class="dlg-b">
+      <div class="st-sec" id="st-sync">
+        <h4>Sync &amp; account</h4>
+        <div id="sy-box"></div>
+      </div>
       <div class="st-sec">
         <h4>Home screen</h4>
         <div class="hs-cur"><span>Using <b id="st-hs-name"></b></span><button type="button" class="btn small primary" id="st-hs-change">Change home screen</button></div>
         <p class="note">Save up to 3 home screens. Each keeps its own laptop and phone layout. On a phone you can also press and hold the home screen to edit it.</p>
+      </div>
+      <div class="st-sec" id="st-links-sec">
+        <div class="st-h"><h4>Links</h4><button type="button" class="btn small primary" id="st-link-add" aria-label="Add a link" title="Add a link">+</button></div>
+        <ul class="lk-list" id="st-links"></ul>
+        <p class="note">Links show in the row under the header and open in a pop-up. Use ↑ ↓ to reorder.</p>
       </div>
       <div class="st-sec">
         <h4>Appearance</h4>
@@ -1263,6 +1378,28 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
       <div class="st-sec">
         <h4>Course colors</h4>
         <div id="st-courses"></div>
+      </div>
+      <div class="st-sec" id="st-facts">
+        <h4>Daily facts</h4>
+        <div class="field"><label for="fx-topic-in">Topics</label><div class="chips fx-topics" id="fx-topics"></div>
+          <div class="cp-row" style="margin-top:6px"><input id="fx-topic-in" class="wp-sel" style="flex:1;width:auto" maxlength="40" placeholder="Add a topic, e.g. Ancient Rome"><button type="button" class="btn small" id="fx-topic-add">Add</button></div></div>
+        <div class="row">
+          <div class="field"><label for="fx-per">Facts per day</label><select id="fx-per"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div>
+          <div class="field"><label for="fx-model">Ollama model</label><input id="fx-model" autocomplete="off" spellcheck="false"></div>
+        </div>
+        <div class="rv-tools"><button type="button" class="btn small primary" id="fx-refill">Refill a month</button><button type="button" class="btn small ghost" id="fx-cancel" hidden>Stop</button><span class="note" id="fx-st"></span></div>
+        <p class="note">Refill asks the Ollama model on this laptop (server URL under AI-assisted import) for about 30 days of facts and saves them with your synced data, so your phone keeps showing them when the laptop is off. Run it on the laptop. Facts from a local model can be wrong. Add the Daily facts widget with Edit home screen → + Add widget.</p>
+      </div>
+      <div class="st-sec" id="st-remind">
+        <h4>Reminders on your iPhone</h4>
+        <div id="rm-topic-box"></div>
+        <div class="row">
+          <div class="field"><label for="rm-server">ntfy server</label><input id="rm-server" type="url" placeholder="https://ntfy.sh" spellcheck="false"></div>
+          <div class="field"><label for="rm-daytime">Time for items with no time</label><input id="rm-daytime" type="time"></div>
+        </div>
+        <div class="field"><label>Default reminder by type</label><div class="rm-defs" id="rm-defs"></div></div>
+        <div class="rv-tools"><button type="button" class="btn small" id="rm-test">Send a test notification</button><span class="note" id="rm-st"></span></div>
+        <p class="note">On your iPhone: install the free ntfy app, tap +, and subscribe to your topic on ntfy.sh. Each item can also have its own reminders (open the item). Supabase sends them at the right minute, even weeks ahead and with Homebase closed. Anyone who knows the topic can send you notifications, so keep it private.</p>
       </div>
       <div class="st-sec">
         <h4>AI-assisted import</h4>
@@ -1346,6 +1483,7 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
   </form>
 </dialog>
 
+<dialog id="dlg-calx" aria-label="Calendar"></dialog>
 <dialog id="dlg-confirm" aria-labelledby="cf-title">
   <form class="dlg" method="dialog">
     <div class="dlg-h"><h3 id="cf-title">Are you sure?</h3></div>
@@ -1373,6 +1511,1201 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
     </div>
   </div>
 </dialog>
+
+<dialog id="dlg-link" class="linkx" aria-labelledby="lx-t">
+  <div class="lx">
+    <header class="lx-top">
+      <span id="lx-ic"></span>
+      <div class="lx-tt"><b id="lx-t"></b><span id="lx-sub"></span></div>
+      <button class="btn small ghost" type="button" id="lx-reload" title="Reload" aria-label="Reload">↻</button>
+      <button class="btn small" type="button" id="lx-tab" title="Open in a new tab">↗<span class="lx-tab-l"> Open in new tab</span></button>
+      <button class="x" type="button" data-close aria-label="Close">×</button>
+    </header>
+    <div class="lx-hint" id="lx-hint" hidden><span>Blank or showing an error? Many sites refuse to be shown inside another page.</span><button type="button" class="btn small" data-lxh="tab">Open in new tab</button><button type="button" class="btn small" data-lxh="always">Always open in new tab</button><button type="button" class="btn small ghost" data-lxh="ok">It works, hide this</button></div>
+    <div class="lx-body" id="lx-body"></div>
+  </div>
+</dialog>
+
+<dialog id="dlg-le" aria-labelledby="le-h"><form class="dlg" id="form-le" novalidate autocomplete="off">
+  <div class="dlg-h"><h3 id="le-h">Add a link</h3><button class="x" type="button" data-close aria-label="Close">×</button></div>
+  <div class="dlg-b">
+    <div class="seg" id="le-kind" role="group" aria-label="Link type"><button type="button" data-k="url">Web address</button><button type="button" data-k="html">Upload an HTML file</button></div>
+    <div class="field" id="le-url-f"><label for="le-url">Web address</label><input id="le-url" type="url" inputmode="url" placeholder="https://example.com" spellcheck="false"></div>
+    <div class="field" id="le-file-f"><label for="le-file">HTML file</label><input id="le-file" type="file" accept=".html,.htm,text/html"><p class="note" id="le-file-n"></p></div>
+    <div class="field"><label for="le-title">Title</label><input id="le-title" maxlength="40"></div>
+    <div class="field"><label>Symbol</label><div class="le-icons" id="le-icons" role="group" aria-label="Symbol"></div>
+      <div class="cp-row" style="margin-top:6px"><input id="le-emoji" class="hexin" maxlength="8" placeholder="Any emoji" aria-label="Custom emoji"><span class="note">or type or paste any emoji</span></div></div>
+    <div id="le-tab-row"><label class="switch"><input type="checkbox" id="le-tab"><span>Always open in a new tab</span></label><p class="note" id="le-tab-n"></p></div>
+    <p class="err" id="le-err" hidden></p>
+  </div>
+  <div class="dlg-f"><button class="btn" type="button" data-close>Cancel</button><button class="btn primary" type="submit">Save</button></div>
+</form></dialog>
+
+<dialog id="dlg-facts" aria-labelledby="fx-h"><div class="dlg">
+  <div class="dlg-h"><h3 id="fx-h">Daily facts</h3><button class="x" type="button" data-close aria-label="Close">×</button></div>
+  <div class="dlg-b">
+    <div class="fx-nav"><button class="btn small ghost" type="button" id="fx-prev" aria-label="Previous day">‹</button><b id="fx-day"></b><button class="btn small ghost" type="button" id="fx-next" aria-label="Next day">›</button></div>
+    <ul class="fx-full" id="fx-full"></ul>
+    <p class="note">Written by your local model, so double-check anything you plan to repeat.</p>
+  </div>
+  <div class="dlg-f"><button class="btn" type="button" id="fx-settings">Topics and refill</button><span class="sp"></span><button class="btn primary" type="button" data-close>Done</button></div>
+</div></dialog>
+
+<dialog id="dlg-choice" aria-labelledby="ch-title">
+  <form class="dlg" method="dialog">
+    <div class="dlg-h"><h3 id="ch-title"></h3></div>
+    <div class="dlg-b"><p id="ch-body" style="margin:0"></p></div>
+    <div class="dlg-f"><button class="btn" value="b" id="ch-b"></button><button class="btn primary" value="a" id="ch-a"></button></div>
+  </form>
+</dialog>
+
+<!-- The Lifts app (formerly "Two-Day Lift Log"). It runs in its own frame; see LIFTS in the script. Edit it here. -->
+<template id="tpl-lifts">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Layout: one phone-width column; sticky tab bar on top, rest timer pinned to the bottom. Chalk-and-rubber palette, cobalt (20 kg plate) accent, red (25 kg plate) for PRs. */
+:root{
+  --bg:#eef1f4; --surface:#ffffff; --surface-2:#e4e9ef; --ink:#141b24; --muted:#586473; --line:#d3dae2;
+  --accent:#1f4fd1; --accent-ink:#ffffff; --accent-soft:#dde6fb;
+  --good:#1d7f47; --good-soft:#dcf1e4; --pr:#c4302b; --pr-soft:#fbe3e1; --amber:#9a6412; --amber-soft:#f8ecd6;
+  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  --r:12px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111418; --surface:#1a1f25; --surface-2:#242a31; --ink:#e8ecf1; --muted:#9aa5b2; --line:#2f3741;
+  --accent:#7398ff; --accent-ink:#0b1220; --accent-soft:#1c2948;
+  --good:#52c585; --good-soft:#15301f; --pr:#ff7b6f; --pr-soft:#3a1e1b; --amber:#e3ab52; --amber-soft:#35290f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111418; --surface:#1a1f25; --surface-2:#242a31; --ink:#e8ecf1; --muted:#9aa5b2; --line:#2f3741;
+  --accent:#7398ff; --accent-ink:#0b1220; --accent-soft:#1c2948;
+  --good:#52c585; --good-soft:#15301f; --pr:#ff7b6f; --pr-soft:#3a1e1b; --amber:#e3ab52; --amber-soft:#35290f; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:560px;margin:0 auto;padding-inline:16px;padding-block:0 140px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+
+/* header + tabs */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);padding-block:12px 10px;border-bottom:1px solid var(--line);margin-inline:-16px;padding-inline:16px}
+.brand{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.brand h1{font-family:var(--display);font-weight:700;font-size:26px;letter-spacing:.01em;margin:0;text-transform:uppercase}
+.sync{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:6px;white-space:nowrap}
+.sync i{width:8px;height:8px;border-radius:50%;background:var(--good);display:inline-block}
+.sync[data-s="saving"] i{background:var(--amber)}
+.sync[data-s="offline"] i{background:var(--pr)}
+.sync[data-s="local"] i{background:var(--muted)}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:var(--surface-2);border-radius:10px;padding:4px;margin-top:10px}
+.tabs button{border:0;background:transparent;padding:8px 0;border-radius:7px;font-family:var(--display);font-weight:600;font-size:17px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+
+.banner{margin-top:14px;padding:10px 12px;border-radius:10px;background:var(--amber-soft);color:var(--ink);font-size:14px}
+
+/* day picker */
+.dayhead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:18px;flex-wrap:wrap}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.daytitle{font-family:var(--display);font-weight:700;font-size:34px;line-height:1;margin:2px 0 0;text-transform:uppercase}
+.daytitle small{font-size:18px;color:var(--muted);font-weight:600;letter-spacing:.02em;margin-left:6px}
+.daypick{display:flex;gap:6px}
+.daypick button{width:48px;height:48px;border-radius:50%;border:2px solid var(--line);background:var(--surface);font-family:var(--display);font-weight:700;font-size:22px}
+.daypick button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.daypick button:disabled{opacity:.45;cursor:not-allowed}
+.meta{margin-top:8px;font-size:14px;color:var(--muted)}
+
+/* exercise cards */
+.list{display:flex;flex-direction:column;gap:12px;margin-top:16px}
+.ex{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+.ex.done{border-color:color-mix(in srgb,var(--good) 45%,var(--line))}
+.exhead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.exhead h3{margin:0;font-family:var(--display);font-weight:700;font-size:22px;line-height:1.1;text-transform:uppercase;letter-spacing:.01em}
+.exhead .alt{font-size:13px;color:var(--muted);margin-top:2px}
+.target{font-family:var(--display);font-weight:600;font-size:18px;white-space:nowrap;text-align:right}
+.target span{display:block;font-family:var(--body);font-weight:500;font-size:12px;color:var(--muted)}
+.last{margin-top:8px;font-size:13.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;letter-spacing:.02em}
+.chip.up{background:var(--accent-soft);color:var(--accent)}
+.chip.pr{background:var(--pr-soft);color:var(--pr)}
+.chip.ok{background:var(--good-soft);color:var(--good)}
+
+.sets{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.row{display:grid;grid-template-columns:30px 1fr auto;align-items:center;gap:8px;min-height:44px}
+.sn{font-family:var(--display);font-weight:700;font-size:17px;color:var(--muted);text-align:center}
+.logged .sn{color:var(--good)}
+.logged .val{font-family:var(--display);font-weight:600;font-size:21px}
+.logged .val small{font-family:var(--body);font-size:13px;color:var(--muted);font-weight:500}
+.logged .valwrap{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
+.undo{border:0;background:transparent;color:var(--muted);font-size:13px;padding:8px 6px;text-decoration:underline;text-underline-offset:2px}
+.planned{opacity:.5}
+.planned .val{font-family:var(--display);font-weight:500;font-size:18px}
+
+.inputs{display:flex;gap:8px;flex-wrap:wrap;min-width:0}
+.field{display:flex;align-items:center;background:var(--surface-2);border-radius:10px;overflow:hidden}
+.field button{border:0;background:transparent;width:34px;height:44px;font-size:20px;font-weight:600;color:var(--muted)}
+.field button:active{background:var(--line)}
+.field label{display:flex;flex-direction:column;align-items:center}
+.field input{width:56px;border:0;background:transparent;text-align:center;font-family:var(--display);font-weight:700;font-size:22px;color:var(--ink);padding:0;line-height:1}
+.field input::placeholder{color:var(--muted);opacity:.6}
+.field .u{font-size:10.5px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;line-height:1;margin-top:1px}
+.log{width:52px;height:44px;border-radius:10px;border:0;background:var(--accent);color:var(--accent-ink);font-size:22px;font-weight:700}
+.log:active{transform:scale(.96)}
+.addset{margin-top:8px;border:1px dashed var(--line);background:transparent;border-radius:10px;padding:8px 12px;font-size:14px;color:var(--muted);width:100%}
+.err{color:var(--pr);font-size:13px;margin-top:4px}
+
+.finish{margin-top:18px;width:100%;padding:14px;border-radius:var(--r);border:0;background:var(--ink);color:var(--bg);font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:.06em;text-transform:uppercase}
+.finish:disabled{opacity:.35;cursor:not-allowed}
+
+/* summary */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-top:16px}
+.card h2{margin:0 0 4px;font-family:var(--display);font-weight:700;font-size:26px;text-transform:uppercase}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-top:12px}
+.stat{background:var(--surface-2);border-radius:10px;padding:10px 12px}
+.stat b{display:block;font-family:var(--display);font-weight:700;font-size:26px;line-height:1.1}
+.stat span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 14px;font-weight:600;font-size:14.5px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.danger{color:var(--pr);border-color:color-mix(in srgb,var(--pr) 40%,var(--line))}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.prlist{margin:10px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:14.5px}
+
+/* progress */
+.sel{width:100%;margin-top:16px;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-weight:600}
+.seg{display:inline-flex;background:var(--surface-2);border-radius:9px;padding:3px;gap:3px;margin-top:14px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;padding:6px 10px;border-radius:7px;font-size:13.5px;font-weight:600;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.chart{margin-top:10px;width:100%;overflow-x:auto}
+.chart svg{display:block;width:100%;height:auto;max-width:100%}
+.empty{color:var(--muted);font-size:14.5px;padding:18px 4px}
+.weeks{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;margin-top:12px}
+.wk{display:flex;flex-direction:column;gap:3px;align-items:center}
+.wk i{width:100%;max-width:22px;aspect-ratio:1;border-radius:5px;background:var(--surface-2);display:block}
+.wk i.on{background:var(--accent)}
+.wk i.over{background:var(--good)}
+.wk span{font-size:10px;color:var(--muted)}
+.h2{font-family:var(--display);font-weight:700;font-size:20px;text-transform:uppercase;letter-spacing:.03em;margin:22px 0 0}
+
+/* history */
+.hist{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.hitem{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.hsum{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;width:100%;border:0;background:transparent;text-align:left;padding:12px 14px}
+.hday{width:44px;height:44px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:22px}
+.hdate{font-weight:600}
+.hsub{font-size:13px;color:var(--muted)}
+.hvol{font-family:var(--display);font-weight:600;font-size:18px;text-align:right}
+.hvol span{display:block;font-family:var(--body);font-size:11px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.06em}
+.hdetail{padding:0 14px 14px;border-top:1px solid var(--line)}
+.hlifts{display:flex;flex-direction:column;margin-top:4px}
+.hlift{border-bottom:1px solid var(--line)}
+.hlift:last-child{border-bottom:0}
+.hlhead{display:grid;grid-template-columns:1fr auto 20px;gap:10px;align-items:center;width:100%;border:0;background:transparent;text-align:left;padding:10px 0}
+.hlname{font-family:var(--display);font-weight:700;font-size:17px;text-transform:uppercase;letter-spacing:.01em;min-width:0}
+.hlsum{font-size:12.5px;color:var(--muted);white-space:nowrap}
+.hlnote{color:var(--accent);font-weight:600}
+.hlcar{font-size:18px;font-weight:600;color:var(--accent);text-align:center}
+.hsets{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:6px;padding-bottom:10px}
+.hset{display:flex;align-items:center;gap:8px;background:var(--surface-2);border-radius:8px;padding:6px 10px;flex-wrap:wrap}
+.hsn{font-family:var(--display);font-weight:700;font-size:14px;color:var(--good);min-width:10px}
+.hval{font-family:var(--display);font-weight:600;font-size:18px;line-height:1.1}
+.hval small{font-family:var(--body);font-size:11px;color:var(--muted);font-weight:500;margin-left:2px}
+.hset .chip{padding:1px 6px;font-size:11px}
+.hlift .note{margin-bottom:12px}
+.note{display:block;width:100%;margin-top:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);color:var(--ink);font:inherit;font-size:14.5px;line-height:1.4;resize:vertical;min-height:44px}
+.note::placeholder{color:var(--muted)}
+.addnote{margin-top:8px;border:0;background:transparent;color:var(--accent);font-size:14px;font-weight:600;padding:6px 0}
+.lastnote{margin-top:8px;padding:8px 12px;border-radius:10px;background:var(--accent-soft)}
+.lastnote .eyebrow{font-size:11px;color:var(--accent)}
+.lastnote p{margin:2px 0 0;font-size:14.5px;white-space:pre-wrap}
+
+/* rest timer */
+.rest{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--ink);color:var(--bg);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px))}
+.restin{max-width:560px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.restlbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.7}
+.restrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.rest .snd{padding:2px 8px;font-size:11.5px;border-radius:999px;letter-spacing:.04em}
+.rest .snd[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.flash{position:fixed;inset:0;z-index:25;background:var(--good);pointer-events:none;opacity:0}
+@media (prefers-reduced-motion:no-preference){.flash{animation:flashit 1.6s ease-out}@keyframes flashit{0%,40%{opacity:.55}20%,60%{opacity:.15}100%{opacity:0}}}
+@media (prefers-reduced-motion:reduce){.flash{opacity:.3}}
+.padd{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding-bottom:10px}
+.padd input{width:64px;padding:8px;border-radius:8px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);font-family:var(--display);font-weight:700;font-size:18px;text-align:center}
+.padd span{font-size:13px;color:var(--muted)}
+.padd .btn{padding:8px 12px}
+.hset .x{border:0;background:transparent;color:var(--muted);font-size:15px;padding:2px 4px;margin-left:auto;line-height:1}
+.hset .x.arm{color:var(--pr);font-size:12px;font-weight:700}
+.addex{width:100%;margin-top:6px;padding:10px;border-radius:10px;border:1px dashed var(--line);background:transparent;color:var(--accent);font:inherit;font-weight:600;font-size:14px}
+.pform{display:flex;flex-direction:column;gap:12px}
+.pform label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);font-weight:600}
+.pform input[type=date]{padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);font:inherit;font-size:16px;max-width:220px}
+.resttime{font-family:var(--display);font-weight:700;font-size:38px;line-height:1;font-variant-numeric:tabular-nums}
+.restbar{height:4px;background:color-mix(in srgb,var(--bg) 25%,transparent);border-radius:2px;margin-top:6px;overflow:hidden}
+.restbar i{display:block;height:100%;background:var(--accent);width:100%}
+.rest.done .resttime{color:var(--good)}
+.rest .grow{flex:1;min-width:0}
+.rest button{border:1px solid color-mix(in srgb,var(--bg) 35%,transparent);background:transparent;color:var(--bg);border-radius:9px;padding:8px 10px;font-weight:600;font-size:14px}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom,0px));z-index:40;background:var(--pr);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:600;font-size:14.5px;box-shadow:0 6px 20px rgba(0,0,0,.25);max-width:calc(100% - 32px);text-align:center}
+@media (prefers-reduced-motion:no-preference){.toast{animation:pop .25s ease-out}@keyframes pop{from{transform:translate(-50%,10px);opacity:0}to{transform:translate(-50%,0);opacity:1}}}
+.vseg{display:inline-flex;flex-wrap:wrap;gap:3px;background:var(--surface-2);border-radius:9px;padding:3px;margin-top:8px}
+.vseg button{border:0;background:transparent;padding:5px 11px;border-radius:7px;font-size:13px;font-weight:600;color:var(--muted);min-height:32px}
+.vseg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.vseg button:disabled{opacity:.4;cursor:not-allowed}
+.bk{display:flex;align-items:center;justify-content:space-between;gap:8px 12px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.bkst{font-size:13.5px;color:var(--muted);min-width:0;flex:1 1 200px}
+.bkst.ok{color:var(--good);font-weight:600}
+.bkst.bad{color:var(--pr)}
+.bkst a{color:var(--accent)}
+.gym{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.gym a{display:flex;flex-direction:column;gap:1px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);text-decoration:none;min-width:0}
+.gym a:hover{border-color:var(--accent)}
+.gym a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.gym b{font-family:var(--display);font-weight:700;font-size:17px;text-transform:uppercase;letter-spacing:.02em}
+.gym span{font-size:12.5px;color:var(--accent);font-weight:600}
+@media (max-width:360px){.gym{grid-template-columns:1fr}}
+.wu{padding:0}
+.wu summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px}
+.wu summary::-webkit-details-marker{display:none}
+.wut{display:block;font-family:var(--display);font-weight:700;font-size:24px;text-transform:uppercase;line-height:1.1}
+.wuc{font-size:13px;font-weight:600;color:var(--accent)}
+.wus{margin:0;padding:0 16px 4px 36px;display:flex;flex-direction:column;gap:14px}
+.wus>li{padding-left:2px}
+.wus>li::marker{font-family:var(--display);font-weight:700;color:var(--accent)}
+.wus b{font-family:var(--display);font-weight:700;font-size:18px;text-transform:uppercase;letter-spacing:.02em}
+.wus p{margin:2px 0 0;font-size:14px;color:var(--muted)}
+.wum{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.wum li{display:flex;justify-content:space-between;gap:12px;font-size:14.5px;border-bottom:1px solid var(--line);padding-bottom:6px}
+.wum li span{min-width:0}
+.wum small{display:block;font-size:12.5px;color:var(--muted)}
+.wum em{font-style:normal;font-weight:600;white-space:nowrap}
+.ramp{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.ramp span{background:var(--surface-2);border-radius:8px;padding:5px 10px;font-family:var(--display);font-weight:600;font-size:17px}
+.wun{margin:14px 16px 16px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px}
+.foot{margin-top:28px;font-size:12.5px;color:var(--muted)}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1>Two-Day Lift Log</h1>
+      <div class="sync" id="sync" data-s="saving"><i></i><span id="synctext">Connecting…</span></div>
+    </div>
+    <nav class="tabs" role="tablist">
+      <button role="tab" data-act="tab" data-v="today" aria-selected="true">Today</button>
+      <button role="tab" data-act="tab" data-v="progress" aria-selected="false">Progress</button>
+      <button role="tab" data-act="tab" data-v="history" aria-selected="false">History</button>
+    </nav>
+  </header>
+  <div id="banner"></div>
+  <main id="main"></main>
+</div>
+
+<div class="rest" id="rest" hidden>
+  <div class="restin">
+    <div class="grow">
+      <div class="restrow"><span class="restlbl" id="restlbl">Rest</span><button class="snd" id="soundbtn" data-act="sound" aria-pressed="false">Sound off</button></div>
+      <div class="resttime" id="resttime">0:00</div>
+      <div class="restbar"><i id="restbar"></i></div>
+    </div>
+    <button data-act="rest-add" data-v="-15">−15s</button>
+    <button data-act="rest-add" data-v="15">+15s</button>
+    <button data-act="rest-skip">Skip</button>
+  </div>
+</div>
+<div id="toastslot"></div>
+<input type="file" id="impfile" accept=".json,.csv,application/json,text/csv" hidden>
+<div class="flash" id="flash" hidden></div>
+
+<script>
+(function(){
+"use strict";
+var PLAN = {
+  A: [
+    {id:"squat",name:"Back Squat",alt:"or goblet squat",sets:4,lo:6,hi:8,rest:180,inc:10},
+    {id:"bench",name:"Bench Press",alt:"barbell or dumbbell",sets:4,lo:6,hi:8,rest:150,inc:5},
+    {id:"row",name:"Barbell Row",alt:"or chest-supported row",sets:4,lo:8,hi:10,rest:120,inc:5},
+    {id:"calf",name:"Standing Calf Raise",alt:"gives your grip a break before RDLs",sets:3,lo:12,hi:15,rest:75,inc:10},
+    {id:"rdl",name:"Romanian Deadlift",alt:"",sets:3,lo:8,hi:10,rest:150,inc:10},
+    {id:"curl",name:"Dumbbell Curl",alt:"weight per dumbbell",sets:2,lo:10,hi:12,rest:75,inc:5},
+    {id:"sidefront",name:"Side + Front Raise",alt:"each set: reps to the side, then the same reps to the front · log reps per direction · weight per dumbbell",sets:3,lo:10,hi:12,rest:75,inc:5,mult:2}
+  ],
+  B: [
+    {id:"bss_bb",tag:"Barbell",name:"Barbell Bulgarian Split Squat",alt:"total bar weight · reps per leg",sets:3,lo:8,hi:10,rest:150,inc:5,bar:true,
+      opts:[{id:"splitsquat",tag:"Dumbbell",name:"Dumbbell Bulgarian Split Squat",alt:"weight per dumbbell · reps per leg",sets:3,lo:8,hi:10,rest:120,inc:5}]},
+    {id:"dbpress",name:"Dumbbell Shoulder Press",alt:"weight per dumbbell",sets:4,lo:6,hi:8,rest:150,inc:5},
+    {id:"latpulldown",tag:"Lat pulldown",name:"Lat Pulldown",alt:"",sets:4,lo:8,hi:10,rest:120,inc:5,
+      opts:[{id:"pullup",tag:"Pull-ups",name:"Pull-Ups",alt:"0 lb = bodyweight · enter added weight if belted",sets:4,lo:8,hi:10,rest:120,inc:5,bw:true}]},
+    {id:"legcurl",name:"Leg Curl",alt:"seated or lying",sets:3,lo:10,hi:12,rest:90,inc:5},
+    {id:"incline",name:"Incline Dumbbell Press",alt:"weight per dumbbell",sets:3,lo:8,hi:12,rest:120,inc:5},
+    {id:"cablepull1",tag:"Single-arm",name:"Single-Arm Cable Rear Delt Pull",alt:"cable at shoulder height · reps per arm",sets:3,lo:12,hi:15,rest:75,inc:5,
+      opts:[{id:"facepull",tag:"Face pull",name:"Face Pull",alt:"rope, both arms",sets:3,lo:12,hi:15,rest:75,inc:5}]},
+    {id:"pushdown",tag:"Two-arm",name:"Triceps Pushdown",alt:"",sets:2,lo:10,hi:12,rest:75,inc:5,
+      opts:[{id:"pushdown1",tag:"Single-arm",name:"Single-Arm Triceps Pushdown",alt:"reps per arm",sets:2,lo:10,hi:12,rest:75,inc:5}]}
+  ]
+};
+PLAN.A[0].bar=true; PLAN.A[1].bar=true;
+var EX = {}, SLOTS = {}, ALL = [];
+["A","B"].forEach(function(d){PLAN[d].forEach(function(e){
+  var list=[e].concat(e.opts||[]);
+  list.forEach(function(o){o.day=d;o.slot=e.id;EX[o.id]=o;ALL.push(o);});
+  SLOTS[e.id]=list;
+});});
+var choice=(function(){try{var v=localStorage.getItem("tdl_choice");return v?JSON.parse(v):{};}catch(e){return {};}})();
+function pick(e){
+  var list=SLOTS[e.slot||e.id]||[e];
+  if(list.length===1)return list[0];
+  if(typeof active!=="undefined"&&active){for(var i=0;i<list.length;i++){if(active.sets&&active.sets[list[i].id]&&active.sets[list[i].id].length)return list[i];}}
+  var c=choice[list[0].id];
+  return (c&&EX[c]&&EX[c].slot===list[0].id)?EX[c]:list[0];
+}
+
+/* ---------- storage helpers ---------- */
+function lsGet(k,f){try{var v=localStorage.getItem(k);return v?JSON.parse(v):f;}catch(e){return f;}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+
+var db=null, dl=null, mode="connecting"; // connecting | cloud | local
+/* Each set is its own entry inside its workout, and every write is a merge of
+   only the fields that changed, so an old copy of the app can add data but can
+   never wipe out sets saved from somewhere else. */
+var wDocs={}, lDocs={};                  // workouts (current) + sessions (old format, read-only)
+var ops=lsGet("tdl_ops",[]);             // merges not yet confirmed by the server
+var localDocs=lsGet("tdl_local",{});     // used only when cloud saving is unavailable
+var recent=[];                           // just-confirmed merges, kept briefly to avoid flicker
+var cache=[], byId={};
+var activeId=null, active=null, view="today", day=null, dayTouched=false, startAnother=false;
+var drafts={}, extraRow={}, errors={};
+var expanded={}, confirmDel=null, metric="top", exSel=lsGet("tdl_exsel","squat");
+var writing=false, syncState="saving", loadedW=false, loadedL=false, adopted=false, closed={};
+var renderDeferred=false, wake=null, audio=null;
+
+function clone(o){return JSON.parse(JSON.stringify(o));}
+function pad(n){return (n<10?"0":"")+n;}
+function todayStr(d){d=d||new Date();return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());}
+function parseDate(s){var p=s.split("-");return new Date(+p[0],+p[1]-1,+p[2]);}
+var MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+var DOW=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+function fmtDate(s,withDow){var d=parseDate(s);return (withDow?DOW[d.getDay()]+", ":"")+MON[d.getMonth()]+" "+d.getDate();}
+function fmtW(w){return (Math.round(w*10)/10).toString();}
+function fmtK(n){return n>=10000?(Math.round(n/100)/10)+"k":Math.round(n).toLocaleString();}
+function e1rm(w,r){return r<=1?w:w*(1+r/30);}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+
+function isObj(o){return !!o&&typeof o==="object"&&!Array.isArray(o);}
+function merge(a,b){
+  if(!isObj(b))return a;
+  Object.keys(b).forEach(function(k){var v=b[k];if(v===undefined)return;a[k]=isObj(v)?merge(isObj(a[k])?a[k]:{},v):v;});
+  return a;
+}
+function legacyRaw(s){
+  var log={};
+  Object.keys(s.sets||{}).forEach(function(e){(s.sets[e]||[]).forEach(function(x){log["L"+e+"_"+x.t]={e:e,w:x.w,r:x.r,t:x.t};});});
+  var o={date:s.date,day:s.day,startedAt:s.startedAt,log:log};
+  if(s.endedAt)o.endedAt=s.endedAt;
+  if(s.manual)o.manual=true;
+  if(isObj(s.notes))o.notes=clone(s.notes);
+  return o;
+}
+function rebuild(){
+  var raw={}, now=Date.now();
+  Object.keys(lDocs).forEach(function(id){raw[id]=legacyRaw(lDocs[id]);});
+  var W=mode==="local"?localDocs:wDocs;
+  Object.keys(W).forEach(function(id){raw[id]=merge(raw[id]||{},clone(W[id]));});
+  recent=recent.filter(function(r){return now-r.at<15000;});
+  recent.concat(ops).forEach(function(op){raw[op.id]=merge(raw[op.id]||{},clone(op.data));});
+  var out=[]; byId={};
+  Object.keys(raw).forEach(function(id){
+    var r=raw[id]; if(r.gone||!r.date)return;
+    var sets={};
+    Object.keys(r.log||{}).forEach(function(k){var x=r.log[k];if(!x||x.x||!EX[x.e])return;(sets[x.e]=sets[x.e]||[]).push({w:x.w,r:x.r,t:x.t,k:k});});
+    Object.keys(sets).forEach(function(e){sets[e].sort(function(a,b){return a.t-b.t;});});
+    var notes={}; Object.keys(r.notes||{}).forEach(function(e){if(r.notes[e])notes[e]=r.notes[e];});
+    var s={id:id,date:r.date,day:r.day||"A",startedAt:r.startedAt||0,endedAt:r.endedAt||0,manual:!!r.manual,notes:notes,sets:sets,backups:isObj(r.backups)?r.backups:{}};
+    out.push(s); byId[id]=s;
+  });
+  out.sort(function(a,b){return b.startedAt-a.startedAt;});
+  cache=out;
+  active=activeId?(byId[activeId]||null):null;
+}
+function all(){return cache;}
+function setsOf(s,id){return (s&&s.sets&&s.sets[id])||[];}
+function mult(id){return (EX[id]&&EX[id].mult)||1;}
+function sessionVolume(s){var v=0;Object.keys(s.sets||{}).forEach(function(k){(s.sets[k]||[]).forEach(function(x){v+=x.w*x.r*mult(k);});});return v;}
+function sessionSetCount(s){var n=0;Object.keys(s.sets||{}).forEach(function(k){n+=(s.sets[k]||[]).length;});return n;}
+function lastSetTime(s){var t=s.startedAt;Object.keys(s.sets||{}).forEach(function(k){(s.sets[k]||[]).forEach(function(x){if(x.t>t)t=x.t;});});return t;}
+
+function lastFor(id,excludeId){
+  var list=all();
+  for(var i=0;i<list.length;i++){var s=list[i];if(s.id!==excludeId&&setsOf(s,id).length)return s;}
+  return null;
+}
+function bestBefore(id,excludeId,before){
+  var bw=0,be=0,br=0,any=false;
+  all().forEach(function(s){
+    setsOf(s,id).forEach(function(x){
+      if(x.t>=before)return;
+      any=true; if(x.w>bw)bw=x.w; var e=e1rm(x.w,x.r); if(e>be)be=e; if(x.w===0&&x.r>br)br=x.r;
+    });
+  });
+  return {any:any,w:bw,e:be,r:br};
+}
+function progression(ex,last){
+  if(!last)return null;
+  var ls=setsOf(last,ex.id); if(ls.length<ex.sets)return null;
+  var w=ls[0].w;
+  for(var i=0;i<ex.sets;i++){if(ls[i].r<ex.hi||ls[i].w!==w)return null;}
+  if(ex.bw&&w===0)return null;
+  return {from:w,to:w+ex.inc};
+}
+
+/* ---------- persistence ---------- */
+function setSync(s,t){syncState=s;var el=document.getElementById("sync");el.dataset.s=s;document.getElementById("synctext").textContent=t;}
+function refreshSync(){
+  if(mode==="local"){setSync("local","Saved on this device");return;}
+  if(mode==="connecting"||!loadedW){setSync("saving","Connecting…");return;}
+  if(writing)setSync("saving","Saving…");
+  else if(ops.length)setSync("offline",ops.length+" unsynced · will retry");
+  else setSync("ok","All saved");
+}
+function commit(id,data){
+  if(mode==="local"){localDocs[id]=merge(localDocs[id]||{},clone(data));lsSet("tdl_local",localDocs);}
+  else{ops.push({id:id,data:clone(data)});lsSet("tdl_ops",ops);flush();}
+  rebuild();
+}
+async function writeOp(op){
+  var ref=db.doc("workouts/"+op.id);
+  try{await ref.update(op.data);return;}
+  catch(e){if(!e||e.code!=="invalid_argument")throw e;}
+  var snap=await ref.get();
+  if(snap.exists)await ref.update(op.data); else await ref.set(op.data);
+}
+function flush(){
+  refreshSync();
+  if(!db||writing||!ops.length)return;
+  writing=true; refreshSync();
+  (async function(){
+    var failed=false;
+    while(ops.length&&!failed){
+      var op=ops[0];
+      try{await writeOp(op);ops.shift();recent.push({id:op.id,data:op.data,at:Date.now()});lsSet("tdl_ops",ops);}
+      catch(e){
+        if(e&&e.code==="invalid_argument"){ops.shift();lsSet("tdl_ops",ops);continue;}
+        failed=true;
+        if(e&&e.code==="quota_exceeded")toast("Storage is full. Export your log, then delete old workouts.");
+      }
+    }
+    writing=false; refreshSync();
+  })();
+}
+window.addEventListener("online",flush);
+setInterval(function(){if(ops.length)flush();},15000);
+document.addEventListener("visibilitychange",function(){if(!document.hidden){flush();if(active)requestWake();}});
+
+function reconcile(){
+  var t=todayStr();
+  all().slice().forEach(function(s){
+    if(s.endedAt||closed[s.id]||s.id===activeId)return;
+    if(s.date===t&&sessionSetCount(s)){if(!activeId){activeId=s.id;day=s.day;}return;}
+    closed[s.id]=true;
+    if(sessionSetCount(s))commit(s.id,{endedAt:lastSetTime(s)});
+  });
+  rebuild();
+}
+
+/* ---------- actions ---------- */
+/* ---------- Google Drive backup: every backup ADDS a new file, nothing is ever overwritten ---------- */
+var mcp=null, bk={};
+var DRIVE="Google Drive", BK_FOLDER="1sHHJOZbVGhiLX_Nz8EvEKhJRSJN5EwQv";
+function csvCell(c){c=String(c==null?"":c);return /[",\n]/.test(c)?'"'+c.replace(/"/g,'""')+'"':c;}
+function hm(t){var d=new Date(t),h=d.getHours(),m=d.getMinutes();return ((h%12)||12)+":"+pad(m)+(h<12?" AM":" PM");}
+function workoutCsv(s){
+  var rows=[["Date","Day","Exercise","Set","Weight (lb)","Reps","Time","Note","Exercise ID","Timestamp"]], list=[];
+  ALL.forEach(function(ex){setsOf(s,ex.id).forEach(function(x,i){list.push([s.date,s.day,ex.name,i+1,x.w,x.r,hm(x.t),i===0?noteOf(s,ex.id):"",ex.id,x.t]);});});
+  list.sort(function(a,b){return a[9]-b[9];});
+  return rows.concat(list).map(function(r){return r.map(csvCell).join(",");}).join("\n")+"\n";
+}
+function bkErrText(e){
+  var c=e&&e.code;
+  if(c==="server_not_connected")return "Google Drive isn't connected. Add it in claude.ai Settings → Connectors, then tap Back up to Drive.";
+  if(c==="needs_reauth")return "Google Drive needs to be reconnected. Reconnect it in claude.ai Settings → Connectors, then tap Back up to Drive.";
+  if(c==="selection_required")return "Choose which Google Drive account to use when Claude asks, then tap Back up to Drive.";
+  if(c==="not_in_manifest")return "Drive backup is turned off for this app. Turn on Google Drive in this page's Permissions menu, then tap Back up to Drive.";
+  if(c==="approval_required")return "The backup needs your approval. Tap Back up to Drive and allow it.";
+  if(c==="blocked_by_policy")return "Your account's settings don't allow this app to use Google Drive.";
+  if(c==="tool_error")return "Google Drive refused the file"+(e.message?": "+e.message:".");
+  if(c==="server_unavailable"||c==="upstream_error"||c==="cancelled")return "Drive didn't confirm the backup. Check your Lift Log Backups folder before tapping Back up to Drive again, so you don't get a duplicate.";
+  return "The backup didn't finish ("+(c||"unknown error")+"). Tap Back up to Drive to try again.";
+}
+function fileFrom(res){var p=res&&res.payload;if(typeof p==="string"){try{p=JSON.parse(p);}catch(e){p=null;}}return p&&typeof p==="object"?p:{};}
+async function backupWorkout(sid,auto){
+  var s=byId[sid];
+  if(!s||!sessionSetCount(s)){if(!auto)toast("This workout has no sets to back up.");return;}
+  if(!mcp){if(auto)return;bk[sid]={s:"err",msg:"Drive backup only works when the app is open in Claude while you're signed in. Use Export all to CSV as a backup instead."};scheduleRender();return;}
+  if(bk[sid]&&bk[sid].s==="busy")return;
+  bk[sid]={s:"busy"}; scheduleRender();
+  var title="Lift Log "+s.date+" Day "+s.day+" (backed up "+todayStr()+" "+hm(Date.now())+")";
+  var input={title:title,parentId:BK_FOLDER,contentMimeType:"text/csv",textContent:workoutCsv(s)};
+  var res=null;
+  try{res=await mcp.callTool(DRIVE,"create_file",input);}
+  catch(e){
+    if(e&&e.code==="tool_error"){
+      try{delete input.parentId;res=await mcp.callTool(DRIVE,"create_file",input);}
+      catch(e2){bk[sid]={s:"err",msg:bkErrText(e2)};scheduleRender();return;}
+    }else{bk[sid]={s:"err",msg:bkErrText(e)};scheduleRender();return;}
+  }
+  var f=fileFrom(res), url=f.viewUrl||(f.id?"https://docs.google.com/spreadsheets/d/"+f.id:"");
+  var rec={at:Date.now(),sets:sessionSetCount(s)}; if(url)rec.url=url; if(f.id)rec.id=f.id;
+  var b={}; b["b"+Date.now().toString(36)]=rec; commit(sid,{backups:b});
+  bk[sid]={s:"ok"}; scheduleRender();
+  if(auto)toast("Workout backed up to Google Drive.");
+}
+function bkLine(s){
+  if(!mcp&&!Object.keys(s.backups||{}).length)return "";
+  var st=bk[s.id], keys=Object.keys(s.backups||{}).sort(), last=keys.length?s.backups[keys[keys.length-1]]:null;
+  var h='<div class="bk">';
+  if(st&&st.s==="busy")h+='<span class="bkst">Backing up to Google Drive…</span>';
+  else if(st&&st.s==="err")h+='<span class="bkst bad">'+esc(st.msg)+'</span>';
+  else if(last){
+    var stale=(last.sets||0)!==sessionSetCount(s);
+    h+='<span class="bkst ok">✓ Backed up '+fmtDate(todayStr(new Date(last.at)))+', '+hm(last.at)+(stale?' · sets changed since':'')+(last.url?' · <a href="'+esc(last.url)+'" target="_blank" rel="noopener">Open</a>':'')+'</span>';
+  }else h+='<span class="bkst">Not backed up to Drive yet</span>';
+  if(mcp&&!(st&&st.s==="busy"))h+='<button class="btn" data-act="backup" data-v="'+s.id+'">'+(last?'Back up again':'Back up to Drive')+'</button>';
+  return h+'</div>';
+}
+function newKey(){return "k"+Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+function addSet(sid,e,w,r,t){var log={};log[newKey()]={e:e,w:w,r:r,t:t};commit(sid,{log:log});}
+function delSet(sid,k){var log={};log[k]={x:true};commit(sid,{log:log});}
+function removeSession(id){if(id===activeId)activeId=null;commit(id,{gone:true});render();}
+function currentDay(){
+  if(active)return active.day;
+  if(day)return day;
+  var list=all(); var last=list[0];
+  return last?(last.day==="A"?"B":"A"):"A";
+}
+function prefill(ex){
+  var logged=active?setsOf(active,ex.id):[];
+  var idx=logged.length;
+  var last=lastFor(ex.id,active&&active.id);
+  var ls=last?setsOf(last,ex.id):[];
+  var prog=progression(ex,last);
+  var w="",r="";
+  if(logged.length){w=logged[logged.length-1].w;}
+  else if(prog){w=prog.to;}
+  else if(ls.length){w=ls[Math.min(idx,ls.length-1)].w;}
+  else if(ex.bw){w=0;}
+  if(prog&&idx<ex.sets){r=ex.lo;}
+  else if(ls[idx]&&!prog){r=ls[idx].r;}
+  else if(logged.length){r=logged[logged.length-1].r;}
+  else r=ex.hi;
+  return {w:w,r:r};
+}
+function draftFor(ex){if(!drafts[ex.id])drafts[ex.id]=prefill(ex);return drafts[ex.id];}
+
+function logSet(id){
+  var ex=EX[id], d=draftFor(ex);
+  var w=parseFloat(d.w), r=parseInt(d.r,10);
+  if(isNaN(w)||w<0||(!ex.bw&&w===0)){errors[id]="Enter the weight for this set.";render();return;}
+  if(isNaN(r)||r<1){errors[id]="Enter at least 1 rep.";render();return;}
+  delete errors[id];
+  var now=Date.now();
+  if(!active){
+    var nid="s"+now.toString(36), dd=currentDay();
+    activeId=nid; startAnother=false;
+    commit(nid,{date:todayStr(),day:dd,startedAt:now});
+  }
+  var best=bestBefore(id,active.id,now);
+  addSet(active.id,id,w,r,now);
+  delete drafts[id]; delete extraRow[id];
+  requestWake();
+  if(best.any){
+    if(ex.bw&&w===0&&r>best.r&&best.w===0)toast("Rep PR · "+ex.name+": "+r+" reps");
+    else if(w>0&&w>best.w)toast("Weight PR · "+ex.name+": "+fmtW(w)+" lb");
+    else if(w>0&&e1rm(w,r)>best.e+0.01)toast("Est. 1RM PR · "+ex.name+": "+fmtW(Math.round(e1rm(w,r)))+" lb");
+  }
+  startRest(ex.rest, ex.name);
+  render();
+}
+function undoSet(id,k){
+  if(!active)return;
+  delSet(active.id,k);
+  delete drafts[id];
+  if(active&&!sessionSetCount(active)&&!active.manual){var aid=active.id;activeId=null;commit(aid,{gone:true});stopRest();}
+  render();
+}
+function finish(){
+  if(!active)return;
+  var aid=active.id;
+  closed[aid]=true; activeId=null;
+  commit(aid,{endedAt:Date.now()});
+  backupWorkout(aid,true);
+  drafts={}; extraRow={}; startAnother=false; dayTouched=false; day=null;
+  stopRest(); releaseWake(); render(); window.scrollTo(0,0);
+}
+
+/* ---------- wake lock + timer ---------- */
+async function requestWake(){
+  try{if("wakeLock" in navigator&&!wake&&active&&!document.hidden){wake=await navigator.wakeLock.request("screen");wake.addEventListener("release",function(){wake=null;});}}catch(e){wake=null;}
+}
+function releaseWake(){try{if(wake)wake.release();}catch(e){}wake=null;}
+var rest={end:0,total:0,iv:null,doneAt:0,label:""};
+function ensureAudio(){try{if(!audio){var C=window.AudioContext||window.webkitAudioContext;if(C)audio=new C();}if(audio&&audio.state==="suspended")audio.resume();}catch(e){audio=null;}}
+var soundOn=lsGet("tdl_sound",false);
+function syncSoundBtn(){var b=document.getElementById("soundbtn");if(b){b.setAttribute("aria-pressed",String(soundOn));b.textContent=soundOn?"Sound on":"Sound off";}}
+function flash(){var f=document.getElementById("flash");f.hidden=true;void f.offsetWidth;f.hidden=false;setTimeout(function(){f.hidden=true;},1700);}
+function alertDone(){if(soundOn)beep();try{if(navigator.vibrate)navigator.vibrate([200,100,200]);}catch(e){}flash();}
+function beep(){
+  try{if(!audio)return;[0,0.22,0.44].forEach(function(o){var t=audio.currentTime+o;var g=audio.createGain();var osc=audio.createOscillator();osc.frequency.value=880;g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.25,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+0.16);osc.connect(g);g.connect(audio.destination);osc.start(t);osc.stop(t+0.18);});}catch(e){}
+}
+function startRest(sec,label){
+  ensureAudio();
+  rest.total=sec*1000; rest.end=Date.now()+rest.total; rest.doneAt=0; rest.label=label;
+  document.getElementById("rest").hidden=false; syncSoundBtn();
+  if(!rest.iv)rest.iv=setInterval(tick,250);
+  tick();
+}
+function stopRest(){if(rest.iv)clearInterval(rest.iv);rest.iv=null;document.getElementById("rest").hidden=true;}
+function tick(){
+  var el=document.getElementById("rest"), left=rest.end-Date.now();
+  if(left<=0){
+    if(!rest.doneAt){rest.doneAt=Date.now();alertDone();}
+    el.classList.add("done");
+    document.getElementById("restlbl").textContent="Rest done · next set";
+    document.getElementById("resttime").textContent="Go";
+    document.getElementById("restbar").style.width="0%";
+    if(Date.now()-rest.doneAt>8000)stopRest();
+    return;
+  }
+  el.classList.remove("done");
+  var s=Math.ceil(left/1000);
+  document.getElementById("restlbl").textContent="Rest · after "+rest.label;
+  document.getElementById("resttime").textContent=Math.floor(s/60)+":"+pad(s%60);
+  document.getElementById("restbar").style.width=Math.max(0,Math.min(100,left/rest.total*100))+"%";
+}
+
+var toastTimer=null;
+function toast(msg){
+  var slot=document.getElementById("toastslot");
+  slot.innerHTML='<div class="toast" role="status">'+esc(msg)+'</div>';
+  clearTimeout(toastTimer); toastTimer=setTimeout(function(){slot.innerHTML="";},3200);
+}
+
+/* ---------- rendering ---------- */
+function scheduleRender(){
+  var a=document.activeElement;
+  if(a&&(a.tagName==="INPUT"||a.tagName==="TEXTAREA")&&document.getElementById("main").contains(a)){renderDeferred=true;return;}
+  render();
+}
+document.addEventListener("focusout",function(e){
+  var t=e.target;
+  if(t.tagName==="TEXTAREA"&&t.dataset.note)commitNote(t.dataset.sid+"|"+t.dataset.note);
+  if(renderDeferred){setTimeout(function(){var a=document.activeElement;if(!(a&&(a.tagName==="INPUT"||a.tagName==="TEXTAREA"))){renderDeferred=false;render();}},0);}
+});
+
+/* notes */
+var noteDraft={}, noteTimers={}, noteOpen={}, liftOpen={}, extraLift={}, pdelArm=null, pastForm=false, pastDay="A", pastDate=null;
+function setNote(sid,id,v){
+  var key=sid+"|"+id; noteDraft[key]=v;
+  clearTimeout(noteTimers[key]); noteTimers[key]=setTimeout(function(){commitNote(key);},800);
+}
+function commitNote(key){
+  if(!(key in noteDraft))return;
+  clearTimeout(noteTimers[key]); delete noteTimers[key];
+  var p=key.split("|"), n={}; n[p[1]]=noteDraft[key].trim()?noteDraft[key]:"";
+  delete noteDraft[key];
+  commit(p[0],{notes:n});
+}
+function noteBox(sid,id,v){
+  return '<textarea class="note" id="note-'+sid+'-'+id+'" data-sid="'+sid+'" data-note="'+id+'" rows="2" placeholder="Note for next time, e.g. last set felt easy, go up 5 lb" aria-label="Note for '+esc(EX[id].name)+'">'+esc(v)+'</textarea>';
+}
+function noteOf(s,id){if(!s)return "";var k=s.id+"|"+id;if(k in noteDraft)return noteDraft[k];return (s.notes&&s.notes[id])||"";}
+
+function render(){
+  document.querySelectorAll(".tabs button").forEach(function(b){b.setAttribute("aria-selected",String(b.dataset.v===view));});
+  var b=document.getElementById("banner");
+  b.innerHTML=mode==="local"?'<div class="banner">Your log is saving to this browser only, because cloud saving isn\'t available in this view. Open the app from your Claude account to keep it synced, and use Export in History as a backup.</div>':"";
+  var m=document.getElementById("main");
+  if(view==="today")m.innerHTML=renderToday();
+  else if(view==="progress")m.innerHTML=renderProgress();
+  else m.innerHTML=renderHistory();
+}
+
+function lastLine(ex,last){
+  if(!last)return '<span>First time logging this. Pick a weight you can do for '+ex.hi+' clean reps.</span>';
+  var ls=setsOf(last,ex.id), sameW=ls.every(function(x){return x.w===ls[0].w;});
+  var txt=sameW?(ls[0].w===0&&ex.bw?"Bodyweight":fmtW(ls[0].w)+" lb")+" × "+ls.map(function(x){return x.r;}).join(", ")
+    :ls.map(function(x){return fmtW(x.w)+"×"+x.r;}).join(" · ");
+  return '<span>Last · '+fmtDate(last.date)+': <b class="num">'+txt+'</b></span>';
+}
+
+function renderToday(){
+  var t=todayStr(), list=all();
+  var finishedToday=!active&&list[0]&&list[0].date===t&&list[0].endedAt;
+  if(finishedToday&&!startAnother)return renderSummary(list[0],true);
+  var d=currentDay(), plan=PLAN[d];
+  var locked=!!active;
+  var last=list.filter(function(s){return !active||s.id!==active.id;})[0];
+  var h='<div class="dayhead"><div><div class="eyebrow">'+(active?"In progress · started "+timeStr(active.startedAt):fmtDate(t,true)+(last&&!dayTouched?" · suggested":""))+'</div>'
+    +'<div class="daytitle">Day '+d+'<small>'+(d==="A"?"Squat + horizontal":"Single-leg + vertical")+'</small></div></div>'
+    +'<div class="daypick" role="group" aria-label="Workout day">'
+    +['A','B'].map(function(x){return '<button data-act="day" data-v="'+x+'" aria-pressed="'+(x===d)+'"'+(locked&&x!==d?" disabled":"")+'>'+x+'</button>';}).join("")+'</div></div>';
+  if(last)h+='<div class="meta">Last workout: Day '+last.day+' on '+fmtDate(last.date,true)+'.</div>';
+  else h+='<div class="meta">Enter a weight, adjust reps, tap ✓. Everything else is recorded for you.</div>';
+  h+=GYM;
+  h+=renderWarmup(d);
+  h+='<div class="list">';
+  plan.forEach(function(ex){h+=renderExercise(pick(ex));});
+  h+='</div>';
+  var n=active?sessionSetCount(active):0;
+  h+='<button class="finish" data-act="finish"'+(n?"":" disabled")+'>Finish workout'+(n?' · '+n+' sets':'')+'</button>';
+  h+='<p class="foot">Rest guide: 2–3 min on the big lifts, 60–90 sec on accessories. When every set reaches the top of its rep range, the app suggests a heavier weight next time.</p>';
+  return h;
+}
+var GYM='<nav class="gym" aria-label="Gym links"><a href="https://www.purdue.edu/recwell/facility-usage/index.php" target="_blank" rel="noopener"><b>How busy is it?</b><span>Live RecWell facility usage ↗</span></a><a href="https://www.purdue.edu/recwell/index.php" target="_blank" rel="noopener"><b>Purdue RecWell</b><span>Hours, programs and info ↗</span></a></nav>';
+var WARM={
+  A:{moves:[["World's greatest stretch","3 per side","hips, hamstrings, upper back"],["Bodyweight squat, 2 sec pause at the bottom","10","knees out, chest up"],["Glute bridge","10","squeeze 1 sec at the top"],["Band pull-apart (or arm circles)","15","shoulders and upper back for bench and rows"]],
+     first:"squat",second:"bench",secondNote:"before your first working set of bench"},
+  B:{moves:[["World's greatest stretch","3 per side","hips, hamstrings, upper back"],["Reverse lunge","5 per leg","slow, control the bottom"],["Scap pull-up (or band pull-apart)","8","shoulder blades down and back, arms straight"],["Wall slide (or band dislocate)","10","overhead range for pressing"]],
+     first:"bss_bb",second:"dbpress",secondNote:"before your first working set of shoulder press"}
+};
+var warmOpen=null;
+function r5(x){return Math.max(5,Math.round(x/5)*5);}
+function rampFor(ex,pcts){
+  var d=draftFor(ex), w=parseFloat(d.w), out=[];
+  var bar=!!ex.bar;
+  if(isNaN(w)||w<=0){
+    if(bar)out.push("Empty bar × 10");
+    pcts.forEach(function(p){out.push(Math.round(p[0]*100)+"% × "+p[1]);});
+    return {list:out,known:false};
+  }
+  var lastW=0;
+  if(bar&&w>45){out.push("45 lb × 10");lastW=45;}
+  else if(!bar&&ex.id==="splitsquat"){out.push("Bodyweight × 8/leg");}
+  pcts.forEach(function(p){var x=r5(w*p[0]);if(x>lastW&&x<w){out.push(x+" lb × "+p[1]);lastW=x;}});
+  return {list:out,known:true,w:w};
+}
+function renderWarmup(d){
+  var W=WARM[d], started=active&&sessionSetCount(active)>0;
+  var open=warmOpen===null?!started:warmOpen;
+  var f=pick(EX[W.first]), s=pick(EX[W.second]);
+  var r1=rampFor(f,f.id==="squat"?[[0.5,5],[0.7,3],[0.85,1]]:[[0.5,5],[0.75,3]]);
+  var r2=rampFor(s,[[0.5,5],[0.75,2]]);
+  var h='<details class="card wu" id="warmup"'+(open?" open":"")+'><summary><span><span class="eyebrow">About 10 min · before set 1</span><span class="wut">Warm-up</span></span><span class="wuc" aria-hidden="true">'+(open?"Hide":"Show")+'</span></summary>';
+  h+='<ol class="wus">';
+  h+='<li><b>General · 3 min</b><p>Easy bike, rower or incline walk. Breathing up a little, able to talk. The goal is a warmer body, not fatigue.</p></li>';
+  h+='<li><b>Dynamic mobility · 3 min</b><p>One round, no rest between moves.</p><ul class="wum">'+W.moves.map(function(m){return '<li><span>'+esc(m[0])+'<small>'+esc(m[2])+'</small></span><em class="num">'+esc(m[1])+'</em></li>';}).join("")+'</ul></li>';
+  h+='<li><b>Ramp-up sets · '+esc(f.name)+' · 3–4 min</b><p>'+(r1.known?'Building to your first working set of '+fmtW(r1.w)+' lb. Rest only 30–60 sec between these.':'Percentages of your first working set. Rest only 30–60 sec between these.')+'</p><div class="ramp">'+r1.list.map(function(x){return '<span class="num">'+esc(x)+'</span>';}).join("")+'</div></li>';
+  h+='<li><b>Primer · '+esc(s.name)+'</b><p>Two quick sets '+esc(W.secondNote)+'. Later exercises need no separate warm-up.</p><div class="ramp">'+r2.list.map(function(x){return '<span class="num">'+esc(x)+'</span>';}).join("")+'</div></li>';
+  h+='</ol><p class="wun">Skip long static stretching before lifting. Holds over about 60 sec per muscle can briefly reduce strength; save them for after your workout. Ramp-up sets don\'t count as working sets and aren\'t logged.</p></details>';
+  return h;
+}
+function timeStr(ms){var d=new Date(ms),h=d.getHours(),m=d.getMinutes();return ((h%12)||12)+":"+pad(m)+(h<12?" am":" pm");}
+
+function renderExercise(ex){
+  var logged=active?setsOf(active,ex.id):[];
+  var last=lastFor(ex.id,active&&active.id);
+  var prog=progression(ex,last);
+  var target=logged.length<ex.sets?ex.sets:logged.length+(extraRow[ex.id]?1:0);
+  var done=logged.length>=ex.sets;
+  var h='<section class="ex'+(done?" done":"")+'" id="ex-'+ex.id+'"><div class="exhead"><div><h3>'+esc(ex.name)+'</h3>'+(ex.alt?'<div class="alt">'+esc(ex.alt)+'</div>':"")+'</div>'
+    +'<div class="target num">'+ex.sets+' × '+ex.lo+'–'+ex.hi+(ex.mult?' + '+ex.lo+'–'+ex.hi:'')+'<span>'+restLabel(ex.rest)+' rest</span></div></div>';
+  var opts=SLOTS[ex.slot]||[ex];
+  if(opts.length>1){
+    var lockV=logged.length>0;
+    h+='<div class="vseg" role="group" aria-label="Variation">'+opts.map(function(o){return '<button data-act="variant" data-slot="'+o.slot+'" data-v="'+o.id+'" aria-pressed="'+(o.id===ex.id)+'"'+(lockV&&o.id!==ex.id?' disabled title="Undo your logged sets to switch"':'')+'>'+esc(o.tag)+'</button>';}).join("")+'</div>';
+  }
+  h+='<div class="last">'+lastLine(ex,last);
+  if(prog&&!logged.length)h+='<span class="chip up">↑ Go to '+fmtW(prog.to)+' lb</span>';
+  if(done)h+='<span class="chip ok">✓ Done</span>';
+  h+='</div>';
+  var ln=noteOf(last,ex.id);
+  if(ln)h+='<div class="lastnote"><span class="eyebrow">Your note · '+fmtDate(last.date)+'</span><p>'+esc(ln)+'</p></div>';
+  h+='<div class="sets">';
+  var t0=active?active.startedAt:0;
+  logged.forEach(function(x,i){
+    var best=bestBefore(ex.id,active.id,x.t), pr="";
+    if(best.any){
+      if(x.w>0&&x.w>best.w)pr='<span class="chip pr">Weight PR</span>';
+      else if(x.w>0&&e1rm(x.w,x.r)>best.e+0.01)pr='<span class="chip pr">1RM PR</span>';
+      else if(ex.bw&&x.w===0&&best.w===0&&x.r>best.r)pr='<span class="chip pr">Rep PR</span>';
+    }
+    h+='<div class="row logged"><div class="sn">'+(i+1)+'</div><div class="valwrap"><span class="val num">'+(x.w===0&&ex.bw?"BW":fmtW(x.w)+' <small>lb</small>')+' × '+x.r+'</span>'+pr+'</div>'
+      +'<button class="undo" data-act="undo" data-ex="'+ex.id+'" data-k="'+x.k+'" aria-label="Remove set '+(i+1)+'">Undo</button></div>';
+  });
+  if(logged.length<target){
+    var d=draftFor(ex);
+    h+='<div class="row"><div class="sn">'+(logged.length+1)+'</div><div class="inputs">'
+      +field(ex.id,"w",d.w,"lb")+field(ex.id,"r",d.r,"reps")+'</div>'
+      +'<button class="log" data-act="log" data-ex="'+ex.id+'" aria-label="Log set '+(logged.length+1)+' of '+esc(ex.name)+'">✓</button></div>';
+    for(var k=logged.length+1;k<target;k++){
+      h+='<div class="row planned"><div class="sn">'+(k+1)+'</div><div class="val num">'+(d.w!==""?(d.w==0&&ex.bw?"BW":fmtW(+d.w)+" lb")+" × ":"")+ex.lo+'–'+ex.hi+'</div><div></div></div>';
+    }
+  }
+  h+='</div>';
+  if(errors[ex.id])h+='<div class="err">'+esc(errors[ex.id])+'</div>';
+  if(logged.length>=target)h+='<button class="addset" data-act="addset" data-ex="'+ex.id+'">+ Add a set</button>';
+  if(logged.length){
+    var nv=noteOf(active,ex.id);
+    if(nv||noteOpen[ex.id])h+=noteBox(active.id,ex.id,nv);
+    else h+='<button class="addnote" data-act="addnote" data-ex="'+ex.id+'">+ Note for next time</button>';
+  }
+  return h+'</section>';
+}
+function restLabel(s){return s%60===0?(s/60)+" min":Math.floor(s/60)?Math.floor(s/60)+":"+pad(s%60):s+" sec";}
+function field(id,f,v,unit){
+  return '<div class="field"><button data-act="step" data-ex="'+id+'" data-f="'+f+'" data-d="-1" aria-label="Decrease '+unit+'">−</button>'
+    +'<label><input id="in-'+f+'-'+id+'" data-ex="'+id+'" data-f="'+f+'" inputmode="'+(f==="w"?"decimal":"numeric")+'" value="'+esc(v)+'" placeholder="'+(f==="w"?"0":"0")+'" aria-label="'+unit+'" autocomplete="off"><span class="u">'+unit+'</span></label>'
+    +'<button data-act="step" data-ex="'+id+'" data-f="'+f+'" data-d="1" aria-label="Increase '+unit+'">+</button></div>';
+}
+
+function prsIn(s){
+  var out=[];
+  Object.keys(s.sets||{}).forEach(function(id){
+    var ex=EX[id]; if(!ex)return;
+    var topW=-1,topE=-1,topR=-1,firstT=Infinity;
+    setsOf(s,id).forEach(function(x){if(x.w>topW)topW=x.w;var e=e1rm(x.w,x.r);if(e>topE)topE=e;if(x.w===0&&x.r>topR)topR=x.r;if(x.t<firstT)firstT=x.t;});
+    var best=bestBefore(id,s.id,firstT);
+    if(!best.any)return;
+    if(topW>0&&topW>best.w)out.push(ex.name+": "+fmtW(topW)+" lb (weight PR)");
+    else if(topW>0&&topE>best.e+0.01)out.push(ex.name+": est. 1RM "+Math.round(topE)+" lb");
+    else if(ex.bw&&topW===0&&best.w===0&&topR>best.r)out.push(ex.name+": "+topR+" reps (rep PR)");
+  });
+  return out;
+}
+function renderSummary(s,isToday){
+  var mins=Math.max(1,Math.round(((s.endedAt||lastSetTime(s))-s.startedAt)/60000));
+  var prs=prsIn(s), next=s.day==="A"?"B":"A";
+  var h='<div class="card"><div class="eyebrow">'+(isToday?"Done for today":"Workout")+' · '+fmtDate(s.date,true)+'</div><h2>Day '+s.day+' complete</h2>'
+    +'<div class="stats"><div class="stat"><b class="num">'+mins+'</b><span>Minutes</span></div><div class="stat"><b class="num">'+sessionSetCount(s)+'</b><span>Sets</span></div><div class="stat"><b class="num">'+fmtK(sessionVolume(s))+'</b><span>Volume lb</span></div><div class="stat"><b class="num">'+prs.length+'</b><span>PRs</span></div></div>';
+  if(prs.length)h+='<ul class="prlist">'+prs.map(function(p){return '<li><span class="chip pr">PR</span> '+esc(p)+'</li>';}).join("")+'</ul>';
+  h+=bkLine(s);
+  h+='<p class="meta">Next up: Day '+next+'. Aim for 2–3 days of rest before it.</p>'
+    +'<div class="btnrow"><button class="btn" data-act="tab" data-v="progress">See progress</button><button class="btn" data-act="another">Log another workout</button></div></div>';
+  return h;
+}
+
+/* progress */
+function seriesFor(id){
+  var ex=EX[id], out=[];
+  all().slice().reverse().forEach(function(s){
+    var ls=setsOf(s,id); if(!ls.length)return;
+    var top=0,topR=0,e=0,v=0,reps=0;
+    ls.forEach(function(x){if(x.w>top)top=x.w;if(x.r>topR)topR=x.r;var q=e1rm(x.w,x.r);if(q>e)e=q;v+=x.w*x.r*(ex.mult||1);reps+=x.r;});
+    out.push({date:s.date,top:top,e:e,vol:v,reps:reps,topR:topR});
+  });
+  var allBw=ex.bw&&out.every(function(p){return p.top===0;});
+  return {pts:out,allBw:allBw};
+}
+function renderProgress(){
+  var list=all();
+  var h='<select class="sel" id="exsel" aria-label="Exercise">';
+  ["A","B"].forEach(function(d){h+='<optgroup label="Day '+d+'">'+ALL.filter(function(e){return e.day===d;}).map(function(e){return '<option value="'+e.id+'"'+(e.id===exSel?" selected":"")+'>'+esc(e.name)+'</option>';}).join("")+'</optgroup>';});
+  h+='</select>';
+  var ex=EX[exSel]||EX.squat, S=seriesFor(ex.id), pts=S.pts;
+  var bestW=0,bestE=0,bestR=0; pts.forEach(function(p){if(p.top>bestW)bestW=p.top;if(p.e>bestE)bestE=p.e;if(p.topR>bestR)bestR=p.topR;});
+  h+='<div class="stats">'
+    +(S.allBw?'<div class="stat"><b class="num">'+(pts.length?bestR:"–")+'</b><span>Best reps</span></div>'
+      :'<div class="stat"><b class="num">'+(pts.length?fmtW(bestW):"–")+'</b><span>Best lb</span></div><div class="stat"><b class="num">'+(pts.length?Math.round(bestE):"–")+'</b><span>Est. 1RM lb</span></div>')
+    +'<div class="stat"><b class="num">'+pts.length+'</b><span>Sessions</span></div></div>';
+  var metrics=S.allBw?[["reps","Total reps"],["topR","Best set"]]:[["top","Top weight"],["e","Est. 1RM"],["vol","Volume"]];
+  if(!metrics.some(function(m){return m[0]===metric;}))metric=metrics[0][0];
+  h+='<div class="seg" role="group" aria-label="Chart metric">'+metrics.map(function(m){return '<button data-act="metric" data-v="'+m[0]+'" aria-pressed="'+(m[0]===metric)+'">'+m[1]+'</button>';}).join("")+'</div>';
+  h+='<div class="chart">'+(pts.length?chart(pts.map(function(p){return {x:p.date,y:p[metric]};}),metric==="reps"||metric==="topR"?"reps":"lb"):'<div class="empty">No sets logged for '+esc(ex.name)+' yet. Log it on Day '+ex.day+' and your progress will chart here.</div>')+'</div>';
+
+  /* consistency */
+  var now=new Date(); var mon=new Date(now.getFullYear(),now.getMonth(),now.getDate()-((now.getDay()+6)%7));
+  var weeks=[]; for(var i=11;i>=0;i--){var st=new Date(mon.getFullYear(),mon.getMonth(),mon.getDate()-7*i);weeks.push({start:st,n:0});}
+  list.forEach(function(s){if(!sessionSetCount(s))return;var d=parseDate(s.date);for(var k=0;k<weeks.length;k++){var en=new Date(weeks[k].start.getFullYear(),weeks[k].start.getMonth(),weeks[k].start.getDate()+7);if(d>=weeks[k].start&&d<en){weeks[k].n++;break;}}});
+  var hit=weeks.filter(function(w){return w.n>=2;}).length, streak=0;
+  for(var j=weeks.length-2;j>=0;j--){if(weeks[j].n>=2)streak++;else break;}
+  if(weeks[11].n>=2)streak++;
+  var thisWeek=weeks[11].n;
+  h+='<h2 class="h2">Consistency</h2><div class="stats"><div class="stat"><b class="num">'+thisWeek+'/2</b><span>This week</span></div><div class="stat"><b class="num">'+streak+'</b><span>Week streak</span></div><div class="stat"><b class="num">'+list.filter(function(s){return sessionSetCount(s);}).length+'</b><span>Workouts</span></div></div>';
+  h+='<div class="weeks" aria-label="Workouts per week, last 12 weeks">'+weeks.map(function(w){return '<div class="wk" title="Week of '+MON[w.start.getMonth()]+' '+w.start.getDate()+': '+w.n+' workouts"><i class="'+(w.n>=2?"over":w.n?"on":"")+'"></i><i class="'+(w.n>=2?"over":"")+'"></i><span>'+(w.start.getMonth()+1)+'/'+w.start.getDate()+'</span></div>';}).join("")+'</div>';
+  h+='<p class="foot">Each column is a week (Mon–Sun). Green means both workouts done. '+hit+' of the last 12 weeks hit 2 workouts.</p>';
+  return h;
+}
+function niceTicks(min,max){
+  if(min===max){min=min-5;max=max+5;}
+  var span=max-min, step=Math.pow(10,Math.floor(Math.log10(span/3))), err=span/3/step;
+  if(err>=5)step*=5;else if(err>=2)step*=2;
+  var lo=Math.floor(min/step)*step, hi=Math.ceil(max/step)*step, t=[];
+  for(var v=lo;v<=hi+1e-9;v+=step)t.push(Math.round(v*100)/100);
+  return {lo:lo,hi:hi,t:t};
+}
+function chart(pts,unit){
+  var W=600,H=240,L=46,R=16,T=16,B=30;
+  var ys=pts.map(function(p){return p.y;}), mn=Math.min.apply(null,ys), mx=Math.max.apply(null,ys);
+  var tk=niceTicks(Math.max(0,mn-(mx-mn)*0.15),mx+(mx-mn)*0.1);
+  function X(i){return pts.length===1?L+(W-L-R)/2:L+i*(W-L-R)/(pts.length-1);}
+  function Y(v){return T+(H-T-B)*(1-(v-tk.lo)/(tk.hi-tk.lo));}
+  var s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Chart of '+unit+' per session">';
+  tk.t.forEach(function(v){var y=Y(v);s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y+'" y2="'+y+'" stroke="var(--line)" stroke-width="1"/><text x="'+(L-8)+'" y="'+(y+4)+'" text-anchor="end" font-size="12" fill="var(--muted)" font-family="Barlow, sans-serif">'+fmtK(v)+'</text>';});
+  var path=pts.map(function(p,i){return (i?"L":"M")+X(i).toFixed(1)+" "+Y(p.y).toFixed(1);}).join(" ");
+  if(pts.length>1){
+    var area=path+" L"+X(pts.length-1).toFixed(1)+" "+(H-B)+" L"+X(0).toFixed(1)+" "+(H-B)+" Z";
+    s+='<path d="'+area+'" fill="var(--accent)" fill-opacity="0.12" stroke="none"/>';
+    s+='<path d="'+path+'" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>';
+  }
+  pts.forEach(function(p,i){var last=i===pts.length-1;s+='<circle cx="'+X(i)+'" cy="'+Y(p.y)+'" r="'+(last?5.5:3)+'" fill="'+(last?"var(--accent)":"var(--surface)")+'" stroke="var(--accent)" stroke-width="2"><title>'+fmtDate(p.x)+': '+fmtW(Math.round(p.y*10)/10)+' '+unit+'</title></circle>';});
+  var lp=pts[pts.length-1];
+  s+='<text x="'+Math.min(W-R,X(pts.length-1))+'" y="'+Math.max(12,Y(lp.y)-12)+'" text-anchor="end" font-size="14" font-weight="700" fill="var(--ink)" font-family="Barlow Condensed, sans-serif">'+fmtK(Math.round(lp.y))+' '+unit+'</text>';
+  s+='<text x="'+X(0)+'" y="'+(H-8)+'" text-anchor="'+(pts.length===1?"middle":"start")+'" font-size="12" fill="var(--muted)" font-family="Barlow, sans-serif">'+fmtDate(pts[0].x)+'</text>';
+  if(pts.length>1)s+='<text x="'+(W-R)+'" y="'+(H-8)+'" text-anchor="end" font-size="12" fill="var(--muted)" font-family="Barlow, sans-serif">'+fmtDate(lp.x)+'</text>';
+  return s+'</svg>';
+}
+
+/* history */
+function renderHistory(){
+  var list=all().filter(function(s){return sessionSetCount(s)||s.manual;});
+  var h='<div class="btnrow"><button class="btn primary" data-act="export">Export all to CSV</button><button class="btn" data-act="pastnew">+ Add a past workout</button><button class="btn" data-act="exportjson">Export JSON</button><button class="btn" data-act="import">Import</button></div>';
+  if(pastForm){
+    var t=todayStr();
+    h+='<div class="card pform"><div class="eyebrow">Add a workout you didn\'t log</div><label for="pdate">Date<input type="date" id="pdate" max="'+t+'" value="'+esc(pastDate||t)+'"></label>'
+      +'<div class="daypick" role="group" aria-label="Workout day">'+['A','B'].map(function(x){return '<button data-act="pastday" data-v="'+x+'" aria-pressed="'+(x===pastDay)+'">'+x+'</button>';}).join('')+'</div>'
+      +'<div class="btnrow" style="margin:0"><button class="btn primary" data-act="pastcreate">Create workout</button><button class="btn" data-act="pastcancel">Cancel</button></div></div>';
+  }
+  if(!list.length)return h+'<div class="empty">No workouts yet. Your sessions will be listed here after you log your first set.</div>';
+  h+='<div class="hist">';
+  list.forEach(function(s){
+    var open=!!expanded[s.id], live=active&&active.id===s.id;
+    var mins=Math.max(1,Math.round(((s.endedAt||lastSetTime(s))-s.startedAt)/60000));
+    h+='<div class="hitem"><button class="hsum" data-act="expand" data-v="'+s.id+'" aria-expanded="'+open+'"><span class="hday">'+s.day+'</span><span><span class="hdate">'+fmtDate(s.date,true)+'</span><br><span class="hsub">'+(live?"In progress · ":s.manual?"Added later · ":mins+" min · ")+sessionSetCount(s)+' sets</span></span><span class="hvol num">'+fmtK(sessionVolume(s))+'<span>lb volume</span></span></button>';
+    if(open){
+      h+='<div class="hdetail"><div class="hlifts">';
+      var ex2=extraLift[s.id]||{};
+      ALL.forEach(function(ex){var ls=setsOf(s,ex.id);if(!ls.length&&!ex2[ex.id])return;
+        var key=s.id+":"+ex.id, lo=!!liftOpen[key], note=noteOf(s,ex.id);
+        var topW=ls.length?Math.max.apply(null,ls.map(function(x){return x.w;})):0;
+        var top=!ls.length?"no sets yet":(ex.bw&&topW===0)?"best "+Math.max.apply(null,ls.map(function(x){return x.r;}))+" reps":"top "+fmtW(topW)+" lb";
+        h+='<div class="hlift'+(lo?" open":"")+'"><button class="hlhead" data-act="lift" data-v="'+key+'" aria-expanded="'+lo+'"><span class="hlname">'+esc(ex.name)+'</span><span class="hlsum num">'+ls.length+' sets · '+top+(note?' · <span class="hlnote">note</span>':'')+'</span><span class="hlcar" aria-hidden="true">'+(lo?"−":"+")+'</span></button>';
+        if(lo){
+          h+='<div class="hsets">';
+          ls.forEach(function(x,i){
+            var best=bestBefore(ex.id,s.id,x.t), pr="";
+            if(best.any){
+              if(x.w>0&&x.w>best.w)pr='<span class="chip pr">PR</span>';
+              else if(x.w>0&&e1rm(x.w,x.r)>best.e+0.01)pr='<span class="chip pr">1RM PR</span>';
+              else if(ex.bw&&x.w===0&&best.w===0&&x.r>best.r)pr='<span class="chip pr">Rep PR</span>';
+            }
+            h+='<div class="hset"><span class="hsn">'+(i+1)+'</span><span class="hval num">'+(x.w===0&&ex.bw?"BW":fmtW(x.w)+'<small>lb</small>')+' × '+x.r+'</span>'+pr+'<button class="x'+(pdelArm===key+":"+x.k?" arm":"")+'" data-act="pdel" data-sid="'+s.id+'" data-ex="'+ex.id+'" data-k="'+x.k+'" aria-label="Remove set '+(i+1)+'">'+(pdelArm===key+":"+x.k?"Remove?":"×")+'</button></div>';
+          });
+          var lx=ls[ls.length-1];
+          h+='</div><div class="padd"><input id="pw-'+key+'" inputmode="decimal" value="'+(lx?fmtW(lx.w):"")+'" placeholder="lb" aria-label="Weight in pounds"><span>lb ×</span><input id="pr-'+key+'" inputmode="numeric" value="'+(lx?lx.r:"")+'" placeholder="reps" aria-label="Reps"><button class="btn primary" data-act="padd" data-sid="'+s.id+'" data-ex="'+ex.id+'">Add set</button></div>'+noteBox(s.id,ex.id,note);
+        }
+        h+='</div>';
+      });
+      h+='</div>';
+      if(!live)h+=bkLine(s);
+      var miss=ALL.filter(function(e){return !setsOf(s,e.id).length&&!ex2[e.id];}).sort(function(a,b){return (a.day===s.day?0:1)-(b.day===s.day?0:1);});
+      if(miss.length)h+='<select class="addex" data-sid="'+s.id+'" aria-label="Add an exercise to this workout"><option value="">+ Add an exercise to this workout</option>'+miss.map(function(e){return '<option value="'+e.id+'">'+esc(e.name)+' (Day '+e.day+')</option>';}).join('')+'</select>';
+      if(confirmDel===s.id)h+='<div class="btnrow"><span class="meta" style="margin:0;align-self:center">Delete this workout for good?</span><button class="btn danger" data-act="delyes" data-v="'+s.id+'">Delete</button><button class="btn" data-act="delno">Keep</button></div>';
+      else if(!live)h+='<div class="btnrow"><button class="btn danger" data-act="del" data-v="'+s.id+'">Delete workout</button></div>';
+      h+='</div>';
+    }
+    h+='</div>';
+  });
+  return h+'</div>';
+}
+async function exportCsv(){
+  var rows=[["date","day","exercise","set","weight_lb","reps","est_1rm_lb","volume_lb","time","note"]];
+  all().slice().reverse().forEach(function(s){
+    ALL.forEach(function(ex){setsOf(s,ex.id).forEach(function(x,i){
+      rows.push([s.date,s.day,ex.name,i+1,x.w,x.r,Math.round(e1rm(x.w,x.r)),x.w*x.r*(ex.mult||1),new Date(x.t).toLocaleTimeString(),i===0?noteOf(s,ex.id):""]);});});
+  });
+  var csv=rows.map(function(r){return r.map(function(c){c=String(c);return /[",\n]/.test(c)?'"'+c.replace(/"/g,'""')+'"':c;}).join(",");}).join("\n");
+  if(rows.length===1){toast("Nothing to export yet.");return;}
+  if(!dl){toast("Export isn't available in this view. Open the app in Claude to export.");return;}
+  try{await dl.save({filename:"workout-log-"+todayStr()+".csv",data:csv});}
+  catch(e){if(e&&e.code==="declined")return;if(e&&e.code==="rate_limited"){toast("A save prompt is already open.");return;}toast("Export couldn't start. Try again in a moment.");}
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click",function(e){
+  var b=e.target.closest("[data-act]"); if(!b)return;
+  var a=b.dataset.act, id=b.dataset.ex, v=b.dataset.v;
+  if(a==="tab"){view=v;render();window.scrollTo(0,0);return;}
+  if(a==="day"){if(active)return;day=v;dayTouched=true;drafts={};render();return;}
+  if(a==="log"){logSet(id);return;}
+  if(a==="undo"){undoSet(id,b.dataset.k);return;}
+  if(a==="step"){
+    var ex=EX[id], d=draftFor(ex), f=b.dataset.f, dir=+b.dataset.d;
+    var cur=parseFloat(d[f]); if(isNaN(cur))cur=0;
+    var nv=f==="w"?Math.max(0,cur+dir*5):Math.max(1,cur+dir);
+    d[f]=nv; var inp=document.getElementById("in-"+f+"-"+id); if(inp)inp.value=f==="w"?fmtW(nv):nv;
+    delete errors[id]; return;
+  }
+  if(a==="addnote"){noteOpen[id]=true;render();var ta=active&&document.getElementById("note-"+active.id+"-"+id);if(ta)ta.focus();return;}
+  if(a==="sound"){soundOn=!soundOn;lsSet("tdl_sound",soundOn);syncSoundBtn();if(soundOn){ensureAudio();beep();}return;}
+  if(a==="pastnew"){pastForm=!pastForm;pastDate=null;render();return;}
+  if(a==="pastcancel"){pastForm=false;render();return;}
+  if(a==="pastday"){var pd=document.getElementById("pdate");if(pd)pastDate=pd.value;pastDay=v;render();return;}
+  if(a==="pastcreate"){
+    var pv=(document.getElementById("pdate")||{}).value||"";
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(pv)||pv>todayStr()){toast("Pick a date that isn't in the future.");return;}
+    var dd=parseDate(pv), st=new Date(dd.getFullYear(),dd.getMonth(),dd.getDate(),12).getTime();
+    var nd={id:"s"+Date.now().toString(36)};
+    closed[nd.id]=true; commit(nd.id,{date:pv,day:pastDay,startedAt:st,endedAt:st,manual:true}); expanded[nd.id]=true; pastForm=false; render(); toast("Workout added. Now add its exercises."); return;
+  }
+  if(a==="padd"){
+    var key=b.dataset.sid+":"+id, wi=document.getElementById("pw-"+key), ri=document.getElementById("pr-"+key);
+    var pw=parseFloat(wi&&wi.value), pr2=parseInt(ri&&ri.value,10), exo=EX[id];
+    if(isNaN(pw)||pw<0||(!exo.bw&&pw===0)){toast("Enter the weight for this set.");return;}
+    if(isNaN(pr2)||pr2<1){toast("Enter at least 1 rep.");return;}
+    var ss=byId[b.dataset.sid]; if(!ss)return;
+    var t=Math.max(lastSetTime(ss),ss.startedAt)+1000;
+    addSet(ss.id,id,pw,pr2,t); if(ss.endedAt&&t>ss.endedAt)commit(ss.id,{endedAt:t});
+    render();
+    return;
+  }
+  if(a==="pdel"){
+    var k2=b.dataset.sid+":"+id+":"+b.dataset.k;
+    if(pdelArm!==k2){pdelArm=k2;render();return;}
+    pdelArm=null;
+    delSet(b.dataset.sid,b.dataset.k);
+    var ss2=byId[b.dataset.sid]; if(ss2&&!setsOf(ss2,id).length){extraLift[ss2.id]=extraLift[ss2.id]||{};extraLift[ss2.id][id]=true;}
+    render();
+    if(active&&active.id===b.dataset.sid)delete drafts[id];
+    return;
+  }
+  if(a==="variant"){
+    var cur=pick(EX[b.dataset.slot]);
+    if(active&&setsOf(active,cur.id).length)return;
+    choice[b.dataset.slot]=v; lsSet("tdl_choice",choice);
+    (SLOTS[b.dataset.slot]||[]).forEach(function(o){delete drafts[o.id];delete errors[o.id];});
+    render(); return;
+  }
+  if(a==="lift"){liftOpen[v]=!liftOpen[v];render();return;}
+  if(a==="addset"){extraRow[id]=true;delete drafts[id];render();return;}
+  if(a==="finish"){finish();return;}
+  if(a==="another"){startAnother=true;day=null;dayTouched=false;drafts={};render();return;}
+  if(a==="rest-add"){rest.end+= (+v)*1000; rest.total=Math.max(rest.total,rest.end-Date.now()); rest.doneAt=0; tick(); return;}
+  if(a==="rest-skip"){stopRest();return;}
+  if(a==="metric"){metric=v;render();return;}
+  if(a==="expand"){expanded[v]=!expanded[v];if(confirmDel===v&&!expanded[v])confirmDel=null;render();return;}
+  if(a==="del"){confirmDel=v;render();return;}
+  if(a==="delno"){confirmDel=null;render();return;}
+  if(a==="delyes"){confirmDel=null;delete expanded[v];removeSession(v);toast("Workout deleted.");return;}
+  if(a==="export"){exportCsv();return;}
+  if(a==="exportjson"){exportJson();return;}
+  if(a==="import"){document.getElementById("impfile").click();return;}
+  if(a==="backup"){backupWorkout(v,false);return;}
+});
+document.addEventListener("input",function(e){
+  var t=e.target;
+  if(t.tagName==="TEXTAREA"&&t.dataset.note){setNote(t.dataset.sid,t.dataset.note,t.value);return;}
+  if(t.tagName!=="INPUT"||!t.dataset.ex)return;
+  var ex=EX[t.dataset.ex], d=draftFor(ex); d[t.dataset.f]=t.value; delete errors[t.dataset.ex];
+});
+document.addEventListener("keydown",function(e){
+  var t=e.target; if(e.key==="Enter"&&t.tagName==="INPUT"&&t.dataset.ex){e.preventDefault();t.blur();logSet(t.dataset.ex);}
+});
+document.addEventListener("toggle",function(e){
+  if(e.target.id==="warmup"){warmOpen=e.target.open;var c=e.target.querySelector(".wuc");if(c)c.textContent=warmOpen?"Hide":"Show";}
+},true);
+document.addEventListener("focusin",function(e){var t=e.target;if(t.tagName==="INPUT"&&t.dataset.ex){try{t.select();}catch(x){}}});
+document.addEventListener("change",function(e){
+  if(e.target.classList.contains("addex")&&e.target.value){var sid=e.target.dataset.sid,v=e.target.value;extraLift[sid]=extraLift[sid]||{};extraLift[sid][v]=true;liftOpen[sid+":"+v]=true;render();return;}
+  if(e.target.id==="exsel"){exSel=e.target.value;lsSet("tdl_exsel",exSel);render();}});
+
+/* ---------- import / export (added in Homebase) ----------
+   Import takes the JSON from "Export JSON" (or the lift-log-export.json made from the original app)
+   or the CSV from "Export all to CSV". Importing the same file twice changes nothing. */
+function exportJson(){
+  var W=mode==="local"?localDocs:wDocs, list=Object.keys(W).map(function(id){return {id:id,data:W[id]};});
+  if(!list.length){toast("Nothing to export yet.");return;}
+  if(!dl){toast("Export isn't available here.");return;}
+  dl.save({filename:"lift-log-"+todayStr()+".json",data:JSON.stringify({format:"lift-log-export",version:1,exportedAt:todayStr(),workouts:list},null,1)});
+}
+function parseCsv(t){var rows=[],row=[],f="",q=false;for(var i=0;i<t.length;i++){var c=t[i];if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++;}else q=false;}else f+=c;}else if(c==='"')q=true;else if(c===','){row.push(f);f="";}else if(c==='\n'||c==='\r'){if(c==='\r'&&t[i+1]==='\n')i++;row.push(f);rows.push(row);row=[];f="";}else f+=c;}if(f!==""||row.length){row.push(f);rows.push(row);}return rows.filter(function(r){return r.some(function(x){return String(x).trim();});});}
+function clockMs(s){var m=String(s||"").match(/(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([ap])?/i);if(!m)return null;var h=+m[1];if(m[4]){var p=m[4].toLowerCase();if(p==="p"&&h<12)h+=12;if(p==="a"&&h===12)h=0;}return ((h*60+(+m[2]))*60+(+(m[3]||0)))*1000;}
+function importData(text){
+  var n=0,sets=0;
+  if(/^\s*[\[{]/.test(text)){
+    var j=JSON.parse(text), list=Array.isArray(j)?j:(j.workouts||[]), sess=Array.isArray(j.sessions)?j.sessions:[];
+    list.forEach(function(w){var id=w&&w.id,d=w&&(w.data||w);if(!id||!isObj(d)||!d.date)return;d=clone(d);delete d.id;commit(id,d);n++;
+      Object.keys(d.log||{}).forEach(function(k){if(d.log[k]&&!d.log[k].x)sets++;});});
+    sess.forEach(function(s){var d=s&&(s.data||s),id=s&&(s.id||d.id);if(!id||!isObj(d)||!d.date)return;var L=legacyRaw(d);commit(id,L);n++;sets+=Object.keys(L.log).length;});
+  } else {
+    var rows=parseCsv(text), head=(rows.shift()||[]).map(function(h){return String(h).trim().toLowerCase();}), ix=function(k){return head.indexOf(k);};
+    var iD=ix("date"),iDay=ix("day"),iE=ix("exercise"),iW=ix("weight_lb"),iR=ix("reps"),iT=ix("time"),iN=ix("note");
+    if(iD<0||iE<0||iW<0||iR<0)throw new Error("this CSV doesn't have the Lift Log columns (date, day, exercise, weight_lb, reps)");
+    var byName={};ALL.forEach(function(e){byName[e.name.toLowerCase()]=e.id;});
+    var docs={};
+    rows.forEach(function(r,k){
+      var date=String(r[iD]||"").trim(),exId=byName[String(r[iE]||"").trim().toLowerCase()];
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!exId)return;
+      var w=parseFloat(r[iW]),reps=parseInt(r[iR],10);if(isNaN(w)||isNaN(reps))return;
+      var dv=iDay>=0?String(r[iDay]||"").trim():"", day=/^[AB]$/.test(dv)?dv:EX[exId].day, id="c"+date.replace(/-/g,"")+day;
+      var cm=clockMs(iT>=0?r[iT]:""), t=parseDate(date).getTime()+(cm==null?12*3600000:cm)+(k%1000);
+      var d=docs[id]||(docs[id]={date:date,day:day,startedAt:t,endedAt:t,log:{},notes:{}});
+      d.log["c"+exId+"_"+t]={e:exId,w:w,r:reps,t:t};
+      if(t<d.startedAt)d.startedAt=t; if(t>d.endedAt)d.endedAt=t;
+      if(iN>=0&&String(r[iN]||"").trim())d.notes[exId]=String(r[iN]).trim();
+      sets++;
+    });
+    Object.keys(docs).forEach(function(id){commit(id,docs[id]);n++;});
+  }
+  rebuild(); reconcile(); render();
+  toast(n?("Imported "+n+" workout"+(n===1?"":"s")+" · "+sets+" sets"):"Nothing to import in that file.");
+}
+document.getElementById("impfile").addEventListener("change",function(e){
+  var f=e.target.files[0]; e.target.value=""; if(!f)return;
+  f.text().then(function(t){try{importData(t);}catch(err){toast("Couldn't import: "+(err&&err.message||err));}});
+});
+
+/* ---------- boot ---------- */
+rebuild();
+render();
+function startLocal(){
+  if(mode==="local")return;
+  mode="local";
+  ops.forEach(function(op){localDocs[op.id]=merge(localDocs[op.id]||{},clone(op.data));});
+  ops=[]; lsSet("tdl_ops",ops); lsSet("tdl_local",localDocs);
+  rebuild(); reconcile(); drafts={}; refreshSync(); render();
+}
+function adopt(){
+  Object.keys(lDocs).forEach(function(id){
+    var L=legacyRaw(lDocs[id]), W=wDocs[id]||{}, data={}, any=false;
+    if(!W.date){data.date=L.date;data.day=L.day;data.startedAt=L.startedAt;if(L.endedAt)data.endedAt=L.endedAt;if(L.manual)data.manual=true;any=true;}
+    var log={};
+    Object.keys(L.log).forEach(function(k){if(!(W.log&&W.log[k])){log[k]=L.log[k];any=true;}});
+    if(Object.keys(log).length)data.log=log;
+    var n={};
+    Object.keys(L.notes||{}).forEach(function(e){if(!(W.notes&&(e in W.notes))){n[e]=L.notes[e];any=true;}});
+    if(Object.keys(n).length)data.notes=n;
+    if(any)ops.push({id:id,data:data});
+  });
+  lsSet("tdl_ops",ops); flush();
+}
+function afterSnap(){
+  rebuild();
+  if(loadedW&&loadedL){if(!adopted){adopted=true;adopt();rebuild();drafts={};}reconcile();}
+  refreshSync(); scheduleRender();
+}
+(async function(){
+  var c=window.claude;
+  if(!c||!c.use){startLocal();return;}
+  c.use("downloads").then(function(x){dl=x;}).catch(function(){dl=null;});
+  c.use("mcp").then(function(x){mcp=x;scheduleRender();}).catch(function(){mcp=null;});
+  try{db=await c.use("db");}catch(e){db=null;}
+  if(!db){startLocal();return;}
+  mode="cloud";
+  var lk=Object.keys(localDocs);
+  if(lk.length){lk.forEach(function(id){ops.push({id:id,data:localDocs[id]});});localDocs={};lsSet("tdl_local",localDocs);lsSet("tdl_ops",ops);}
+  refreshSync(); flush();
+  function onErr(err){refreshSync();scheduleRender();}
+  db.collection("workouts").limit(1000).onSnapshot(function(snap){
+    var m={}; snap.docs.forEach(function(d){if(d.exists)m[d.id]=clone(d.data());}); wDocs=m; loadedW=true; afterSnap();
+  },onErr);
+  db.collection("sessions").limit(1000).onSnapshot(function(snap){
+    var m={}; snap.docs.forEach(function(d){if(d.exists)m[d.id]=clone(d.data());}); lDocs=m; loadedL=true; afterSnap();
+  },onErr);
+})();
+setTimeout(function(){if(mode==="connecting")startLocal();},12000);
+})();
+</script>
+</template>
 
 <datalist id="courses"></datalist>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toast-msg"></span><button type="button" id="toast-undo">Undo</button></div>
@@ -1976,7 +3309,7 @@ const CALENDAR_ONLY = new Set(["Lecture","Review","No Class","Event"]);     // n
 const PRIORITIES = ["None","Low","Medium","High"];
 const PRI_RANK = {None:0, Low:1, Medium:2, High:3};
 const SCHEDULED_TYPES = new Set(["Lecture","Review","Exam","Quiz","Lab","Event"]);   // have a start and end time; every other type has a due time
-const SERIES_FIELDS = ["title","category","course","type","time","endTime","location","priority","flagged","notes"];  // shared when editing a whole series
+const SERIES_FIELDS = ["title","category","course","type","time","endTime","location","priority","flagged","notes","reminders"];  // shared when editing a whole series
 const COURSE_COLORS = 10;
 const MAX_OCC = 200;
 const TYPE_VAR = t => `var(--t-${String(t).toLowerCase().replace(/[^a-z0-9]+/g, "-")})`;
@@ -2043,6 +3376,293 @@ const catDef = n => CATEGORIES.find(c => c.name === n) || {name:n, hasCourse:fal
    then call Store.init(MyAdapter), and call Store.applyRemote(records)
    from a realtime subscription. No UI code needs to change.
    ===================================================================== */
+/* =====================================================================
+   CLOUD SYNC (Supabase). Optional. Everything still saves to this
+   browser first; when you're signed in, each change is also sent to your
+   Supabase project and other devices pick it up live.
+
+   How it works: every kind of data ("item", "note", "folder", "settings",
+   "link", "workout", "factday", "appdata", ...) registers here with
+     all()   -> the local records, each with an id
+     m(rec)  -> when the record last changed (ms)
+     apply(upserts, deletedIds) -> store records that came from the cloud
+   Modules call Sync.touch(kind) after they save; Sync diffs against the
+   last copy it saw and queues just the changed records. Newer wins.
+
+   The Supabase project URL and publishable key are typed in Settings and
+   kept in this browser's storage. Nothing secret lives in this file.
+   ===================================================================== */
+const Sync = (() => {
+  const CFG = "homebase.cloud.v1", OUT = "homebase.sync.outbox.v1", META = "homebase.sync.meta.v1", T = "hb_docs";
+  const SB_ESM = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+  const rd = (k, f) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : f; } catch(e){ return f; } };
+  const wr = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(e){ return false; } };
+  const J = o => JSON.stringify(o, (k, v) => k === "_m" ? undefined : v);
+  const kinds = {}, snaps = {}, dirty = new Set(), subs = new Set(), localSubs = new Set();
+  let outbox = rd(OUT, {}), meta = rd(META, {}), cfg = rd(CFG, null);
+  let sb = null, user = null, state = cfg ? "connecting" : "off", err = "", applying = 0, channel = null, flushT = 0, touchT = 0, busy = false, started = null, lastSync = null;
+  const emit = () => subs.forEach(f => { try { f(); } catch(e){ console.error(e); } });
+  const setState = (s, e = "") => { state = s; err = e; if (s === "ok") lastSync = new Date(); emit(); };
+  const msg = e => (e && (e.message || e.error_description || e.msg)) || String(e || "Unknown error");
+  const key = (k, id) => k + "\u0001" + id;
+  const queueing = () => !!(cfg && meta.userId && !meta.out);
+
+  /* ---------- local side ---------- */
+  function register(kind, def){ kinds[kind] = def; snaps[kind] = new Map(def.all().map(o => [o.id, J(o)])); }
+  function touch(kind){
+    dirty.add(kind);
+    localSubs.forEach(f => { try { f(kind); } catch(e){ console.error(e); } });
+    clearTimeout(touchT); touchT = setTimeout(runTouches, 300);
+  }
+  function runTouches(){
+    clearTimeout(touchT); if (applying) return;
+    const ks = [...dirty]; dirty.clear(); let any = false;
+    for (const k of ks) any = diff(k) || any;
+    if (any){ wr(OUT, outbox); flushSoon(); }
+  }
+  function diff(kind){
+    const def = kinds[kind]; if (!def) return false;
+    const snap = snaps[kind], seen = new Set(); let any = false, stamped = false;
+    for (const o of def.all()){
+      seen.add(o.id); const j = J(o);
+      if (snap.get(o.id) === j) continue;
+      if (def.stamp){ def.stamp(o); stamped = true; }
+      snap.set(o.id, j); queue(kind, o.id, {...o, _m:def.m(o)}, false); any = true;
+    }
+    for (const id of [...snap.keys()]) if (!seen.has(id)){ snap.delete(id); queue(kind, id, {id, _m:Date.now()}, true); any = true; }
+    if (stamped && def.persist) def.persist();
+    return any;
+  }
+  function queue(kind, id, data, deleted){ if (queueing()) outbox[key(kind, id)] = {kind, id, data, deleted}; }
+  function queueAll(kind, force){   // after sign-in: send local records the cloud lacks or has older copies of
+    const def = kinds[kind]; if (!def) return;
+    for (const o of def.all()){ const r = force && force.get(o.id); if (!force || !r || def.m(o) > r.m) outbox[key(kind, o.id)] = {kind, id:o.id, data:{...o, _m:def.m(o)}, deleted:false}; }
+  }
+
+  /* ---------- applying records from the cloud ---------- */
+  function receive(rows, forceKinds){
+    runTouches();
+    const by = {}, locs = {};
+    const loc = k => locs[k] || (locs[k] = new Map(kinds[k].all().map(o => [o.id, o])));
+    for (const r of rows){
+      const def = kinds[r.kind]; if (!def || !r.data) continue;
+      const rm = +r.data._m || 0, pend = outbox[key(r.kind, r.id)], force = forceKinds && forceKinds.has(r.kind);
+      if (!force && pend && (+pend.data._m || 0) >= rm) continue;
+      const lo = loc(r.kind).get(r.id), b = by[r.kind] || (by[r.kind] = {u:[], d:[]});
+      if (r.deleted){ if (lo && (force || rm >= def.m(lo))) b.d.push(r.id); }
+      else if (!lo || force || rm > def.m(lo)) b.u.push(r.data);
+    }
+    apply(by);
+  }
+  function apply(by){
+    applying++;
+    try {
+      for (const [kind, {u, d}] of Object.entries(by)){
+        if (!u.length && !d.length) continue;
+        const def = kinds[kind];
+        try { def.apply(u, d); } catch(e){ console.error("Sync apply failed for", kind, e); }
+        const now = new Map(def.all().map(o => [o.id, o]));
+        for (const id of [...u.map(o => o.id), ...d]){ const x = now.get(id); x ? snaps[kind].set(id, J(x)) : snaps[kind].delete(id); }
+      }
+    } finally { applying--; }
+    if (dirty.size){ clearTimeout(touchT); touchT = setTimeout(runTouches, 300); }
+  }
+
+  /* ---------- talking to Supabase ---------- */
+  async function pull(since){
+    const out = [];
+    for (let a = 0; a < 200000; a += 1000){
+      let q = sb.from(T).select("kind,id,data,deleted,updated_at").order("updated_at", {ascending:true}).range(a, a + 999);
+      if (since) q = q.gt("updated_at", new Date(Date.parse(since) - 120000).toISOString());   // a 2-minute overlap; re-reading a record is harmless
+      const {data, error} = await q; if (error) throw error;
+      out.push(...data); if (data.length < 1000) break;
+    }
+    for (const r of out) if (!meta.lastPull || r.updated_at > meta.lastPull) meta.lastPull = r.updated_at;
+    return out;
+  }
+  function flushSoon(ms = 600){ clearTimeout(flushT); flushT = setTimeout(flush, ms); }
+  async function flush(){
+    if (!sb || !user || busy) return;
+    const keys = Object.keys(outbox);
+    if (!keys.length){ if (state !== "ok" && state !== "syncing") setState("ok"); return; }
+    busy = true; setState("saving");
+    try {
+      for (let i = 0; i < keys.length; i += 100){
+        const batch = keys.slice(i, i + 100).map(k => [k, outbox[k]]).filter(([, e]) => e);
+        const {error} = await sb.from(T).upsert(batch.map(([, e]) => ({user_id:user.id, kind:e.kind, id:e.id, data:e.data, deleted:!!e.deleted})), {onConflict:"user_id,kind,id"});
+        if (error) throw error;
+        batch.forEach(([k, e]) => { if (outbox[k] === e) delete outbox[k]; });
+        wr(OUT, outbox);
+      }
+      busy = false; setState("ok");
+      if (Object.keys(outbox).length) flushSoon();
+    } catch(e){
+      busy = false; setState(navigator.onLine === false ? "offline" : "error", msg(e));
+      flushSoon(20000);
+    }
+  }
+  function hasLocalData(){ return Object.values(kinds).some(def => def.all().length && !(def.seedOnly && def.seedOnly())); }
+  async function fullSync(firstTime){
+    const rows = await pull(null);
+    const remote = {};
+    for (const r of rows) (remote[r.kind] ||= new Map()).set(r.id, {m:+(r.data && r.data._m) || 0, deleted:r.deleted});
+    const remoteHas = rows.some(r => !r.deleted && r.kind !== "settings");
+    let mode = "merge";
+    if (firstTime && remoteHas) mode = hasLocalData() ? await chooseMode() : "replace";
+    if (mode === "replace"){
+      const by = {};
+      for (const kind of Object.keys(kinds)){
+        const rk = remote[kind] || new Map(), b = by[kind] = {u:[], d:[]};
+        for (const o of kinds[kind].all()){ const r = rk.get(o.id); if (!r || r.deleted) b.d.push(o.id); }
+      }
+      for (const r of rows) if (!r.deleted && kinds[r.kind]) by[r.kind].u.push(r.data);
+      if (!remote.settings) delete by.settings;
+      apply(by);
+      if (!remote.settings) queueAll("settings");
+    } else {
+      if (firstTime && remoteHas){   // merging into an account that has data: this device's sample items and starter notes aren't worth copying
+        const by = {};
+        for (const [kind, def] of Object.entries(kinds)) if (def.isSeed){ const rk = remote[kind] || new Map(); by[kind] = {u:[], d:def.all().filter(o => !rk.has(o.id) && def.isSeed(o, rows)).map(o => o.id)}; }
+        apply(by);
+      }
+      receive(rows, firstTime && remote.settings ? new Set(["settings"]) : null);   // on a new device the account's settings win
+      for (const kind of Object.keys(kinds)) queueAll(kind, remote[kind] || new Map());
+    }
+    wr(OUT, outbox);
+  }
+  /* "Merge" or "Use account data only" when a device with its own data signs in for the first time. */
+  function chooseMode(){
+    return new Promise(res => {
+      const d = $("#dlg-choice");
+      $("#ch-title").textContent = "Your account already has Homebase data";
+      $("#ch-body").textContent = "This device also has items, notes or other data. Merge keeps both (newest edit wins where the same thing was changed on both). Use account data replaces what's on this device with your account's data.";
+      $("#ch-a").textContent = "Merge"; $("#ch-b").textContent = "Use account data only";
+      d.returnValue = ""; d.addEventListener("close", () => res(d.returnValue === "b" ? "replace" : "merge"), {once:true});
+      d.showModal();
+    });
+  }
+  function subscribeLive(){
+    if (channel) sb.removeChannel(channel);
+    channel = sb.channel("hb-" + user.id)
+      .on("postgres_changes", {event:"*", schema:"public", table:T, filter:`user_id=eq.${user.id}`}, p => { const r = p.new; if (r && r.kind) receive([r]); })
+      .subscribe(st => { if (st === "SUBSCRIBED") catchUp(); });
+  }
+  let catching = false;
+  async function catchUp(){
+    if (!sb || !user || catching || state === "syncing") return;
+    catching = true;
+    try { const rows = await pull(meta.lastPull); if (rows.length) receive(rows); wr(META, meta); await flush(); if (state !== "saving") setState("ok"); }
+    catch(e){ setState(navigator.onLine === false ? "offline" : "error", msg(e)); }
+    finally { catching = false; }
+  }
+  let signing = null;
+  async function afterSignIn(u){
+    if (signing === u.id) return; signing = u.id; user = u;
+    setState("syncing");
+    try {
+      const first = meta.userId !== u.id;
+      if (first){ outbox = {}; wr(OUT, outbox); }
+      if (first || meta.out || !meta.lastPull) await fullSync(first);
+      else { const rows = await pull(meta.lastPull); if (rows.length) receive(rows); }
+      meta.userId = u.id; meta.email = u.email; meta.out = false; wr(META, meta);
+      runTouches(); wr(OUT, outbox);
+      subscribeLive();
+      setState("ok"); await flush();
+      readyFns.forEach(f => { try { f(); } catch(e){ console.error(e); } });
+    } catch(e){ signing = null; setState(navigator.onLine === false ? "offline" : "error", msg(e)); }
+  }
+  const readyFns = new Set();
+  async function start(){
+    cfg = rd(CFG, null);
+    if (!cfg){ setState("off"); return; }
+    setState("connecting");
+    try {
+      const mod = await import(SB_ESM);
+      sb = mod.createClient(cfg.url, cfg.key, {auth:{persistSession:true, autoRefreshToken:true, detectSessionInUrl:true, storageKey:"homebase.sb.auth"}});
+    } catch(e){ sb = null; setState("error", "Couldn't load the Supabase library. Check your connection and reload."); return; }
+    sb.auth.onAuthStateChange((ev, session) => {
+      const u = session && session.user;
+      if (u) setTimeout(() => afterSignIn(u), 0);
+      else if (ev === "SIGNED_OUT"){ user = null; signing = null; setState("signedout"); }
+    });
+    const {data} = await sb.auth.getSession();
+    if (data && data.session) afterSignIn(data.session.user); else if (!user) setState("signedout");
+  }
+  document.addEventListener("visibilitychange", () => { if (!document.hidden && user) catchUp(); });
+  addEventListener("online", () => { if (user) catchUp(); });
+  setInterval(() => { if (user && Object.keys(outbox).length) flush(); }, 30000);
+
+  const api = {
+    register, touch, flush:() => { runTouches(); return flush(); },
+    subscribe(f){ subs.add(f); return () => subs.delete(f); },
+    onLocal(f){ localSubs.add(f); },
+    onReady(f){ readyFns.add(f); if (user && state === "ok") f(); },
+    start:() => started || (started = start()),
+    get state(){ return state; }, get error(){ return err; },
+    configured:() => !!cfg, config:() => cfg,
+    user:() => user, client:() => sb, live:() => !!(sb && user),
+    pending:() => Object.keys(outbox).length,
+    setConfig(c){
+      cfg = c; c ? wr(CFG, c) : localStorage.removeItem(CFG);
+      started = null; sb = null; user = null; signing = null;
+      if (channel){ try { channel.unsubscribe(); } catch(e){} channel = null; }
+      return api.start();
+    },
+    async signIn(email, password){ const {error} = await sb.auth.signInWithPassword({email, password}); if (error) throw error; },
+    async signUp(email, password){ const {data, error} = await sb.auth.signUp({email, password, options:{emailRedirectTo:location.origin + location.pathname}}); if (error) throw error; return !data.session; },
+    async magicLink(email){ const {error} = await sb.auth.signInWithOtp({email, options:{emailRedirectTo:location.origin + location.pathname}}); if (error) throw error; },
+    async signOut(){
+      runTouches(); await flush();
+      if (channel){ try { await sb.removeChannel(channel); } catch(e){} channel = null; }
+      await sb.auth.signOut(); user = null; signing = null;
+      outbox = {}; wr(OUT, outbox); meta.out = true; wr(META, meta); setState("signedout");
+    },
+    async syncNow(){ if (!user) return; runTouches(); await catchUp(); },
+    statusText(){
+      const p = Object.keys(outbox).length;
+      switch (state){
+        case "off": return "Saved in this browser. Turn on sync in Settings to use Homebase on your phone too.";
+        case "connecting": return "Connecting to sync…";
+        case "signedout": return "Signed out of sync. Saved in this browser.";
+        case "syncing": return "Syncing…";
+        case "saving": return "Saving to the cloud…";
+        case "offline": return `Offline. ${p ? plural(p, "change") + " will sync" : "Changes will sync"} when you're back online.`;
+        case "error": return `Sync problem: ${err}`;
+        default: return `Synced${user && user.email ? " as " + user.email : ""}.`;
+      }
+    },
+  };
+  return api;
+})();
+
+/* A small synced key → record store, used by links, lifts, facts and app data. */
+function DocStore(lsKey, kind, seed){
+  let map = {};
+  try { map = JSON.parse(localStorage.getItem(lsKey) || "null") || {}; } catch(e){ map = {}; }
+  const seeds = seed ? seed() : [];
+  for (const s of seeds) if (!map[s.id]) map[s.id] = s;
+  const subs = new Set();
+  let warned = false;
+  const persist = () => { try { localStorage.setItem(lsKey, JSON.stringify(map)); } catch(e){ if (!warned){ warned = true; setTimeout(() => toast("This browser's storage is full. Remove big uploaded HTML files or old data."), 0); } } };
+  const emit = () => subs.forEach(f => { try { f(); } catch(e){ console.error(e); } });
+  const api = {
+    kind,
+    all: () => Object.values(map),
+    get: id => map[id] ? map[id].d : null,
+    put(id, d){ map[id] = {id, d, _m:Date.now()}; persist(); Sync.touch(kind); emit(); },
+    putMany(list){ const t = Date.now(); for (const [id, d] of list) map[id] = {id, d, _m:t}; persist(); Sync.touch(kind); emit(); },
+    del(id){ if (!map[id]) return; delete map[id]; persist(); Sync.touch(kind); emit(); },
+    delMany(ids){ let any = false; for (const id of ids) if (map[id]){ delete map[id]; any = true; } if (any){ persist(); Sync.touch(kind); emit(); } },
+    subscribe(f){ subs.add(f); return () => subs.delete(f); },
+  };
+  Sync.register(kind, {
+    all: api.all, m: o => +o._m || 0, persist,
+    seedOnly: () => Object.keys(map).every(id => seeds.some(s => s.id === id)),
+    apply(u, d){ for (const o of u) if (o && o.id) map[o.id] = {id:o.id, d:o.d, _m:+o._m || 0}; for (const id of d) delete map[id]; persist(); emit(); },
+  });
+  return api;
+}
+
 const LocalAdapter = {
   KEY: "homebase.items.v2",
   LEGACY: "homebase.events.v1",   // old format, left in place untouched as a backup
@@ -2083,6 +3703,10 @@ function normalize(r){
     flagged: !!r.flagged,
     notes: String(r.notes || ""),
     subtasks: Array.isArray(r.subtasks) ? r.subtasks.map(s => ({id: s.id || uid(), text: String(s.text || ""), done: !!s.done})) : [],
+    /* null = use the default reminder for this type (Settings → Reminders); [] = none.
+       Each is {id, off: minutes before} or {id, at: "YYYY-MM-DDTHH:MM"}. */
+    reminders: Array.isArray(r.reminders) ? r.reminders.filter(x => x && (Number.isFinite(+x.off) && x.off !== null && x.off !== "" || /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(x.at || ""))).slice(0, 8)
+      .map(x => /^\d{4}/.test(x.at || "") ? {id: String(x.id || uid()), at: x.at} : {id: String(x.id || uid()), off: Math.max(0, Math.round(+x.off))}) : null,
     completed,
     completedAt: completed ? (r.completedAt || `${date}T12:00:00`) : null,
     deletedAt: r.deletedAt || null,
@@ -2139,12 +3763,18 @@ const Store = (() => {
     },
     /* Replace whole records (used for undo). */
     put(records){
-      const map = new Map(records.map(r => [r.id, normalize(r)]));
+      const map = new Map(records.map(r => [r.id, normalize({...r, updatedAt: nowIso()})]));
       cache = cache.map(r => map.get(r.id) || r);
       for (const [id, r] of map) if (!cache.some(x => x.id === id)) cache.push(r);
       write("upsert", [...map.values()]); emit();
     },
-    applyRemote(records){ api.put(records); },   // for future realtime sync
+    /* Records from another device (see Sync). Keeps their timestamps; saves locally only. */
+    applyRemote(records, removedIds = []){
+      const gone = new Set(removedIds), map = new Map(records.map(r => [r.id, normalize(r)]));
+      cache = cache.filter(r => !gone.has(r.id)).map(r => map.get(r.id) || r);
+      for (const [id, r] of map) if (!cache.some(x => x.id === id)) cache.push(r);
+      write("upsert", []); emit();
+    },
     remove(ids){ const t = nowIso(); return api.updateMany(ids, () => ({deletedAt: t})); },
     restore(ids){ return api.updateMany(ids, () => ({deletedAt: null})); },
     purge(ids){
@@ -2166,11 +3796,24 @@ const Store = (() => {
    ===================================================================== */
 const Settings = (() => {
   const KEY = "homebase.settings.v1";
-  let s = {theme:{mode:"auto", lightAt:"07:00", darkAt:"22:00", override:null}, courseColors:{}, importProfiles:{},
-    ai:{mode:"off", localUrl:"http://localhost:11434", localModel:"llama3.1", claudeModel:"claude-sonnet-5-5"}, mail:{account:"gmail"}, screens:null, myColors:[], calFilter:"both"};   // no API keys in here; see AI module
-  try { const raw = localStorage.getItem(KEY); if (raw){ const p = JSON.parse(raw); s = {...s, ...p, theme:{...s.theme, ...(p.theme || {})}, courseColors:{...(p.courseColors || {})}, importProfiles:{...(p.importProfiles || {})}, ai:{...s.ai, ...(p.ai || {})}, mail:{...s.mail, ...(p.mail || {})}}; } } catch(e){}
+  const defaults = () => ({theme:{mode:"auto", lightAt:"07:00", darkAt:"22:00", override:null}, courseColors:{}, importProfiles:{},
+    ai:{mode:"off", localUrl:"http://localhost:11434", localModel:"llama3.1", claudeModel:"claude-sonnet-5-5"}, mail:{account:"gmail"}, screens:null, myColors:[], calFilter:"both",
+    facts:{topics:["Electrical engineering","Energy & power systems","Space","History"], perDay:3, model:""},
+    remind:{topic:"", server:"https://ntfy.sh", dayTime:"09:00", defaults:{Exam:[1440], Quiz:[1440]}}});   // no API keys in here; see AI module
+  const hydrate = p => { const s = defaults(); if (!p) return s;
+    return {...s, ...p, theme:{...s.theme, ...(p.theme || {})}, courseColors:{...(p.courseColors || {})}, importProfiles:{...(p.importProfiles || {})}, ai:{...s.ai, ...(p.ai || {})}, mail:{...s.mail, ...(p.mail || {})},
+      facts:{...s.facts, ...(p.facts || {})}, remind:{...s.remind, ...(p.remind || {}), defaults:{...((p.remind && p.remind.defaults) || s.remind.defaults)}}}; };
+  let s;
+  try { const raw = localStorage.getItem(KEY); s = hydrate(raw ? JSON.parse(raw) : null); } catch(e){ s = hydrate(null); }
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch(e){} };
-  return { get: () => s, update(fn){ fn(s); save(); } };
+  const hooks = new Set();
+  return {
+    get: () => s,
+    update(fn){ fn(s); s._m = Date.now(); save(); Sync.touch("settings"); },
+    /* settings that came from another device */
+    replace(p){ s = hydrate(p); save(); hooks.forEach(f => { try { f(); } catch(e){ console.error(e); } }); },
+    onReplace(f){ hooks.add(f); },
+  };
 })();
 
 /* Notes color: picked in Settings; sets --h-notes for light and dark. */
@@ -2224,6 +3867,7 @@ function applyTheme(){
   if (th.override && !overrideActive()) Settings.update(st => { st.theme.override = null; });
   const t = currentTheme();
   document.documentElement.dataset.theme = t;
+  if (window.HB_onTheme) window.HB_onTheme(t);
   const b = $("#btn-theme"); b.innerHTML = t === "dark" ? SUN : MOON;
   b.title = t === "dark" ? "Switch to light mode" : "Switch to dark mode"; b.setAttribute("aria-label", b.title);
   if ($("#dlg-settings").open) renderSettings();
@@ -2258,6 +3902,7 @@ function renderSettings(){
   const nc = Settings.get().notesColor || "blue";
   $("#st-ncolor").innerHTML = NOTE_COLORS.map(([k, n, l, d]) => `<button type="button" data-nc="${k}" aria-pressed="${k === nc}" style="--nc:${currentTheme() === "dark" ? d : l}"><i></i>${n}</button>`).join("");
   renderAISettings();
+  renderCloud(); renderLinkSettings(); Facts.renderSettingsSec(); Rem.renderSettingsSec();
 }
 $("#st-ncolor").addEventListener("click", e => { const b = e.target.closest("[data-nc]"); if (!b) return; Settings.update(st => { st.notesColor = b.dataset.nc; }); applyNotesColor(); renderSettings(); });
 $("#btn-theme").onclick = toggleTheme;
@@ -2889,6 +4534,21 @@ $("#cal-filter").addEventListener("click", e => { const b = e.target.closest("[d
 $("#cal-views").addEventListener("click", e => { const b = e.target.closest("[data-view]"); if (b) setView(b.dataset.view); });
 $("#prev").onclick = () => stepCal(-1);
 $("#next").onclick = () => stepCal(1);
+/* Small calendar widgets get a button that opens the calendar full size in a pop-up. */
+$("#cal-x").onclick = () => {
+  const d = $("#dlg-calx"), t = $("#t-cal");
+  if (d.open){ d.close(); return; }
+  calHome = t.parentElement; d.appendChild(t); d.showModal();
+  $("#cal-x").setAttribute("aria-label", "Close"); $("#cal-x").title = "Close (Esc)"; calXIcon = $("#cal-x").innerHTML;
+  $("#cal-x").innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+  t.querySelectorAll(".fit-off").forEach(e => e.classList.remove("fit-off"));
+};
+let calHome = null, calXIcon = "";
+$("#dlg-calx").addEventListener("close", () => {
+  const t = $("#t-cal"); if (calHome && calHome.isConnected) calHome.appendChild(t); else $("#w-park").appendChild(t);
+  calHome = null; if (calXIcon) $("#cal-x").innerHTML = calXIcon; $("#cal-x").setAttribute("aria-label", "Open the calendar larger"); $("#cal-x").title = "Open larger"; fitSoon();
+});
+$("#dlg-calx").addEventListener("click", e => { if (e.target === e.currentTarget) e.currentTarget.close(); });   // click outside closes
 $("#today").onclick = () => { cal.cursor = startOfDay(new Date()); cal.selected = todayS(); renderCal(); };
 $("#cal-body").addEventListener("click", e => {
   if (e.target.closest("[data-open]") || e.target.closest("input")) return;
@@ -3139,7 +4799,7 @@ function syncDetailDynamic(){
   $("#d-time-l").textContent = sched ? "Starts" : "Due time";
   $("#d-end-f").hidden = !sched; $("#d-end").value = r.endTime || "";
   $("#d-lec-f").hidden = r.type !== "Lecture" && r.lectureNumber == null;
-  renderSubtasks(); renderRepeat();
+  renderSubtasks(); renderRepeat(); renderItemReminders();
   $("#d-meta").textContent = detail.draft ? "" : [r.completed ? `Completed ${fmtDT(r.completedAt)}` : "", `Created ${fmtDT(r.createdAt)}`, r.sample ? "Sample item" : ""].filter(Boolean).join(" · ");
   const series = !detail.draft && r.seriesId;
   $("#d-foot").innerHTML = detail.draft
@@ -3260,9 +4920,10 @@ const Notes = (() => {
   let d;
   try { const raw = localStorage.getItem(KEY); d = raw ? JSON.parse(raw) : seed(); d.folders ||= []; d.notes ||= []; } catch(e){ d = seed(); }
   const subs = new Set();
-  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(d)); } catch(e){} };
+  const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(d)); } catch(e){} };
+  const save = () => { persist(); Sync.touch("note"); Sync.touch("folder"); };
   const emit = () => subs.forEach(f => { try { f(); } catch(e){ console.error(e); } });
-  if (!localStorage.getItem(KEY)) save();
+  if (!localStorage.getItem(KEY)) persist();
   function descendants(id){ const out = [id]; for (let i = 0; i < out.length; i++) d.folders.filter(f => f.parentId === out[i] && !f.deletedAt).forEach(f => out.push(f.id)); return out; }
   const api = {
     subscribe(f){ subs.add(f); },
@@ -3313,6 +4974,24 @@ const Notes = (() => {
       api.deletedEntries().filter(e => new Date(e.deletedAt).getTime() < cutoff).forEach(e => api.purge(e.kind, e.id));
     },
   };
+  /* sync: notes and folders from another device (a note you're typing in is left alone) */
+  const applyTo = arr => (u, dl) => {
+    const ae = document.activeElement, typing = arr === "notes" && ae && (ae.id === "nt-body" || ae.id === "nt-title") ? nt.note : null;
+    const ds = new Set(dl); if (typing) ds.delete(typing);
+    for (const o of u){
+      if (o.id === typing) continue;
+      const i = d[arr].findIndex(x => x.id === o.id); if (i >= 0) d[arr][i] = {...o}; else d[arr].push({...o});
+      if (arr === "notes" && nt.loaded === o.id) nt.loaded = null;
+    }
+    if (ds.size) d[arr] = d[arr].filter(x => !ds.has(x.id));
+    persist(); emit();
+  };
+  const seedOnly = () => d.notes.length <= 1 && d.notes.every(n => n.title === "Welcome to Notes") && d.folders.every(f => ["School","Personal"].includes(f.name));
+  Sync.register("note", {all:() => d.notes, m:o => +o._m || Date.parse(o.updatedAt) || 0, stamp:o => { o._m = Date.now(); }, persist, seedOnly, apply:applyTo("notes"),
+    isSeed:n => n.title === "Welcome to Notes" && /Make folders on the left/.test(n.html || "")});
+  Sync.register("folder", {all:() => d.folders, m:o => +o._m || Date.parse(o.createdAt) || 0, stamp:o => { o._m = Date.now(); }, persist, seedOnly, apply:applyTo("folders"),
+    isSeed:(f, rows) => ["School","Personal"].includes(f.name) && !f.parentId && !d.notes.some(n => n.folderId === f.id && !(n.title === "Welcome to Notes"))
+      && rows.some(r => r.kind === "folder" && !r.deleted && r.data && r.data.name === f.name && !r.data.parentId)});
   return api;
 })();
 
@@ -3885,6 +5564,7 @@ const Home = (() => {
     {k:"outlook",  type:"inbox", acct:"outlook", name:"Outlook",      desc:"School inbox",            def:[2,2]},
     {k:"inbox",    type:"inbox", acct:"split",   name:"Inbox (both)", desc:"Switch between Gmail and Outlook", def:[2,3]},
     {k:"note",     type:"note",     name:"Note",            desc:"Any of your notes, live",      def:[2,2]},
+    {k:"facts",    type:"facts",    name:"Daily facts",     desc:"A few facts a day from your topics", def:[2,2]},
     {k:"import",   type:"import",   name:"Import schedule", desc:"Drop a PDF, CSV or .ics",      def:[2,2]},
   ];
   const kindOf = it => it.type === "inbox" ? KINDS.find(k => k.acct === (it.acct || "split")) : KINDS.find(k => k.type === it.type);
@@ -4012,12 +5692,12 @@ const Home = (() => {
   function noteHTML(it){
     const n = it.note && Notes.note(it.note);
     if (!n || n.deletedAt) return `<section class="tile tinted mw note-w"><h2><span>Note</span></h2><p class="note">This note was deleted. Choose another one in Edit home screen.</p></section>`;
-    const can = it.pick !== false && pickItems(n).length >= 2;
+    const can = it.pickOn === true && pickItems(n).length >= 2;
     return `<section class="tile tinted mw note-w" data-onote="${n.id}" aria-label="Note: ${esc(n.title || "Untitled")}"><h2><span>${esc(n.title || "Untitled")}</span><span class="nw-open" role="link" tabindex="0">Open ›</span></h2>
       <div class="nt-body nw-body" data-nwid="${n.id}" spellcheck="true">${cleanHTML(n.html)}</div>
       ${can ? `<div class="nw-pick"><button type="button" class="btn small" data-wpick="${it.id}">${picked[it.id] ? "Pick again" : "Pick one for me"}</button><output>${esc(picked[it.id] || "")}</output></div>` : ""}</section>`;
   }
-  function multiHTML(it){ return it.type === "inbox" ? inboxHTML(it) : it.type === "note" ? noteHTML(it) : `<section class="tile mw"><p class="note">Unknown widget.</p></section>`; }
+  function multiHTML(it){ return it.type === "inbox" ? inboxHTML(it) : it.type === "note" ? noteHTML(it) : it.type === "facts" ? Facts.widget(it) : `<section class="tile mw"><p class="note">Unknown widget.</p></section>`; }
 
   /* ---------- building a grid (home or editor) ---------- */
   function build(grid, items, cols, editing){
@@ -4098,6 +5778,7 @@ const Home = (() => {
       if (t.closest(".nw-body.editable") && !t.closest(".nw-open")) return;   // editing in place
       nt.note = nw.dataset.onote; nt.mobileEdit = true; nt.loaded = null; location.hash = "#notes"; return;
     }
+    if (t.closest(".facts-w")){ Facts.openDialog(); return; }
     if (hw.dataset.type === "todo" && !t.closest("input,a,button,[data-open],label")) location.hash = "#todo";
   }, true);
   /* typing in a note widget saves to the note */
@@ -4198,7 +5879,7 @@ const Home = (() => {
   function hidePop(){ pop.hidden = true; }
   function sizeTab(it){
     const cols = edCols();
-    return `<div><p class="wp-l">Preset sizes</p><div class="chips">${SIZES.map(([n, w, h]) => { w = w || cols; return w > cols ? "" : `<button type="button" data-size="${w},${h}" aria-pressed="${it.w === w && it.h === h}">${n}<small>${w}×${h}</small></button>`; }).join("")}</div></div>
+    return `<div><p class="wp-l">Preset sizes</p><div class="chips">${SIZES.map(([n, w, h]) => { w = w || cols; return w > cols || tooSmall(it.type, w, h) ? "" : `<button type="button" data-size="${w},${h}" aria-pressed="${it.w === w && it.h === h}">${n}<small>${w}×${h}</small></button>`; }).join("")}</div></div>
       <div><p class="wp-l">Exact size</p><div class="wp-steps"><span class="step"><button type="button" data-dim="w,-1" aria-label="Narrower">−</button><b>${it.w} wide</b><button type="button" data-dim="w,1" aria-label="Wider">+</button></span>
       <span class="step"><button type="button" data-dim="h,-1" aria-label="Shorter">−</button><b>${it.h} tall</b><button type="button" data-dim="h,1" aria-label="Taller">+</button></span></div>
       <p class="note" style="margin-top:8px">Or drag the round handle in the widget's corner.</p></div>`;
@@ -4236,8 +5917,8 @@ const Home = (() => {
     const notes = Notes.notes().slice().sort((x, y) => (x.title || "").localeCompare(y.title || ""));
     const n = Notes.note(it.note), items = n ? pickItems(n).length : 0;
     return `<div><label class="wp-l" for="wp-note">Note</label><select class="wp-sel" id="wp-note">${notes.map(x => `<option value="${x.id}" ${x.id === it.note ? "selected" : ""}>${esc(x.title || "Untitled")}${x.folderId ? " · " + esc(Notes.path(x.folderId)) : ""}</option>`).join("")}</select></div>
-      <label class="switch"><input type="checkbox" id="wp-pick" ${it.pick !== false ? "checked" : ""}><span>Show “Pick one for me”</span></label>
-      <p class="note">${items >= 2 ? `Picks a random unchecked item from this note's ${items} list items.` : "Shows up only when the note has a list with at least 2 items."}</p>`;
+      <label class="switch"><input type="checkbox" id="wp-pick" ${it.pickOn === true ? "checked" : ""}><span>Show a “Pick one for me” button</span></label>
+      <p class="note">Off by default. Useful for list notes like dinner ideas: it picks a random unchecked item. ${items >= 2 ? `This note has ${items} list items.` : "It only shows when the note has a list with at least 2 items."}</p>`;
   }
   function renderPop(){
     const it = selItem();
@@ -4296,8 +5977,10 @@ const Home = (() => {
     Settings.update(st => { st.myColors = [c, ...(st.myColors || [])].slice(0, 30); });
     toast("Saved to My colors"); renderPop();
   }
+  const tooSmall = (type, w, h) => type === "calendar" && w === 1 && h === 1;   // the calendar needs at least 2 tiles
   function resizeTo(it, w, h){
     const cols = edCols(); w = clamp(w, 1, cols); h = clamp(h, 1, 16);
+    if (tooSmall(it.type, w, h)){ toast("The calendar needs at least 2 tiles."); return; }
     const r = {x:Math.min(it.x, cols - w), y:it.y, w, h};
     if (!fits(edItems(), r, cols, it.id)){ toast("Not enough room there. Move it or make room first."); return; }
     Object.assign(it, r); renderEditor();
@@ -4347,7 +6030,7 @@ const Home = (() => {
   pop.addEventListener("change", e => {
     const it = selItem(); if (!it) return;
     if (e.target.id === "wp-note"){ it.note = e.target.value; delete picked[it.id]; renderEditor(); }
-    if (e.target.id === "wp-pick"){ it.pick = e.target.checked; renderEditor(); }
+    if (e.target.id === "wp-pick"){ it.pickOn = e.target.checked; renderEditor(); }
     if (e.target.dataset.lab){ it.labels = {...(it.labels || {}), [e.target.dataset.lab]: e.target.value.trim()}; renderEditor(); }
   });
   pop.addEventListener("keydown", e => { if (e.key === "Enter" && e.target.id === "cs-hex"){ e.preventDefault(); pop.querySelector('[data-wp="cs-use"]').click(); } });
@@ -4357,7 +6040,7 @@ const Home = (() => {
     if (!r){ toast("No open spot. Remove or shrink something first."); return; }
     const it = {id:uid(), type:p.type, ...r, color:{k:"default"}};
     if (p.type === "inbox"){ it.acct = p.acct; if (p.acct === "split") it.view = "gmail"; }
-    if (p.type === "note"){ it.note = p.note; it.pick = true; }
+    if (p.type === "note"){ it.note = p.note; }
     edItems().push(it); ed.placing = null; ed.tab = "size"; select(it.id);
   }
   egrid.addEventListener("click", e => {
@@ -4404,7 +6087,7 @@ const Home = (() => {
       if (!drag.moved){ if (!drag.canDrag || Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) < 6) return; drag.moved = true; drag.el.classList.add("dragging"); hidePop(); }
       drag.r = {x:clamp(c.x - drag.dx, 0, cols - it.w), y:Math.max(0, c.y - drag.dy), w:it.w, h:it.h};
     } else drag.r = {x:it.x, y:it.y, w:clamp(c.x - it.x + 1, 1, cols - it.x), h:clamp(c.y - it.y + 1, 1, 16)};
-    drag.ok = fits(edItems(), drag.r, cols, it.id); showGhost(drag.r, drag.ok);
+    drag.ok = fits(edItems(), drag.r, cols, it.id) && !tooSmall(it.type, drag.r.w, drag.r.h); showGhost(drag.r, drag.ok);
     if (e.clientY < 90) scrollBy(0, -14); else if (e.clientY > innerHeight - 60) scrollBy(0, 14);
     e.preventDefault();
   });
@@ -4413,7 +6096,7 @@ const Home = (() => {
     const d = drag; drag = null; hideGhost();
     if (!cancel && d.mode === "move" && !d.moved){ if (ed.sel !== d.it.id) return select(d.it.id); return renderEditor(); }
     if (!cancel && d.r && d.ok) Object.assign(d.it, d.r);
-    else if (!cancel && d.r && !d.ok) toast("That overlaps another widget.");
+    else if (!cancel && d.r && !d.ok) toast(tooSmall(d.it.type, d.r.w, d.r.h) ? "The calendar needs at least 2 tiles." : "That overlaps another widget.");
     renderEditor();
   };
   egrid.addEventListener("pointerup", e => endDrag(e, false));
@@ -4476,7 +6159,8 @@ const Home = (() => {
     $("#ga-note-f").hidden = gal.k !== "note";
     const notes = Notes.notes().slice().sort((x, y) => (x.title || "").localeCompare(y.title || ""));
     $("#ga-note").innerHTML = notes.length ? notes.map(n => `<option value="${n.id}" ${n.id === gal.note ? "selected" : ""}>${esc(n.title || "Untitled")}</option>`).join("") : `<option value="">No notes yet. Make one on the Notes page</option>`;
-    $("#ga-sizes").innerHTML = SIZES.map(([n, w, h]) => { w = w || cols; return w > cols ? "" : `<button type="button" data-gs="${w},${h}" aria-pressed="${gal.w === w && gal.h === h}">${n}<small>${w}×${h}</small></button>`; }).join("");
+    const gtype = KINDS.find(k => k.k === gal.k).type;
+    $("#ga-sizes").innerHTML = SIZES.map(([n, w, h]) => { w = w || cols; return w > cols || tooSmall(gtype, w, h) ? "" : `<button type="button" data-gs="${w},${h}" aria-pressed="${gal.w === w && gal.h === h}">${n}<small>${w}×${h}</small></button>`; }).join("");
     const noNote = gal.k === "note" && !notes.length;
     $("#ga-place").disabled = $("#ga-auto").disabled = noNote;
   }
@@ -4570,6 +6254,9 @@ const PAGES = ["home","todo","notes","items","deleted"];
 let page = "home";
 function route(){
   const [p, sub] = location.hash.slice(1).split("/");
+  if (ready && checkSetupLink()) return;
+  if (p === "link" && sub && ready) setTimeout(() => openLink(decodeURIComponent(sub), true), 0);
+  if (p === "item" && sub && ready){ history.replaceState(null, "", "#home"); setTimeout(() => openDetail(decodeURIComponent(sub)), 0); }
   page = PAGES.includes(p) ? p : "home";
   if (page === "todo" && sub) todoState.list = (sub === "history" || SMART.some(s => s.k === sub)) ? sub : "all";
   document.body.className = "pg-" + page;
@@ -4591,7 +6278,7 @@ function renderAll(){
   $("#more-b").title = urgent ? `To-do (${urgent} due today or overdue), All items, Deleted` : "To-do, All items, Deleted";
   Home.render();
   updateDelCount();
-  $("#store-note").textContent = Store.persistent ? "Saved in this browser." : "This browser is blocking storage, so changes last until you close the page.";
+  $("#store-note").textContent = Store.persistent ? Sync.statusText() : "This browser is blocking storage, so changes last until you close the page.";
 }
 
 /* =====================================================================
@@ -5102,6 +6789,610 @@ $("#form-review").addEventListener("submit", e => {
 });
 
 /* =====================================================================
+   SYNC WIRING: items and settings join the synced data.
+   ===================================================================== */
+Sync.register("settings", {
+  all: () => [{id:"main", s:Settings.get()}],
+  m: o => +o.s._m || 0,
+  seedOnly: () => true,
+  apply(u){ if (u[0] && u[0].s) Settings.replace(u[0].s); },
+});
+Settings.onReplace(() => {
+  applyNotesColor(); applyTheme();
+  if (ready){ Home.render(true); renderAll(); }
+  if ($("#dlg-settings").open) renderSettings();
+});
+const downloadText = (name, text, type = "text/plain") => {
+  const a = document.createElement("a"), url = URL.createObjectURL(new Blob([text], {type}));
+  a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000);
+};
+const safeJSON = x => JSON.stringify(x).replace(/</g, "\\u003c").replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029");
+const hostOf = u => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch(e){ return ""; } };
+const siteBase = () => location.origin + location.pathname;
+
+/* =====================================================================
+   LINKS: the row under the header. Each link opens in a pop-up (or a
+   new tab). Kinds: "url" (a web page), "html" (an uploaded HTML file,
+   run sandboxed) and "app" (built in: Lifts).
+   ===================================================================== */
+const LinkStore = DocStore("homebase.links.v1", "link", () => [{id:"lifts", d:{kind:"app", app:"lifts", title:"Lifts", icon:"e:🏋️", order:0}, _m:0}]);
+const Workouts = DocStore("homebase.lifts.workouts.v1", "workout");
+const LiftSessions = DocStore("homebase.lifts.sessions.v1", "liftsession");
+const AppData = DocStore("homebase.appdata.v1", "appdata");
+
+/* Sites that refuse to be shown inside another page. New links to them default to "always open in a new tab". */
+const NO_FRAME = ["google.com","gmail.com","github.com","facebook.com","instagram.com","x.com","twitter.com","linkedin.com","reddit.com","amazon.com","netflix.com",
+  "apple.com","icloud.com","microsoft.com","office.com","live.com","outlook.com","microsoftonline.com","sharepoint.com","notion.so","chatgpt.com","openai.com",
+  "claude.ai","anthropic.com","brightspace.com","instructure.com","stackoverflow.com","discord.com","slack.com","zoom.us","spotify.com","twitch.tv","tiktok.com",
+  "paypal.com","venmo.com","chase.com","bankofamerica.com","wellsfargo.com","capitalone.com","dropbox.com","canva.com","figma.com","supabase.com","vercel.com","ntfy.sh"];
+const likelyBlocks = u => { const h = hostOf(u); return !!h && NO_FRAME.some(d => h === d || h.endsWith("." + d)); };
+const opensTab = l => l.kind !== "app" && (!!l.newTab || (l.kind === "url" && /^http:/i.test(l.url || "")));
+function embedUrl(u){
+  try {
+    const x = new URL(u), h = x.hostname.replace(/^(www|m)\./, "");
+    if (h === "youtube.com" && x.pathname === "/watch" && x.searchParams.get("v")) return `https://www.youtube.com/embed/${encodeURIComponent(x.searchParams.get("v"))}`;
+    if (h === "youtu.be" && x.pathname.length > 1) return `https://www.youtube.com/embed/${encodeURIComponent(x.pathname.slice(1))}`;
+  } catch(e){}
+  return u;
+}
+const LICONS = {
+  link:'<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>',
+  globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+  book:'<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/>',
+  cap:'<path d="M12 4 2 9l10 5 10-5z"/><path d="M6 11v5c3 2 9 2 12 0v-5M22 9v6"/>',
+  bolt:'<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
+  code:'<path d="m8 8-5 4 5 4M16 8l5 4-5 4M14 4l-4 16"/>',
+  mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
+  cal:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',
+  chart:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+  music:'<path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>',
+  cart:'<circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M3 4h2l2.4 11h11l2-8H6.2"/>',
+  dumbbell:'<path d="M6 7v10M3 9v6M18 7v10M21 9v6M6 12h12"/>',
+  flask:'<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.8 3h10.4a2 2 0 0 0 1.8-3l-5-9V3"/>',
+  home:'<path d="m3 11 9-7 9 7"/><path d="M5 10v10h14V10"/>',
+  star:'<path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.9 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/>',
+};
+const LEMOJI = ["🏋️","📚","🎓","📅","📝","💼","⚡","🔋","🧮","🔬","💡","🌐","🏠","💰","🛒","🍳","🏃","🎵","🎬","📈","🗂️","⭐","🎮","☕"];
+function iconHTML(l){
+  const ic = (l && l.icon) || "";
+  if (ic.startsWith("e:")) return `<span class="lk-ic" aria-hidden="true">${esc(ic.slice(2))}</span>`;
+  if (ic.startsWith("i:") && LICONS[ic.slice(2)]) return `<span class="lk-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${LICONS[ic.slice(2)]}</svg></span>`;
+  if (ic === "f:" && l.url && hostOf(l.url)) return `<span class="lk-ic" aria-hidden="true"><img src="https://icons.duckduckgo.com/ip3/${encodeURIComponent(new URL(l.url).hostname)}.ico" alt="" loading="lazy" referrerpolicy="no-referrer"></span>`;
+  return "";
+}
+const linksSorted = () => LinkStore.all().map(o => ({id:o.id, ...o.d})).filter(l => l.title).sort((a, b) => (a.order ?? 0) - (b.order ?? 0) || a.title.localeCompare(b.title));
+const getLink = id => { const d = LinkStore.get(id); return d ? {id, ...d} : null; };
+
+function renderLinkRow(){
+  const el = $("#linkrow"), L = linksSorted();
+  el.innerHTML = L.map(l => `<button type="button" class="lk" data-link="${esc(l.id)}" title="${esc(l.title)}${opensTab(l) ? " (opens in a new tab)" : ""}">${iconHTML(l)}<span class="lk-t">${esc(l.title)}</span>${opensTab(l) ? '<span class="lk-ext" aria-hidden="true">↗</span>' : ""}</button>`).join("");
+  el.hidden = !L.length;
+}
+$("#linkrow").addEventListener("click", e => { const b = e.target.closest("[data-link]"); if (b) openLink(b.dataset.link); });
+
+/* ---------- the pop-up ---------- */
+const SANDBOX = "allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-modals allow-downloads";
+const lx = {id:null, timer:0};
+const appWins = new Map();   // sandboxed app window → link id (for saving what it stores)
+let liftFrame = null;
+function openLink(id, forcePopup){
+  const l = getLink(id); if (!l) return;
+  if (!forcePopup && opensTab(l)) return openInTab(l);
+  lx.id = l.id; clearTimeout(lx.timer);
+  $("#lx-ic").innerHTML = iconHTML(l);
+  $("#lx-t").textContent = l.title;
+  $("#lx-sub").textContent = l.kind === "url" ? hostOf(l.url) : l.kind === "html" ? `${l.fileName || "HTML file"} · runs sandboxed` : "Built into Homebase";
+  $("#lx-hint").hidden = true;
+  const body = $("#lx-body");
+  body.querySelectorAll("iframe:not(#lx-lifts)").forEach(f => { appWins.delete(f.contentWindow); f.remove(); });
+  if (liftFrame) liftFrame.hidden = true;
+  if (l.kind === "app"){ ensureLiftFrame().hidden = false; }
+  else {
+    const f = document.createElement("iframe");
+    f.title = l.title;
+    if (l.kind === "html"){ f.setAttribute("sandbox", SANDBOX); f.dataset.app = l.id; body.appendChild(f); appWins.set(f.contentWindow, l.id); f.srcdoc = appDoc(l); }
+    else {
+      f.src = embedUrl(l.url); f.referrerPolicy = "strict-origin-when-cross-origin"; f.allow = "fullscreen; clipboard-write; autoplay";
+      body.appendChild(f);
+      if (!l.embedOk){ const show = () => { if (lx.id === l.id) $("#lx-hint").hidden = false; }; f.addEventListener("load", () => setTimeout(show, 900), {once:true}); lx.timer = setTimeout(show, 6000); }
+    }
+  }
+  const d = $("#dlg-link"); if (!d.open) d.showModal();
+}
+function openInTab(l){
+  if (l.kind === "url") return void window.open(l.url, "_blank", "noopener");
+  if (l.kind === "app") return void window.open(siteBase() + "#link/" + encodeURIComponent(l.id), "_blank");
+  /* An uploaded HTML file gets a blank tab of ours holding the same sandboxed frame, so it still can't read Homebase's data. */
+  const w = window.open("", "_blank");
+  if (!w){ toast("Your browser blocked the new tab. Allow pop-ups for this site."); return; }
+  w.document.open();
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(l.title)}</title><style>html,body{margin:0;height:100%;background:#fff}iframe{border:0;width:100%;height:100%;display:block}</style></head><body></body></html>`);
+  w.document.close();
+  const f = w.document.createElement("iframe"); f.setAttribute("sandbox", SANDBOX); w.document.body.appendChild(f);
+  appWins.set(f.contentWindow, l.id); w.addEventListener("message", onAppMessage);
+  f.srcdoc = appDoc(l);
+}
+$("#lx-tab").onclick = () => { const l = getLink(lx.id); if (l) openInTab(l); };
+$("#lx-reload").onclick = () => {
+  const l = getLink(lx.id); if (!l) return;
+  if (l.kind === "app"){ if (liftFrame){ liftFrame.srcdoc = liftDoc(); } return; }
+  openLink(l.id, true);
+};
+$("#lx-hint").addEventListener("click", e => {
+  const b = e.target.closest("[data-lxh]"); if (!b) return; const l = getLink(lx.id); if (!l) return;
+  const {id, ...d} = l;
+  if (b.dataset.lxh === "tab"){ openInTab(l); return; }
+  if (b.dataset.lxh === "always"){ LinkStore.put(id, {...d, newTab:true}); $("#dlg-link").close(); openInTab(l); toast(`"${trunc(l.title, 24)}" will open in a new tab from now on`); return; }
+  if (b.dataset.lxh === "ok"){ LinkStore.put(id, {...d, embedOk:true}); $("#lx-hint").hidden = true; }
+});
+$("#dlg-link").addEventListener("close", () => {
+  clearTimeout(lx.timer); lx.id = null;
+  $("#lx-body").querySelectorAll("iframe:not(#lx-lifts)").forEach(f => { appWins.delete(f.contentWindow); f.remove(); });
+  if (/^#link\//.test(location.hash)) history.replaceState(null, "", "#home");
+});
+
+/* ---------- uploaded HTML: sandboxed, with storage kept by Homebase ---------- */
+/* The file runs with no access to Homebase. Its localStorage is replaced by a copy Homebase keeps (and syncs);
+   writes come back by postMessage from that one frame only. */
+const APP_SHIM = `(function(){var D=__DATA__;function mk(init,area){var m=Object.create(null);Object.keys(init||{}).forEach(function(k){m[k]=String(init[k]);});
+function post(op,k,v){try{parent.postMessage({hbApp:1,area:area,op:op,k:k,v:v},"*");}catch(e){}}
+var st={getItem:function(k){k=String(k);return k in m?m[k]:null;},setItem:function(k,v){k=String(k);v=String(v);m[k]=v;post("set",k,v);},removeItem:function(k){k=String(k);delete m[k];post("del",k);},clear:function(){m=Object.create(null);post("clear");},key:function(i){return Object.keys(m)[i]||null;},get length(){return Object.keys(m).length;}};
+return new Proxy(st,{get:function(t,p){if(p in t)return t[p];if(typeof p==="string"&&p in m)return m[p];return undefined;},set:function(t,p,v){t.setItem(p,v);return true;},deleteProperty:function(t,p){t.removeItem(p);return true;},ownKeys:function(){return Object.keys(m);},getOwnPropertyDescriptor:function(t,p){return p in m?{value:m[p],writable:true,enumerable:true,configurable:true}:undefined;}});}
+try{Object.defineProperty(window,"localStorage",{value:mk(D,"ls"),configurable:true});}catch(e){}
+try{Object.defineProperty(window,"sessionStorage",{value:mk({},"ss"),configurable:true});}catch(e){}})();`;
+function appDoc(l){
+  const tag = `<script>${APP_SHIM.replace("__DATA__", safeJSON(((AppData.get(l.id) || {}).ls) || {}))}<\/script>`;
+  const html = String(l.html || "");
+  for (const rx of [/<head(\s[^>]*)?>/i, /<html(\s[^>]*)?>/i, /<!doctype[^>]*>/i]) if (rx.test(html)) return html.replace(rx, m => m + tag);
+  return tag + html;
+}
+const appPending = {}, appTimers = {};
+function onAppMessage(e){
+  const m = e.data; if (!m || m.hbApp !== 1 || m.area !== "ls") return;
+  const id = appWins.get(e.source); if (!id) return;
+  const ls = appPending[id] || (appPending[id] = {...(((AppData.get(id) || {}).ls) || {})});
+  if (m.op === "set" && typeof m.k === "string") ls[m.k] = String(m.v);
+  else if (m.op === "del") delete ls[m.k];
+  else if (m.op === "clear") for (const k of Object.keys(ls)) delete ls[k];
+  clearTimeout(appTimers[id]);
+  appTimers[id] = setTimeout(() => { AppData.put(id, {ls:appPending[id]}); delete appPending[id]; }, 500);
+}
+addEventListener("message", onAppMessage);
+
+/* =====================================================================
+   LIFTS: the Two-Day Lift Log, built in. It runs in its own frame (its
+   code and styles are in the <template id="tpl-lifts"> below), and its
+   saved workouts go through Homebase's synced storage instead of Claude's.
+   ===================================================================== */
+const LiftDB = (() => {
+  const col = n => n === "sessions" ? LiftSessions : Workouts;
+  const isObj = o => !!o && typeof o === "object" && !Array.isArray(o);
+  const merge = (a, b) => { Object.keys(b).forEach(k => { const v = b[k]; if (v === undefined) return; a[k] = isObj(v) ? merge(isObj(a[k]) ? a[k] : {}, v) : v; }); return a; };
+  const cp = o => o == null ? o : JSON.parse(JSON.stringify(o));
+  return {
+    collection(name){
+      const S = col(name), q = {limit(){ return q; }, onSnapshot(cb){
+        const fire = () => { try { cb({docs:S.all().map(o => ({id:o.id, exists:true, data:() => cp(o.d)}))}); } catch(e){ console.error(e); } };
+        const un = S.subscribe(fire); setTimeout(fire, 0); return un; }};
+      return q;
+    },
+    doc(path){
+      const [c, id] = String(path).split("/"), S = col(c);
+      return {
+        async update(data){ S.put(id, merge(cp(S.get(id)) || {}, cp(data))); },
+        async set(data){ S.put(id, cp(data)); },
+        async get(){ return {exists:!!S.get(id), data:() => cp(S.get(id))}; },
+      };
+    },
+  };
+})();
+window.HB_LIFTS = {db:LiftDB, downloads:{async save({filename, data}){ downloadText(filename, data, /\.json$/i.test(filename) ? "application/json" : "text/csv"); }}};
+const LIFT_BRIDGE = `window.claude={use:function(n){var B=parent.HB_LIFTS;if(!B)return Promise.reject(new Error("no host"));if(n==="db")return Promise.resolve(B.db);if(n==="downloads")return Promise.resolve(B.downloads);return Promise.reject(Object.assign(new Error("unavailable"),{code:"unavailable"}));}};`;
+function liftDoc(){
+  return `<!doctype html><html lang="en" data-theme="${currentTheme()}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Lifts</title><script>${LIFT_BRIDGE}<\/script></head><body>${$("#tpl-lifts").innerHTML}</body></html>`;
+}
+function ensureLiftFrame(){
+  if (liftFrame) return liftFrame;
+  const f = document.createElement("iframe"); f.id = "lx-lifts"; f.title = "Lifts";
+  $("#lx-body").appendChild(f); f.srcdoc = liftDoc(); liftFrame = f; return f;
+}
+window.HB_onTheme = t => { try { if (liftFrame && liftFrame.contentDocument) liftFrame.contentDocument.documentElement.dataset.theme = t; } catch(e){} };
+
+/* ---------- Settings → Links ---------- */
+function renderLinkSettings(){
+  const L = linksSorted();
+  $("#st-links").innerHTML = L.map((l, i) => `<li class="lk-li">${iconHTML(l) || '<span class="lk-ic"></span>'}<span class="lk-m"><b>${esc(l.title)}</b><small>${l.kind === "app" ? "Built in · your workouts sync with Homebase" : l.kind === "html" ? esc(l.fileName || "HTML file") + " · sandboxed" : esc(hostOf(l.url))}${opensTab(l) ? " · new tab" : ""}</small></span>
+    <span class="lk-b"><button type="button" class="btn icon sm" data-lmv="${esc(l.id)},-1" aria-label="Move ${esc(l.title)} up" ${i ? "" : "disabled"}>↑</button><button type="button" class="btn icon sm" data-lmv="${esc(l.id)},1" aria-label="Move ${esc(l.title)} down" ${i < L.length - 1 ? "" : "disabled"}>↓</button><button type="button" class="btn small" data-led="${esc(l.id)}">Edit</button>${l.kind === "app" ? "" : `<button type="button" class="btn small danger" data-ldel="${esc(l.id)}">Delete</button>`}</span></li>`).join("") || `<li class="note">No links yet.</li>`;
+}
+$("#st-links").addEventListener("click", async e => {
+  const mv = e.target.closest("[data-lmv]");
+  if (mv){
+    const [id, dir] = mv.dataset.lmv.split(","), L = linksSorted(), i = L.findIndex(l => l.id === id), j = i + +dir;
+    if (i < 0 || j < 0 || j >= L.length) return;
+    [L[i], L[j]] = [L[j], L[i]];
+    LinkStore.putMany(L.map((l, k) => { const {id:lid, ...d} = l; return [lid, {...d, order:k}]; }));
+    return;
+  }
+  const ed = e.target.closest("[data-led]"); if (ed) return openLinkEditor(ed.dataset.led);
+  const del = e.target.closest("[data-ldel]");
+  if (del){
+    const l = getLink(del.dataset.ldel); if (!l) return;
+    if (!(await confirmBox({title:`Delete “${l.title}”?`, body:l.kind === "html" ? "The link, the uploaded file and anything it saved are deleted on all your devices." : "The link is removed from the row on all your devices.", ok:"Delete"}))) return;
+    LinkStore.del(l.id); AppData.del(l.id); toast(`Deleted “${trunc(l.title, 28)}”`);
+  }
+});
+$("#st-link-add").onclick = () => openLinkEditor(null);
+
+const le = {id:null, kind:"url", icon:"", html:null, fileName:""};
+function openLinkEditor(id){
+  const l = id ? getLink(id) : null;
+  Object.assign(le, {id, kind:l ? l.kind : "url", icon:l ? (l.icon || "") : "", html:null, fileName:l ? (l.fileName || "") : ""});
+  $("#le-h").textContent = l ? `Edit “${l.title}”` : "Add a link";
+  $("#le-url").value = l && l.url || ""; $("#le-title").value = l ? l.title : ""; $("#le-tab").checked = !!(l && l.newTab);
+  $("#le-file").value = ""; $("#le-err").hidden = true;
+  $("#le-emoji").value = le.icon.startsWith("e:") && !LEMOJI.includes(le.icon.slice(2)) ? le.icon.slice(2) : "";
+  renderLinkEditor(); $("#dlg-le").showModal(); if (!l) $("#le-url").focus();
+}
+function renderLinkEditor(){
+  const k = le.kind, app = k === "app";
+  $("#le-kind").hidden = !!le.id;
+  $$("#le-kind [data-k]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.k === k)));
+  $("#le-url-f").hidden = k !== "url"; $("#le-file-f").hidden = k !== "html"; $("#le-tab-row").hidden = app;
+  $("#le-file-n").textContent = k === "html" ? (le.html != null ? `Ready: ${le.fileName} (${Math.round(le.html.length / 1024)} KB)` : le.fileName ? `Current file: ${le.fileName}. Choose another to replace it.` : "Its scripts run in a sandbox with no access to Homebase. What it saves in localStorage is kept and synced.") : "";
+  const url = $("#le-url").value.trim();
+  $("#le-title").placeholder = k === "url" ? (hostOf(/^[a-z]+:/i.test(url) ? url : "https://" + url) || "Title") : (le.fileName.replace(/\.html?$/i, "") || "Title");
+  $("#le-tab-n").textContent = k === "url" && url && likelyBlocks(/^[a-z]+:/i.test(url) ? url : "https://" + url) ? "This site usually blocks being shown inside other pages, so a new tab works best." : k === "url" && /^http:/i.test(url) ? "Plain http:// pages can't be shown inside an https page, so this opens in a new tab." : "";
+  const opt = (v, inner, label) => `<button type="button" class="le-i${v === "" || v === "f:" ? " wide" : ""}" data-icon="${esc(v)}" aria-pressed="${le.icon === v}" title="${esc(label)}" aria-label="${esc(label)}">${inner}</button>`;
+  $("#le-icons").innerHTML = opt("", '<span class="note">None</span>', "No symbol")
+    + (k === "url" ? opt("f:", '<span class="note">Site</span>', "The site's own icon") : "")
+    + LEMOJI.map(x => opt("e:" + x, x, x)).join("")
+    + Object.keys(LICONS).map(x => opt("i:" + x, iconHTML({icon:"i:" + x}), x)).join("");
+}
+$("#le-kind").addEventListener("click", e => { const b = e.target.closest("[data-k]"); if (!b) return; le.kind = b.dataset.k; if (le.kind !== "url" && le.icon === "f:") le.icon = ""; renderLinkEditor(); });
+$("#le-icons").addEventListener("click", e => { const b = e.target.closest("[data-icon]"); if (!b) return; le.icon = b.dataset.icon; $("#le-emoji").value = ""; renderLinkEditor(); });
+$("#le-emoji").addEventListener("input", e => { const v = [...e.target.value.trim()].slice(0, 4).join(""); le.icon = v ? "e:" + v : ""; renderLinkEditor(); });
+$("#le-url").addEventListener("input", () => {
+  const u = $("#le-url").value.trim(), full = /^[a-z]+:/i.test(u) ? u : "https://" + u;
+  if (!le.id && (likelyBlocks(full) || /^http:/i.test(u))) $("#le-tab").checked = true;
+  renderLinkEditor();
+});
+$("#le-file").addEventListener("change", async e => {
+  const f = e.target.files[0]; if (!f) return;
+  if (f.size > 1.5 * 1024 * 1024){ $("#le-err").textContent = "That file is over 1.5 MB. Browsers only keep about 5 MB per site, so pick a smaller file."; $("#le-err").hidden = false; e.target.value = ""; return; }
+  le.html = await f.text(); le.fileName = f.name; $("#le-err").hidden = true; renderLinkEditor();
+});
+$("#form-le").addEventListener("submit", e => {
+  e.preventDefault();
+  const err = t => { $("#le-err").textContent = t; $("#le-err").hidden = false; };
+  const cur = le.id ? LinkStore.get(le.id) : null;
+  const d = cur ? {...cur} : {kind:le.kind, order:Math.max(-1, ...linksSorted().map(l => l.order ?? 0)) + 1};
+  if (le.kind === "url"){
+    let u = $("#le-url").value.trim(); if (!u) return err("Enter a web address.");
+    if (!/^[a-z][a-z0-9+.-]*:/i.test(u)) u = "https://" + u;
+    try { const x = new URL(u); if (!/^https?:$/.test(x.protocol) || !x.hostname.includes(".")) throw 0; } catch(_){ return err("That doesn't look like a web address. Try something like https://example.com"); }
+    if (cur && cur.url !== u) delete d.embedOk;
+    d.url = u; d.newTab = $("#le-tab").checked;
+  } else if (le.kind === "html"){
+    if (le.html != null){ d.html = le.html; d.fileName = le.fileName; }
+    if (!d.html) return err("Choose an HTML file.");
+    d.newTab = $("#le-tab").checked;
+  }
+  d.title = $("#le-title").value.trim() || (le.kind === "url" ? hostOf(d.url) : le.kind === "html" ? (d.fileName || "").replace(/\.html?$/i, "") : cur && cur.title) || "Link";
+  d.icon = le.icon;
+  LinkStore.put(le.id || uid(), d);
+  $("#dlg-le").close(); toast(cur ? `Saved “${trunc(d.title, 28)}”` : `Added “${trunc(d.title, 28)}” to your links`);
+});
+LinkStore.subscribe(() => { renderLinkRow(); if ($("#dlg-settings").open) renderLinkSettings(); });
+
+/* =====================================================================
+   DAILY FACTS: a month of facts at a time from your local Ollama model,
+   stored with your synced data (one record per day).
+   ===================================================================== */
+const FactDays = DocStore("homebase.facts.v1", "factday");
+const Facts = (() => {
+  let run = null, view = null;
+  const stockedThrough = () => FactDays.all().map(o => o.id).filter(d => d >= todayS()).sort().pop() || null;
+  const norm = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g, "").slice(0, 70);
+  function status(t){ const el = $("#fx-st"); if (el) el.textContent = t; }
+  async function ask(prompt, signal){
+    const ai = Settings.get().ai, fs = Settings.get().facts;
+    const url = String(ai.localUrl || "http://localhost:11434").replace(/\/+$/, "") + "/api/chat";
+    let r;
+    try {
+      r = await fetch(url, {method:"POST", signal, headers:{"content-type":"application/json"}, body:JSON.stringify({model:fs.model || ai.localModel || "llama3.1", stream:false, format:"json",
+        options:{temperature:0.85}, messages:[{role:"user", content:prompt}]})});
+    } catch(e){ if (e.name === "AbortError") throw e; throw new Error(`Couldn't reach Ollama at ${url}. Run this on the laptop with Ollama open, and set OLLAMA_ORIGINS (see AI-assisted import below).`); }
+    if (!r.ok) throw new Error(`Ollama error ${r.status}: ${(await r.text()).slice(0, 140)}`);
+    const j = await r.json(), txt = (j.message && j.message.content) || j.response || "";
+    let o; try { o = JSON.parse(txt); } catch(e){ const m = txt.match(/\{[\s\S]*\}|\[[\s\S]*\]/); o = m ? JSON.parse(m[0]) : null; }
+    const arr = Array.isArray(o) ? o : o && (o.facts || o.items || Object.values(o).find(Array.isArray)) || [];
+    return arr.map(x => typeof x === "string" ? {text:x} : x).filter(x => x && typeof x.text === "string");
+  }
+  async function refill(){
+    if (run) return;
+    const fs = Settings.get().facts, topics = (fs.topics || []).filter(Boolean);
+    if (!topics.length){ status("Add at least one topic first."); return; }
+    const per = Math.min(5, Math.max(1, +fs.perDay || 3)), DAYS = 30, need = DAYS * per;
+    const last = stockedThrough(), start = last ? addDays(last, 1) : todayS();
+    const used = new Set(FactDays.all().flatMap(o => (o.d.facts || []).map(f => norm(f.text))));
+    const avoid = FactDays.all().sort((a, b) => b.id.localeCompare(a.id)).flatMap(o => (o.d.facts || []).map(f => f.text)).slice(0, 40);
+    const got = [], ctl = new AbortController(); run = ctl;
+    $("#fx-refill").disabled = true; $("#fx-cancel").hidden = false;
+    try {
+      for (let tries = 0; got.length < need && tries < Math.ceil(need / 15) * 2 + 2; tries++){
+        status(`Asking your local model… ${got.length} of ${need} facts`);
+        const n = Math.min(15, need - got.length + 3);
+        const prompt = `Write ${n} interesting, surprising and accurate facts. Spread them evenly across these topics: ${topics.map(t => `"${t}"`).join(", ")}.
+Rules: each fact is one or two plain sentences, under 220 characters, self-contained, specific (names, numbers, places), and true. No opinions, no "Did you know", no numbering.
+${avoid.length || got.length ? `Do not repeat any of these:\n${[...avoid, ...got.map(g => g.text)].slice(-50).map(t => "- " + t).join("\n")}\n` : ""}Reply with JSON only, exactly in this form: {"facts":[{"topic":"<one of the topics>","text":"<the fact>"}]}`;
+        const list = await ask(prompt, ctl.signal);
+        for (const f of list){
+          const text = String(f.text).replace(/\s+/g, " ").trim(); if (text.length < 25 || text.length > 400) continue;
+          const k = norm(text); if (used.has(k)) continue; used.add(k);
+          const t = topics.find(x => x.toLowerCase() === String(f.topic || "").toLowerCase().trim()) || topics.find(x => String(f.topic || "").toLowerCase().includes(x.toLowerCase())) || topics[got.length % topics.length];
+          got.push({topic:t, text});
+        }
+      }
+      if (!got.length) throw new Error("The model didn't return any usable facts. Try again, or try a different model.");
+      /* Spread topics across each day. */
+      const q = new Map(topics.map(t => [t, got.filter(g => g.topic === t)]));
+      const days = Math.min(DAYS, Math.floor(got.length / per)) || 1, out = [];
+      for (let i = 0; i < days; i++){
+        const facts = [];
+        for (let k = 0; facts.length < per && k < topics.length * 3; k++){ const list = q.get(topics[(i + k) % topics.length]); if (list && list.length) facts.push(list.shift()); }
+        if (!facts.length) break;
+        out.push([addDays(start, i), {date:addDays(start, i), facts}]);
+      }
+      FactDays.putMany(out);
+      FactDays.delMany(FactDays.all().map(o => o.id).filter(d => d < addDays(todayS(), -14)));
+      status(`Added ${plural(out.length, "day")} of facts. Stocked through ${fmtDate(stockedThrough(), {month:"short", day:"numeric"})}.`);
+    } catch(e){ status(e.name === "AbortError" ? "Stopped. Nothing was saved." : e.message); }
+    finally { run = null; $("#fx-refill").disabled = false; $("#fx-cancel").hidden = true; }
+  }
+  function widget(it){
+    const day = FactDays.get(todayS()), facts = day ? day.facts || [] : [], thru = stockedThrough();
+    return `<section class="tile tinted mw facts-w" aria-label="Daily facts"><h2><span>Daily facts</span><span class="fx-when mono" data-drop="2">${fmtDate(todayS(), {month:"short", day:"numeric"})}</span></h2>
+      ${facts.length ? `<ul class="fx-list" data-fitlist data-min="1">${facts.map(f => `<li><span class="fx-tp">${esc(f.topic || "")}</span><span class="fx-tx">${esc(f.text)}</span></li>`).join("")}<li class="fit-more"><span class="more-link">See all<span data-more-n></span></span></li></ul>`
+        : `<p class="note">No facts for today yet. On your laptop, open Settings → Daily facts and press Refill.</p>`}
+      ${thru ? `<p class="note fx-foot" data-drop="1">Stocked through ${fmtDate(thru, {month:"short", day:"numeric"})}</p>` : ""}</section>`;
+  }
+  function openDialog(day){
+    view = day || todayS(); drawDialog(); const d = $("#dlg-facts"); if (!d.open) d.showModal();
+  }
+  function drawDialog(){
+    const day = FactDays.get(view), facts = day ? day.facts || [] : [];
+    const ids = FactDays.all().map(o => o.id).sort();
+    $("#fx-day").textContent = view === todayS() ? "Today" : fmtDate(view, {weekday:"long", month:"short", day:"numeric"});
+    $("#fx-full").innerHTML = facts.length ? facts.map(f => `<li><span class="fx-tp">${esc(f.topic || "")}</span><p>${esc(f.text)}</p></li>`).join("") : `<li class="note">No facts saved for this day.</li>`;
+    $("#fx-prev").disabled = !ids.some(d => d < view); $("#fx-next").disabled = !ids.some(d => d > view);
+  }
+  $("#fx-prev").onclick = () => { const p = FactDays.all().map(o => o.id).filter(d => d < view).sort().pop(); if (p){ view = p; drawDialog(); } };
+  $("#fx-next").onclick = () => { const n = FactDays.all().map(o => o.id).filter(d => d > view).sort()[0]; if (n){ view = n; drawDialog(); } };
+  $("#fx-settings").onclick = () => { $("#dlg-facts").close(); renderSettings(); $("#dlg-settings").showModal(); const s = $("#st-facts"); if (s) s.scrollIntoView({block:"start"}); };
+  function renderSettingsSec(){
+    const fs = Settings.get().facts;
+    $("#fx-topics").innerHTML = (fs.topics || []).map((t, i) => `<button type="button" data-fxdel="${i}" aria-label="Remove topic ${esc(t)}" title="Remove">${esc(t)} <small>×</small></button>`).join("") || `<span class="note">No topics yet.</span>`;
+    $("#fx-per").value = String(fs.perDay || 3); $("#fx-model").value = fs.model || ""; $("#fx-model").placeholder = Settings.get().ai.localModel || "llama3.1";
+    if (!run){ const t = stockedThrough(); status(t ? `Stocked through ${fmtDate(t, {month:"short", day:"numeric"})}.` : "Nothing stocked yet."); }
+  }
+  const addTopic = () => { const v = $("#fx-topic-in").value.trim(); if (!v) return; Settings.update(s => { if (!s.facts.topics.some(t => t.toLowerCase() === v.toLowerCase())) s.facts.topics.push(v); }); $("#fx-topic-in").value = ""; renderSettingsSec(); };
+  $("#fx-topic-add").onclick = addTopic;
+  $("#fx-topic-in").addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); addTopic(); } });
+  $("#fx-topics").addEventListener("click", e => { const b = e.target.closest("[data-fxdel]"); if (!b) return; Settings.update(s => { s.facts.topics.splice(+b.dataset.fxdel, 1); }); renderSettingsSec(); });
+  $("#fx-per").addEventListener("change", e => Settings.update(s => { s.facts.perDay = +e.target.value; }));
+  $("#fx-model").addEventListener("change", e => Settings.update(s => { s.facts.model = e.target.value.trim(); }));
+  $("#fx-refill").onclick = refill;
+  $("#fx-cancel").onclick = () => { if (run) run.abort(); };
+  FactDays.subscribe(() => { if (ready) Home.refresh(); if ($("#dlg-facts").open) drawDialog(); });
+  return {widget, openDialog, renderSettingsSec};
+})();
+
+/* =====================================================================
+   REMINDERS: push to your iPhone through ntfy. Homebase works out when
+   each reminder is due and saves the list in Supabase; a scheduled job
+   there (see supabase-setup.sql) sends each one at the right minute, so
+   it works for reminders weeks out and with every Homebase page closed.
+   ===================================================================== */
+const REM_OPTS = [[0,"At the time"],[5,"5 min before"],[15,"15 min before"],[30,"30 min before"],[60,"1 hour before"],[120,"2 hours before"],[180,"3 hours before"],[720,"12 hours before"],[1440,"1 day before"],[2880,"2 days before"],[10080,"1 week before"]];
+const remLabel = x => x.at ? new Date(x.at).toLocaleString(undefined, {weekday:"short", month:"short", day:"numeric", hour:"numeric", minute:"2-digit"}) : ((REM_OPTS.find(o => o[0] === x.off) || [0, `${x.off} min before`])[1]);
+const Rem = (() => {
+  let t = 0, lastCount = null, lastErr = "";
+  const cfg = () => Settings.get().remind;
+  const listFor = r => Array.isArray(r.reminders) ? r.reminders : (cfg().defaults[r.type] || []).map(off => ({id:"d" + off, off}));
+  const base = r => new Date(`${r.date}T${r.time || cfg().dayTime || "09:00"}:00`);
+  const fireAt = (r, x) => x.at ? new Date(x.at + ":00") : new Date(base(r).getTime() - x.off * 60000);
+  function want(){
+    const out = new Map(), now = Date.now();
+    if (!cfg().topic) return out;
+    for (const r of Store.all()){
+      if (r.completed) continue;
+      for (const x of listFor(r)){
+        const at = fireAt(r, x), ms = at.getTime();
+        if (!isFinite(ms) || ms < now - 60000 || ms > now + 400 * MS_DAY) continue;
+        const when = r.time ? `${isScheduled(r) ? "Starts" : "Due"} ${fmtDate(r.date, {weekday:"short", month:"short", day:"numeric"})}, ${fmtTime(r.time)}` : `${isScheduled(r) ? "On" : "Due"} ${fmtDate(r.date, {weekday:"short", month:"short", day:"numeric"})}`;
+        out.set(`${r.id}:${x.id}`, {id:`${r.id}:${x.id}`, item_id:r.id, fire_at:at.toISOString(), title:r.title.slice(0, 200),
+          body:[[r.type, r.course].filter(Boolean).join(" · "), when, r.location].filter(Boolean).join("\n").slice(0, 400),
+          click:siteBase() + "#item/" + r.id, priority:r.priority === "High" || r.type === "Exam" ? 4 : 3});
+      }
+    }
+    return out;
+  }
+  async function push(){
+    const sb = Sync.client(), u = Sync.user(); if (!sb || !u) return;
+    const W = want(), {data, error} = await sb.from("hb_reminders").select("id,fire_at,title,body,click,priority,sent_at");
+    if (error) throw error;
+    const have = new Map(data.map(h => [h.id, h])), ups = [], dels = [];
+    for (const [id, w] of W){
+      const h = have.get(id), same = h && Date.parse(h.fire_at) === Date.parse(w.fire_at);
+      if (!h || !same || h.title !== w.title || h.body !== w.body || h.click !== w.click || h.priority !== w.priority) ups.push({...w, user_id:u.id, sent_at:same ? h.sent_at : null});
+    }
+    for (const h of data) if (!W.has(h.id) && (!h.sent_at || Date.parse(h.fire_at) < Date.now() - 30 * MS_DAY)) dels.push(h.id);
+    for (let i = 0; i < ups.length; i += 200){ const {error:e} = await sb.from("hb_reminders").upsert(ups.slice(i, i + 200), {onConflict:"user_id,id"}); if (e) throw e; }
+    for (let i = 0; i < dels.length; i += 100){ const {error:e} = await sb.from("hb_reminders").delete().in("id", dels.slice(i, i + 100)); if (e) throw e; }
+    lastCount = W.size;
+  }
+  async function pushConfig(){
+    const sb = Sync.client(), u = Sync.user(); if (!sb || !u) return;
+    const c = cfg();
+    const {error} = c.topic ? await sb.from("hb_push").upsert({user_id:u.id, topic:c.topic, server:c.server || "https://ntfy.sh"}, {onConflict:"user_id"})
+      : await sb.from("hb_push").delete().eq("user_id", u.id);
+    if (error) throw error;
+  }
+  function schedule(ms = 2500){
+    clearTimeout(t);
+    t = setTimeout(async () => {
+      if (!Sync.live()) return;
+      try { await push(); lastErr = ""; } catch(e){ lastErr = e.message || String(e); }
+      if ($("#dlg-settings").open) renderSettingsSec();
+    }, ms);
+  }
+  function newTopic(){
+    const b = crypto.getRandomValues(new Uint8Array(20)), a = "abcdefghijklmnopqrstuvwxyz234567";
+    let s = "hb-"; for (const x of b) s += a[x & 31]; for (let i = 0; i < 12; i++) s += a[b[i] >> 3];
+    return s;
+  }
+  async function test(){
+    const c = cfg(); if (!c.topic){ $("#rm-st").textContent = "Create your topic first."; return; }
+    try {
+      const r = await fetch(String(c.server || "https://ntfy.sh").replace(/\/+$/, "") + "/", {method:"POST", body:JSON.stringify({topic:c.topic, title:"Homebase", message:"Test notification. Reminders will look like this.", tags:["bell"], click:siteBase()})});
+      $("#rm-st").textContent = r.ok ? "Sent. It should show up on your phone in a few seconds." : `ntfy said ${r.status}.`;
+    } catch(e){ $("#rm-st").textContent = "Couldn't reach the ntfy server."; }
+  }
+  function renderSettingsSec(){
+    const c = cfg();
+    $("#rm-topic-box").innerHTML = c.topic
+      ? `<div class="rm-topic"><span class="note">Your topic</span><code id="rm-topic">${esc(c.topic)}</code><button type="button" class="btn small" data-rm="copy">Copy</button><button type="button" class="btn small ghost" data-rm="new">New topic</button><button type="button" class="btn small ghost" data-rm="off">Turn off</button></div>`
+      : `<div class="rm-topic"><button type="button" class="btn small primary" data-rm="new">Create my notification topic</button><span class="note">A long random name only you know.</span></div>`;
+    $("#rm-server").value = c.server || "https://ntfy.sh"; $("#rm-daytime").value = c.dayTime || "09:00";
+    $("#rm-defs").innerHTML = TYPES.filter(x => x !== "No Class").map(ty => { const v = (c.defaults[ty] || [])[0];
+      return `<label class="rm-def"><span class="tb" style="--tc:${TYPE_VAR(ty)}">${typeIcon(ty)}${ty}</span><select data-rmdef="${ty}"><option value="">None</option>${REM_OPTS.map(([m, n]) => `<option value="${m}" ${v === m ? "selected" : ""}>${n}</option>`).join("")}</select></label>`; }).join("");
+    const n = want().size;
+    $("#rm-st").textContent = lastErr ? `Couldn't update reminders: ${lastErr}` : !c.topic ? "" : !Sync.live() ? `${plural(n, "upcoming reminder")}. Sign in to sync (top of Settings) so Supabase can send them.` : `${plural(lastCount ?? n, "upcoming reminder")} scheduled in Supabase.`;
+  }
+  $("#rm-topic-box").addEventListener("click", async e => {
+    const b = e.target.closest("[data-rm]"); if (!b) return;
+    if (b.dataset.rm === "copy"){ try { await navigator.clipboard.writeText(cfg().topic); toast("Topic copied"); } catch(_){ toast("Select the topic and copy it"); } return; }
+    if (b.dataset.rm === "new" && cfg().topic && !(await confirmBox({title:"Make a new topic?", body:"Your phone stops getting reminders until you subscribe to the new topic in the ntfy app.", ok:"Make new topic"}))) return;
+    if (b.dataset.rm === "off" && !(await confirmBox({title:"Turn off phone reminders?", body:"Scheduled reminders are removed. You can create a topic again any time.", ok:"Turn off"}))) return;
+    Settings.update(s => { s.remind.topic = b.dataset.rm === "off" ? "" : newTopic(); });
+    renderSettingsSec(); try { await pushConfig(); } catch(err){ lastErr = err.message; } schedule(200);
+  });
+  $("#rm-server").addEventListener("change", async e => { const v = e.target.value.trim() || "https://ntfy.sh"; Settings.update(s => { s.remind.server = v.replace(/\/+$/, ""); }); try { await pushConfig(); } catch(_){} });
+  $("#rm-daytime").addEventListener("change", e => { if (e.target.value) Settings.update(s => { s.remind.dayTime = e.target.value; }); });
+  $("#rm-defs").addEventListener("change", e => { const s2 = e.target.closest("[data-rmdef]"); if (!s2) return; Settings.update(s => { s.remind.defaults[s2.dataset.rmdef] = s2.value === "" ? [] : [+s2.value]; }); renderSettingsSec(); if ($("#dlg-item").open) renderItemReminders(); });
+  $("#rm-test").onclick = test;
+  Sync.onLocal(k => { if (k === "item" || k === "settings") schedule(); });
+  Sync.onReady(async () => { try { await pushConfig(); } catch(_){} schedule(500); });
+  return {schedule, renderSettingsSec, listFor, fireAt};
+})();
+
+/* ---------- reminders in the item panel ---------- */
+function renderItemReminders(){
+  const r = cur(); if (!r) return;
+  const explicit = Array.isArray(r.reminders), list = Rem.listFor(r);
+  const when = x => { const d = Rem.fireAt(r, x); return isFinite(d) ? d.toLocaleString(undefined, {weekday:"short", month:"short", day:"numeric", hour:"numeric", minute:"2-digit"}) : ""; };
+  $("#d-rem-list").innerHTML = list.map(x => `<button type="button" data-rmx="${esc(x.id)}" title="Sends ${esc(when(x))}. Click to remove." aria-label="Remove reminder: ${esc(remLabel(x))}">${esc(remLabel(x))} <small>×</small></button>`).join("") || `<span class="note">No reminders.</span>`;
+  $("#d-rem-n").innerHTML = (explicit ? `<button type="button" class="linkb" id="d-rem-def">Use my default for ${esc(r.type)}</button>` : `Default for ${esc(r.type)}`)
+    + (Settings.get().remind.topic ? "" : ` · <button type="button" class="linkb" id="d-rem-setup">Set up phone notifications</button>`);
+  $("#d-rem-add").innerHTML = `<option value="">+ Add a reminder</option>${REM_OPTS.map(([m, n]) => `<option value="${m}">${n}</option>`).join("")}<option value="at">Pick a date and time…</option>`;
+}
+function setItemReminders(list){ commit({reminders:list}); renderItemReminders(); }
+$("#d-rem-list").addEventListener("click", e => { const b = e.target.closest("[data-rmx]"); if (!b) return; const r = cur(); setItemReminders(Rem.listFor(r).filter(x => x.id !== b.dataset.rmx).map(x => x.at ? {id:x.id, at:x.at} : {id:x.id, off:x.off})); });
+$("#d-rem-add").addEventListener("change", e => {
+  const v = e.target.value; e.target.value = ""; if (v === "") return;
+  if (v === "at"){ const r = cur(); $("#d-rem-at").value = `${r.date}T${r.time || Settings.get().remind.dayTime || "09:00"}`; $("#d-rem-at").hidden = $("#d-rem-ok").hidden = false; $("#d-rem-at").focus(); return; }
+  const r = cur(), list = Rem.listFor(r).map(x => x.at ? {id:x.id, at:x.at} : {id:x.id, off:x.off});
+  if (!list.some(x => x.off === +v)) list.push({id:uid(), off:+v});
+  setItemReminders(list.sort((a, b) => (b.off ?? -1) - (a.off ?? -1)));
+});
+$("#d-rem-ok").onclick = () => {
+  const v = $("#d-rem-at").value; if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(v)) return;
+  const r = cur(), list = Rem.listFor(r).map(x => x.at ? {id:x.id, at:x.at} : {id:x.id, off:x.off});
+  list.push({id:uid(), at:v.slice(0, 16)}); $("#d-rem-at").hidden = $("#d-rem-ok").hidden = true; setItemReminders(list);
+};
+$("#d-rem-n").addEventListener("click", e => {
+  if (e.target.closest("#d-rem-def")){ commit({reminders:null}); renderItemReminders(); }
+  if (e.target.closest("#d-rem-setup")){ $("#dlg-item").close(); renderSettings(); $("#dlg-settings").showModal(); const s = $("#st-remind"); if (s) s.scrollIntoView({block:"start"}); }
+});
+
+/* =====================================================================
+   SETTINGS → Sync & account
+   ===================================================================== */
+function renderCloud(){
+  const st = Sync.state, cfg = Sync.config(), u = Sync.user(), box = $("#sy-box");
+  if (!cfg){
+    box.innerHTML = `<p class="note">Sign in to use the same Homebase on your laptop and iPhone. You need a free Supabase project first (the setup guide that came with this file walks you through it).</p>
+      <div class="field"><label for="sy-url">Project URL</label><input id="sy-url" type="url" placeholder="https://abcdefghijkl.supabase.co" autocomplete="off" spellcheck="false"></div>
+      <div class="field"><label for="sy-key">Publishable key</label><input id="sy-key" autocomplete="off" spellcheck="false" placeholder="sb_publishable_… or the anon key"></div>
+      <div class="rv-tools"><button type="button" class="btn small primary" data-sy="connect">Connect</button><span class="note" id="sy-msg"></span></div>
+      <p class="note">These are saved in this browser only, never in the HTML file. The publishable key is meant to be public; your data is protected by sign-in and row-level security.</p>`;
+    return;
+  }
+  const host = hostOf(cfg.url);
+  if (!u){
+    box.innerHTML = `<p class="note">${st === "connecting" ? "Connecting to " : "Project: "}<b>${esc(host)}</b>${st === "error" ? ` · <span style="color:var(--bad)">${esc(Sync.error)}</span>` : ""}</p>
+      <form id="sy-form" class="sy-form" autocomplete="on" onsubmit="return false">
+        <div class="row"><div class="field"><label for="sy-email">Email</label><input id="sy-email" type="email" autocomplete="username" required></div>
+        <div class="field"><label for="sy-pass">Password</label><input id="sy-pass" type="password" autocomplete="current-password" minlength="6"></div></div>
+        <div class="rv-tools"><button type="button" class="btn small primary" data-sy="in">Sign in</button><button type="button" class="btn small" data-sy="up">Create account</button><button type="button" class="btn small ghost" data-sy="link">Email me a sign-in link</button></div>
+      </form><p class="note" id="sy-msg"></p>
+      <div class="rv-tools"><button type="button" class="btn small ghost" data-sy="forget">Use a different project</button></div>`;
+    return;
+  }
+  box.innerHTML = `<div class="sy-status"><span class="sy-dot" data-s="${esc(st)}"></span><span><b>${esc(u.email || "Signed in")}</b><br><span class="note">${esc(Sync.statusText())}</span></span></div>
+    <div class="rv-tools"><button type="button" class="btn small" data-sy="now">Sync now</button><button type="button" class="btn small" data-sy="setup">Copy setup link for your phone</button><button type="button" class="btn small ghost" data-sy="out">Sign out</button></div>
+    <p class="note" id="sy-msg">Project: ${esc(host)}. The setup link carries only the project address and publishable key; you still sign in on the phone.</p>`;
+}
+$("#sy-box").addEventListener("click", async e => {
+  const b = e.target.closest("[data-sy]"); if (!b) return;
+  const m = t => { const el = $("#sy-msg"); if (el) el.textContent = t; };
+  const em = () => ($("#sy-email") || {}).value?.trim() || "", pw = () => ($("#sy-pass") || {}).value || "";
+  try {
+    switch (b.dataset.sy){
+      case "connect": {
+        let url = $("#sy-url").value.trim().replace(/\/+$/, ""); const key = $("#sy-key").value.trim();
+        if (url && !/^https?:\/\//.test(url)) url = "https://" + url;
+        if (!/^https:\/\/[^/]+$/.test(url) || !key) return m("Enter the project URL (https://….supabase.co) and the publishable key.");
+        if (/service_role|sb_secret_/i.test(key) || /"role"\s*:\s*"service_role"/.test(atobSafe(key.split(".")[1]))) return m("That's a secret key. Use the publishable (anon) key instead, and never paste the secret key into a web page.");
+        m("Connecting…"); await Sync.setConfig({url, key}); renderCloud(); return;
+      }
+      case "in": if (!em() || !pw()) return m("Enter your email and password."); m("Signing in…"); await Sync.signIn(em(), pw()); m(""); return;
+      case "up": if (!em() || pw().length < 6) return m("Enter your email and a password of at least 6 characters."); m("Creating your account…"); { const confirm = await Sync.signUp(em(), pw()); m(confirm ? "Check your email and click the confirmation link, then sign in here." : "Account created."); } return;
+      case "link": if (!em()) return m("Enter your email first."); await Sync.magicLink(em()); m("Check your email for the sign-in link. Open it on this device."); return;
+      case "forget": if (await confirmBox({title:"Use a different project?", body:"This browser forgets the project address and key. Your data stays in this browser and in the old project.", ok:"Forget project"})){ await Sync.setConfig(null); renderCloud(); } return;
+      case "now": m("Syncing…"); await Sync.syncNow(); renderCloud(); return;
+      case "setup": { const link = siteBase() + "#hbsetup=" + btoa(JSON.stringify(Sync.config()));
+        try { await navigator.clipboard.writeText(link); m("Copied. Send it to your phone (for example in a note to yourself) and open it in Safari, then sign in."); } catch(_){ m(link); } return; }
+      case "out": if (await confirmBox({title:"Sign out of sync?", body:"Everything stays in this browser. Changes made while signed out are merged the next time you sign in.", ok:"Sign out"})){ await Sync.signOut(); renderCloud(); } return;
+    }
+  } catch(err){ m(err.message || String(err)); }
+});
+function atobSafe(s){ try { return atob(String(s || "").replace(/-/g, "+").replace(/_/g, "/")); } catch(e){ return ""; } }
+Sync.subscribe(() => {
+  if ($("#dlg-settings").open && !$("#sy-box").contains(document.activeElement)) renderCloud();
+  const n = $("#store-note"); if (n && Store.persistent) n.textContent = Sync.statusText();
+});
+
+/* A setup link from another device: #hbsetup=<base64 of {url, key}>. Works on a fresh load or in an open tab. */
+function checkSetupLink(){
+  const m = location.hash.match(/^#hbsetup=(.+)$/); if (!m) return false;
+  history.replaceState(null, "", "#home");
+  try {
+    const c = JSON.parse(atob(decodeURIComponent(m[1])));
+    if (c && /^https:\/\//.test(c.url) && c.key){
+      Sync.setConfig({url:c.url, key:c.key});
+      setTimeout(() => { toast("Sync project added. Sign in to finish."); renderSettings(); if (!$("#dlg-settings").open) $("#dlg-settings").showModal(); }, 300);
+    }
+  } catch(e){ toast("That setup link looks incomplete. Copy it again from your laptop."); }
+  return true;
+}
+/* Everything above that needs the page to be up. Called from BOOT. */
+function bootExtras(){
+  renderLinkRow();
+  if (!checkSetupLink()) Sync.start();
+}
+
+/* =====================================================================
    BOOT
    ===================================================================== */
 (async () => {
@@ -5111,7 +7402,12 @@ $("#form-review").addEventListener("submit", e => {
   await Store.init(LocalAdapter);
   Notes.purgeExpired();
   allCourses().forEach(courseIndex);   // give existing courses stable colors in alphabetical order
+  /* items join sync only once they're loaded, so loading doesn't count as a change */
+  Sync.register("item", {all:() => [...Store.all(), ...Store.deleted()], m:r => Date.parse(r.updatedAt) || 0,
+    seedOnly:() => [...Store.all(), ...Store.deleted()].every(r => r.sample), isSeed:r => !!r.sample, apply:(u, d) => Store.applyRemote(u, d)});
+  Store.subscribe(() => Sync.touch("item"));
   ready = true;
+  bootExtras();
   route();
 })();
 })();
