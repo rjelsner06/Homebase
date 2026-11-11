@@ -3258,7 +3258,7 @@ function cleanStyle(el, tag){
   return out.join(";");
 }
 function cleanHTML(html){
-  const doc = new DOMParser().parseFromString(`<body>${html || ""}</body>`, "text/html");
+  const doc = new DOMParser().parseFromString(`<body>${html || ""}<\/body>`, "text/html");
   const walk = el => {
     for (let c of [...el.children]){
       if (c.tagName === "FONT"){   // <font> from the browser's editing commands becomes a styled <span>
@@ -3286,7 +3286,7 @@ function cleanHTML(html){
   walk(doc.body);
   return doc.body.innerHTML;
 }
-const noteText = html => { const d = new DOMParser().parseFromString(`<body>${html || ""}</body>`, "text/html"); d.querySelectorAll("li,p,div,h1,h2,h3,h4,td,th,br").forEach(e => e.append(" ")); return d.body.textContent.replace(/\s+/g, " ").trim(); };
+const noteText = html => { const d = new DOMParser().parseFromString(`<body>${html || ""}<\/body>`, "text/html"); d.querySelectorAll("li,p,div,h1,h2,h3,h4,td,th,br").forEach(e => e.append(" ")); return d.body.textContent.replace(/\s+/g, " ").trim(); };
 
 /* ---------- Notes page: folders, cards grouped by recency, editor ---------- */
 const NT_UI = "homebase.notesui.v1";
@@ -3880,7 +3880,7 @@ const Home = (() => {
       <ul class="mail">${list.map(m => `<li class="${m.unread ? "" : "read"}" data-wmail="${m.id}" tabindex="0"><span class="dot"></span><span class="from">${esc(m.from)}</span><span class="when">${mailWhen(m.at)}</span><span class="subj">${esc(m.subject)}</span></li>`).join("") || `<li class="empty">Inbox is empty.</li>`}</ul></section>`;
   }
   function pickItems(n){
-    const d = new DOMParser().parseFromString(`<body>${n.html || ""}</body>`, "text/html");
+    const d = new DOMParser().parseFromString(`<body>${n.html || ""}<\/body>`, "text/html");
     return [...d.querySelectorAll("li")].filter(x => !x.classList.contains("done") && !x.querySelector("li")).map(x => x.textContent.trim()).filter(Boolean);
   }
   function noteHTML(it){
