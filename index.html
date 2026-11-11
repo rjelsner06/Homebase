@@ -6906,7 +6906,7 @@ function openInTab(l){
   const w = window.open("", "_blank");
   if (!w){ toast("Your browser blocked the new tab. Allow pop-ups for this site."); return; }
   w.document.open();
-  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(l.title)}</title><style>html,body{margin:0;height:100%;background:#fff}iframe{border:0;width:100%;height:100%;display:block}</style></head><body></body></html>`);
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(l.title)}<\/title><style>html,body{margin:0;height:100%;background:#fff}iframe{border:0;width:100%;height:100%;display:block}<\/style><\/head><body><\/body><\/html>`);
   w.document.close();
   const f = w.document.createElement("iframe"); f.setAttribute("sandbox", SANDBOX); w.document.body.appendChild(f);
   appWins.set(f.contentWindow, l.id); w.addEventListener("message", onAppMessage);
@@ -6989,7 +6989,7 @@ const LiftDB = (() => {
 window.HB_LIFTS = {db:LiftDB, downloads:{async save({filename, data}){ downloadText(filename, data, /\.json$/i.test(filename) ? "application/json" : "text/csv"); }}};
 const LIFT_BRIDGE = `window.claude={use:function(n){var B=parent.HB_LIFTS;if(!B)return Promise.reject(new Error("no host"));if(n==="db")return Promise.resolve(B.db);if(n==="downloads")return Promise.resolve(B.downloads);return Promise.reject(Object.assign(new Error("unavailable"),{code:"unavailable"}));}};`;
 function liftDoc(){
-  return `<!doctype html><html lang="en" data-theme="${currentTheme()}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Lifts</title><script>${LIFT_BRIDGE}<\/script></head><body>${$("#tpl-lifts").innerHTML}</body></html>`;
+  return `<!doctype html><html lang="en" data-theme="${currentTheme()}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Lifts</title><script>${LIFT_BRIDGE}<\/script><\/head><body>${$("#tpl-lifts").innerHTML}<\/body><\/html>`;
 }
 function ensureLiftFrame(){
   if (liftFrame) return liftFrame;
