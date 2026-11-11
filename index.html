@@ -543,6 +543,74 @@ dialog.mailx{width:calc(100vw - 24px);max-width:none;height:calc(100dvh - 24px);
 }
 .mx-top .x{margin-left:auto}
 
+/* ===== round 7: widgets fit their tile (no scrolling; extras drop out as the tile shrinks) ===== */
+.fit-off{display:none!important}
+.hw > .tile > *{flex-shrink:0}
+@container (max-height:190px){.hw > .tile{padding:12px 14px;gap:8px}#t-due .tr{padding:4px 2px}#t-due .fit-more{padding-top:2px}}
+@container (max-width:220px){.inbox-w .seg.acct .badge{display:none}.inbox-w .seg.acct button{padding:5px 6px;min-width:0;overflow:hidden;text-overflow:ellipsis}}
+.fit-more{list-style:none}
+.hw .fit-more{display:block;padding:8px 2px 2px;border:0}
+.fit-more .more-link{border:0;background:none;padding:0;cursor:pointer;font:inherit;font-size:13px;font-weight:600;color:var(--accent)}
+.hw .tile h2{white-space:nowrap;min-width:0}
+.hw .tile h2 > span:first-child{overflow:hidden;text-overflow:ellipsis;min-width:0}
+/* clock */
+.dl,.g2{display:inline}.ds{display:none}
+#t-clock .date{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hw #t-clock .clk-mid{min-width:0}
+@container (max-width:250px){#t-clock .g2{display:none}}
+@container (max-width:300px){#t-clock .dl{display:none}#t-clock .ds{display:inline}}
+@container (max-width:170px){#t-clock h2{display:none}}
+.hw #t-clock .time{font-size:clamp(24px,min(42cqh,24cqw),96px)}
+/* weather */
+#t-weather .wx-now{min-width:0}
+#t-weather .wx-txt{min-width:0}
+#t-weather .wx-desc,#t-weather #wx-meta{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wx-days{grid-template-columns:repeat(auto-fit,minmax(54px,1fr))!important;grid-template-rows:auto;grid-auto-rows:0;row-gap:0!important;overflow:hidden}
+.wx-hours{display:grid;grid-template-columns:repeat(auto-fit,minmax(46px,1fr));grid-template-rows:auto;grid-auto-rows:0;row-gap:0;column-gap:4px;overflow:hidden;border-top:1px solid var(--line);padding-top:10px}
+.wx-hour{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12.5px;min-width:0}
+.wx-hour svg{width:20px;height:20px;color:var(--muted)}
+.wx-hour .hh{color:var(--muted);white-space:nowrap}
+.wx-hour b{font-family:var(--f-mono);font-weight:600}
+.wx-hours:empty{display:none}
+@container (max-width:230px){#t-weather .wxw{display:none}}
+/* to-do */
+@container (max-height:210px){#t-due .meta{display:none}}
+@container (max-width:240px){#t-due h2 .btn{display:none}#t-due .tr-r,#t-due .meta{display:none}#t-due .tt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}}
+/* inbox */
+@container (max-width:250px){.inbox-w .hw-role,.inbox-w .seg.acct small{display:none}}
+@container (max-height:200px){.inbox-w .mail .subj{display:none}.inbox-w .mail li{padding:6px 0}}
+/* import */
+.drop .is{display:none}
+.hw #t-import .drop{flex:1 0 auto;justify-content:center;padding:12px}
+@container (max-width:300px){#t-import .il{display:none}#t-import .is{display:inline}}
+@container (max-height:200px){#t-import .il{display:none}#t-import .is{display:inline}#t-import .drop svg{width:22px;height:22px}}
+/* calendar */
+.vs{display:none}
+#t-cal .cal-title{font-size:22px;text-transform:none;letter-spacing:-.01em;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;display:block}
+#t-cal .cal-head{min-width:0}
+.hw #t-cal{gap:10px}
+.hw #cal-body{flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:10px;overflow:hidden}
+.hw .wk{flex:1;min-height:0}
+.hw .wk-col{min-height:0;overflow:hidden}
+.hw .wk-items{overflow:hidden;min-height:0;flex:1}
+.hw .cal{flex:1 1 auto;min-height:0;grid-template-rows:auto;grid-auto-rows:minmax(0,1fr)}
+.hw .day{min-height:0;overflow:hidden}
+.hw .dayview{flex:0 1 auto;min-height:0;overflow:hidden}
+.hw .dayview.solo{flex:1}
+.hw .yr{flex:1;min-height:0;overflow:hidden;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;align-content:start}
+@container (max-height:560px){.hw .dayview:not(.solo){display:none}}
+@container (max-width:640px){.hw .day .chip,.hw .day .more{display:none}.hw .dots{display:flex}.hw .day{padding:3px}}
+@container (max-height:430px){.hw .day .chip,.hw .day .more{display:none}.hw .dots{display:flex}}
+@container (max-width:560px){#t-cal .cal-title{font-size:18px}#cal-views .vl{display:none}#cal-views .vs{display:inline}#cal-views button{padding:5px 9px}.hw .wk-h .dn{font-size:14px;width:24px;height:24px}.hw .wk-h .dw{font-size:10px}.hw .chip.tall .tm{display:none}.hw .wk-col{padding:3px}}
+@media (min-width:641px){@container (max-width:400px){.hw .wk-h .dw{display:none}.hw .wk .chip{font-size:0;padding:0;height:6px;border-radius:3px;border-left:0;background:var(--cc)}.hw .wk .chip.outline{background:transparent;border:1.5px solid var(--cc)}}}
+@media (max-width:640px){.hw .wk-col{grid-template-columns:40px minmax(0,1fr) auto}.hw .wk .chip.tall{display:flex;padding:2px 5px}.hw .wk .chip.tall .tm{display:none}.hw .wk-items{flex-direction:row;flex-wrap:wrap}.hw .wk-items .chip{width:auto;max-width:100%}.hw .wk-h{flex-direction:row;gap:4px;align-items:center}.hw .wk-h .dn{width:22px;height:22px;font-size:12.5px}}
+@container (max-height:360px){.hw .ev .sub{display:none}.hw .ev{padding:5px 8px}}
+/* note widget: edit in place when the note fits */
+.nw-body.editable{cursor:text;outline:none}
+.nw-body.editable:focus{box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--hue) 45%,transparent);border-radius:8px}
+.nw-body.clipped{-webkit-mask-image:linear-gradient(#000 75%,transparent);mask-image:linear-gradient(#000 75%,transparent)}
+.nw-open{cursor:pointer}
+
 /* ===== round 4: calendar tint, notes, paste import, deleted selection ===== */
 #t-cal{background:var(--cal-bg)}
 #t-cal .day,#t-cal .wk-col{background:var(--cal-cell)}
@@ -747,7 +815,7 @@ html.hs-editing header.top .tabs,html.hs-editing header.top .actions,html.hs-edi
 .hs{--cols:8;--gap:14px;--row:130px;display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));grid-auto-rows:var(--row);gap:var(--gap);width:100%;margin:0 auto;position:relative}
 .hs.narrow{max-width:430px}
 .hw{position:relative;min-width:0;min-height:0;container-type:size;border-radius:var(--r);-webkit-touch-callout:none}
-.hw > .tile{position:absolute;inset:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin}
+.hw > .tile{position:absolute;inset:0;overflow:hidden}
 .hw > .tile.glass{background:color-mix(in srgb,var(--tile) 40%,transparent)!important;-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);color:var(--ink)!important;box-shadow:var(--shadow),inset 0 0 0 1px color-mix(in srgb,var(--tile) 60%,transparent)}
 .hw > #t-due{cursor:pointer}
 .hs-empty{background:var(--tile);border-radius:var(--r);padding:28px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center;box-shadow:var(--shadow)}
@@ -756,8 +824,7 @@ html.hs-editing header.top .tabs,html.hs-editing header.top .actions,html.hs-edi
 #t-clock .date{font-size:clamp(12px,min(12cqh,7cqw),18px)}
 @container (max-height:175px){#t-clock .clock-foot{display:none}}
 @container (max-height:118px){.hw > .tile{padding:10px 12px;gap:6px}#t-clock h2{display:none}}
-@container (max-height:250px){#t-weather .wx-days,#t-weather #wx-note{display:none}}
-@container (max-height:160px){#t-weather #wx-meta{display:none}#t-weather .wx-temp{font-size:34px}}
+@container (max-height:160px){#t-weather .wx-temp{font-size:34px}}
 @container (max-width:210px){#t-weather .wx-now svg{display:none}#t-weather .wx-now{gap:0}}
 @container (max-width:260px){.inbox-w .seg.acct small{display:none}}
 .hw-role{font-size:10.5px;opacity:.75;letter-spacing:.06em;margin-left:4px}
@@ -796,8 +863,8 @@ html.hs-editing header.top .tabs,html.hs-editing header.top .actions,html.hs-edi
 .hw-handle{position:absolute;right:6px;bottom:6px;width:32px;height:32px;border-radius:50%;background:var(--accent);color:var(--accent-ink);z-index:4;display:none;place-items:center;touch-action:none;cursor:nwse-resize;border:2px solid var(--tile);box-shadow:var(--shadow)}
 .hw-handle svg{width:14px;height:14px}
 .hw.sel .hw-handle{display:grid}
-.ghost{z-index:5;border-radius:var(--r);border:2.5px dashed var(--accent);background:color-mix(in srgb,var(--accent) 16%,transparent);pointer-events:none}
-.ghost.bad{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,transparent)}
+.hs-ghost{z-index:5;border-radius:var(--r);border:2.5px dashed var(--accent);background:color-mix(in srgb,var(--accent) 16%,transparent);pointer-events:none}
+.hs-ghost.bad{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,transparent)}
 
 /* floating widget panel */
 .wpop{position:fixed;z-index:40;background:var(--tile);color:var(--ink);border-radius:18px;box-shadow:0 18px 50px rgba(0,0,0,.28),0 0 0 1px var(--line);display:flex;flex-direction:column;overflow:hidden}
@@ -919,32 +986,33 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
     </section>
     <div id="w-park" hidden>
     <section class="tile" id="t-clock" aria-label="Clock">
-      <h2><span id="greet">Hello</span><span class="mono" id="sec"></span></h2>
-      <div>
+      <h2 data-drop="2"><span id="greet">Hello</span><span class="mono" id="sec"></span></h2>
+      <div class="clk-mid">
         <div class="time" id="time">--:--</div>
-        <div class="date" id="date"></div>
+        <div class="date" id="date" data-drop="3"></div>
       </div>
-      <div class="clock-foot"><span id="wk"></span><span id="duecount"></span></div>
+      <div class="clock-foot" data-drop="1"><span id="wk"></span><span id="duecount"></span></div>
     </section>
 
     <section class="tile tinted" id="t-weather" aria-label="Weather">
-      <h2><span>West Lafayette</span><span class="tag" id="wx-tag" hidden>Sample</span></h2>
+      <h2 data-drop="5"><span class="wx-loc">West Lafayette</span><span class="tag" id="wx-tag" hidden>Sample</span></h2>
       <div class="wx-now">
         <span id="wx-icon"></span>
-        <div><div class="wx-temp mono" id="wx-temp">--°</div><div class="wx-desc" id="wx-desc">Loading…</div><div class="note" id="wx-meta"></div></div>
+        <div class="wx-txt"><div class="wx-temp mono" id="wx-temp">--°</div><div class="wx-desc" id="wx-desc">Loading…</div><div class="note" id="wx-meta" data-drop="4"></div></div>
       </div>
-      <div class="wx-days" id="wx-days"></div>
-      <p class="note" id="wx-note" hidden>Live weather loads from Open-Meteo once you host this page yourself.</p>
+      <div class="wx-hours" id="wx-hours" data-drop="2" data-rowmin="5"></div>
+      <div class="wx-days" id="wx-days" data-drop="3"></div>
+      <p class="note" id="wx-note" data-drop="1" hidden>Live weather loads from Open-Meteo once you host this page yourself.</p>
     </section>
 
 
-    <section class="tile" id="t-cal" aria-label="Calendar">
+    <section class="tile" id="t-cal" aria-label="Calendar" data-fitbody="#cal-body" data-fitratio=".55">
       <div class="cal-head">
         <h2 class="cal-title" id="cal-title"></h2>
         <div class="cal-ctl">
-          <div class="seg" id="cal-filter" role="group" aria-label="Show on calendar"><button type="button" data-cf="school">School</button><button type="button" data-cf="personal">Personal</button><button type="button" data-cf="both">Both</button></div>
+          <div class="seg" id="cal-filter" role="group" aria-label="Show on calendar" data-drop="2"><button type="button" data-cf="school">School</button><button type="button" data-cf="personal">Personal</button><button type="button" data-cf="both">Both</button></div>
           <div class="seg" id="cal-views" role="group" aria-label="Calendar view">
-            <button type="button" data-view="day">Day</button><button type="button" data-view="week">Week</button><button type="button" data-view="month">Month</button><button type="button" data-view="year">Year</button>
+            <button type="button" data-view="day" title="Day"><span class="vl">Day</span><span class="vs">D</span></button><button type="button" data-view="week" title="Week"><span class="vl">Week</span><span class="vs">W</span></button><button type="button" data-view="month" title="Month"><span class="vl">Month</span><span class="vs">M</span></button><button type="button" data-view="year" title="Year"><span class="vl">Year</span><span class="vs">Y</span></button>
           </div>
           <div class="cal-nav">
             <button class="btn small ghost" id="prev" type="button" aria-label="Previous">‹</button>
@@ -953,26 +1021,26 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
           </div>
         </div>
       </div>
-      <div class="legend" id="legend" aria-label="Legend"></div>
+      <div class="legend" id="legend" aria-label="Legend" data-drop="1"></div>
       <div id="cal-body"></div>
     </section>
 
     <section class="tile tinted" id="t-due" aria-label="To-do">
       <h2><span>To-do</span><a class="btn small" href="#todo">Open list</a></h2>
-      <div class="mini-smart" id="home-smart"></div>
-      <ul class="todo compact" id="home-todo"></ul>
+      <div class="mini-smart" id="home-smart" data-drop="1"></div>
+      <ul class="todo compact" id="home-todo" data-fitlist data-min="2"></ul>
     </section>
 
     <section class="tile tinted" id="t-import" aria-label="Import schedule">
-      <h2><span>Import a schedule</span></h2>
+      <h2 data-drop="4"><span>Import a schedule</span></h2>
       <label class="drop" id="drop" for="file">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4M7 9l5-5 5 5"/><path d="M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg>
-        <strong>Drop a schedule PDF, CSV, .ics or screenshot</strong>
-        <span class="note">Schedule tables are read row by row. You review everything before it's added.</span>
+        <svg data-drop="3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4M7 9l5-5 5 5"/><path d="M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg>
+        <strong><span class="il">Drop a schedule PDF, CSV, .ics or screenshot</span><span class="is">Drop a schedule file</span></strong>
+        <span class="note" data-drop="1">Schedule tables are read row by row. You review everything before it's added.</span>
       </label>
       <input type="file" id="file" accept=".pdf,.csv,.tsv,.ics,.png,.jpg,.jpeg,.webp,application/pdf,text/csv,text/calendar,image/*" hidden>
       <div class="status" id="status"></div>
-      <div class="drop-row"><button class="btn small" id="btn-paste" type="button">Paste text or screenshot</button><button class="btn small ghost" id="btn-prompt" type="button">Get a conversion prompt</button></div>
+      <div class="drop-row" data-drop="2"><button class="btn small" id="btn-paste" type="button">Paste text or screenshot</button><button class="btn small ghost" id="btn-prompt" type="button">Get a conversion prompt</button></div>
     </section>
     </div>
   </main>
@@ -2451,11 +2519,11 @@ function tick(){
   const n = new Date(), h = n.getHours();
   $("#time").innerHTML = `${(h%12)||12}:${pad(n.getMinutes())}<small>${h<12?"AM":"PM"}</small>`;
   $("#sec").textContent = pad(n.getSeconds());
-  $("#date").textContent = n.toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"});
-  $("#greet").textContent = (h<5?"Up late":h<12?"Good morning":h<17?"Good afternoon":"Good evening") + ", Ryan";
+  $("#date").innerHTML = `<span class="dl">${n.toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"})}</span><span class="ds">${n.toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})}</span>`;
+  $("#greet").innerHTML = `<span class="g1">${h<5?"Up late":h<12?"Good morning":h<17?"Good afternoon":"Good evening"}</span><span class="g2">, Ryan</span>`;
   const wk = Math.floor((startOfDay(n) - SEM_START)/MS_DAY/7) + 1;
   $("#wk").textContent = wk >= 1 && wk <= 18 ? `Week ${wk} of the semester` : "";
-  const mk = n.getHours()*60 + n.getMinutes(); if (mk !== lastMin){ lastMin = mk; applyTheme(); }
+  const mk = n.getHours()*60 + n.getMinutes(); if (mk !== lastMin){ lastMin = mk; applyTheme(); fitSoon(); }
   if (ymd(n) !== lastDay){ lastDay = ymd(n); if (ready){ Store.purgeExpired(); Notes.purgeExpired(); renderAll(); } }
 }
 
@@ -2481,16 +2549,25 @@ function renderWeather(d, sample){
   $("#wx-icon").innerHTML = ICONS[ic];
   $("#wx-temp").textContent = Math.round(d.current.temperature_2m) + "°";
   $("#wx-desc").textContent = desc;
-  $("#wx-meta").textContent = `Feels ${Math.round(d.current.apparent_temperature)}° · Wind ${Math.round(d.current.wind_speed_10m)} mph`;
+  $("#wx-meta").innerHTML = `Feels ${Math.round(d.current.apparent_temperature)}°<span class="wxw"> · Wind ${Math.round(d.current.wind_speed_10m)} mph</span>`;
+  /* the next 12 hours (as many as fit are shown, and only when at least 5 fit) */
+  const hr = d.hourly; let hrs = "";
+  if (hr && hr.time){
+    const now = new Date(), i0 = Math.max(0, hr.time.findIndex(t => new Date(t) > now));
+    hrs = hr.time.slice(i0, i0 + 12).map((t, k) => { const dt = new Date(t), h = dt.getHours();
+      return `<div class="wx-hour"><span class="hh">${k === 0 && false ? "Now" : `${(h % 12) || 12} ${h < 12 ? "AM" : "PM"}`}</span>${ICONS[wmo(hr.weather_code[i0 + k])[1]]}<b>${Math.round(hr.temperature_2m[i0 + k])}°</b></div>`; }).join("");
+  }
+  $("#wx-hours").innerHTML = hrs;
   const dd = d.daily;
   $("#wx-days").innerHTML = dd.time.slice(0,4).map((t,i) => {
     const lbl = i===0 ? "Today" : parseYmd(t).toLocaleDateString(undefined,{weekday:"short"});
     return `<div class="wx-day"><span>${lbl}</span>${ICONS[wmo(dd.weather_code[i])[1]]}<span class="hi mono">${Math.round(dd.temperature_2m_max[i])}°</span><span class="lo mono">${Math.round(dd.temperature_2m_min[i])}°</span><span class="lo">${dd.precipitation_probability_max[i]}%</span></div>`;
   }).join("");
   $("#wx-tag").hidden = !sample; $("#wx-note").hidden = !sample;
+  fitSoon();
 }
 async function loadWeather(){
-  const url = "https://api.open-meteo.com/v1/forecast?latitude=40.4259&longitude=-86.9081&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FIndiana%2FIndianapolis&forecast_days=4";
+  const url = "https://api.open-meteo.com/v1/forecast?latitude=40.4259&longitude=-86.9081&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m&hourly=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FIndiana%2FIndianapolis&forecast_days=4";
   try {
     const ctl = new AbortController(); setTimeout(() => ctl.abort(), 6000);
     const r = await fetch(url, {signal:ctl.signal}); if (!r.ok) throw 0;
@@ -2498,6 +2575,9 @@ async function loadWeather(){
   } catch(e){
     const t = startOfDay(new Date());
     renderWeather({current:{temperature_2m:44,apparent_temperature:39,weather_code:2,wind_speed_10m:11},
+      hourly:(() => { const h0 = new Date(); h0.setMinutes(0, 0, 0); const time = [], temperature_2m = [], weather_code = [];
+        for (let i = 0; i < 24; i++){ const x = new Date(h0.getTime() + i * 3600000); time.push(x.toISOString()); temperature_2m.push(44 + Math.round(5 * Math.sin((x.getHours() - 9) / 24 * 2 * Math.PI))); weather_code.push(i < 6 ? 2 : i < 14 ? 3 : 61); }
+        return {time, temperature_2m, weather_code}; })(),
       daily:{time:[0,1,2,3].map(i=>ymd(new Date(t.getTime()+i*MS_DAY))),weather_code:[2,61,3,0],temperature_2m_max:[51,47,43,49],temperature_2m_min:[36,38,31,29],precipitation_probability_max:[10,70,20,0]}}, true);
   }
   setTimeout(loadWeather, 15*60*1000);
@@ -2784,6 +2864,7 @@ function renderCal(){
   $("#cal-body").innerHTML = body;
   $$("#cal-views [data-view]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.view === cal.view)));
   $("#legend").innerHTML = legendHTML();
+  fitSoon();
 }
 function setView(v){
   if (v === "day" && cal.view === "month") cal.cursor = parseYmd(cal.selected);
@@ -2831,12 +2912,14 @@ function defaultAddDate(){
 function renderHomeTodo(){
   const ts = todayS(), lim = addDays(ts, 7);
   $("#home-smart").innerHTML = ["all","today","overdue"].map(k => { const s = SMART.find(x => x.k === k); return `<a href="#todo/${k}" style="--sc:${s.color}">${s.name} <b>${smartCount(k)}</b></a>`; }).join("");
-  const items = Store.all().filter(isTodo).filter(r => !r.completed).filter(r => r.date <= lim).sort(listSort);   // checked items leave the home list right away
-  const shown = items.slice(0, 7);
+  /* every open to-do, soonest due first; the widget shows as many as fit, then "See all" */
+  const all = Store.all().filter(isTodo).filter(r => !r.completed).sort(listSort);   // checked items leave the home list right away
+  const shown = all.slice(0, 40), items = all.filter(r => r.date <= lim);
   $("#home-todo").innerHTML = shown.length
-    ? shown.map(r => todoRowHTML(r, true)).join("") + (items.length > shown.length ? `<li class="empty"><a class="more-link" href="#todo/all">+${items.length - shown.length} more in the full list</a></li>` : "")
-    : `<li class="empty">Nothing due in the next week.</li>`;
+    ? shown.map(r => todoRowHTML(r, true)).join("") + `<li class="fit-more" data-always="${all.length > shown.length ? 1 : ""}"><a class="more-link" href="#todo/all">See all<span data-more-n data-extra="${all.length - shown.length}"></span></a></li>`
+    : `<li class="empty">Nothing to do. Nice.</li>`;
   const open = items.filter(r => !r.completed && r.date >= ts).length;
+  fitSoon();
   $("#duecount").textContent = `${plural(open, "item")} due this week`;
 }
 
@@ -3742,6 +3825,47 @@ addEventListener("resize", closePop);
 Notes.subscribe(() => { if (ready){ renderNotes(); renderDeleted(); updateDelCount(); Home.refresh(); } });
 
 /* =====================================================================
+   FIT: home widgets never scroll. Each tile drops its extras in order
+   (data-drop="1" goes first) and lists show as many rows as fit, with a
+   "See all" row for the rest. Runs after any widget changes size or content.
+   ===================================================================== */
+function fitTile(t){
+  if (!t || !t.isConnected || !t.closest(".hw") || !t.offsetParent) return;
+  t.querySelectorAll(".fit-off").forEach(e => e.classList.remove("fit-off"));
+  const body = t.dataset.fitbody ? t.querySelector(t.dataset.fitbody) : null, ratio = +t.dataset.fitratio || .5;
+  const tight = () => t.scrollHeight > t.clientHeight + 1 || (body && body.clientHeight < t.clientHeight * ratio);
+  /* rows that show only what fits on one line (e.g. hourly weather) need a minimum count */
+  t.querySelectorAll("[data-rowmin]").forEach(r => { const k = [...r.children].filter(c => c.offsetHeight > 0 && c.offsetTop === r.firstElementChild.offsetTop).length; if (r.children.length && k < +r.dataset.rowmin) r.classList.add("fit-off"); });
+  const lists = [...t.querySelectorAll("[data-fitlist]")].map(l => {
+    const items = [...l.querySelectorAll(":scope > li:not(.fit-more):not(.empty)")], more = l.querySelector(":scope > .fit-more");
+    const o = {l, items, more, n:items.length, min:l.dataset.min != null ? +l.dataset.min : 2};
+    o.sync = () => { if (!more) return; const hid = o.items.length - o.n, nEl = more.querySelector("[data-more-n]"), extra = nEl ? +nEl.dataset.extra || 0 : 0;
+      more.classList.toggle("fit-off", hid + extra === 0); if (nEl) nEl.textContent = hid + extra ? ` · ${hid + extra} more` : ""; };
+    o.sync(); return o;
+  });
+  for (const o of lists){ while (tight() && o.n > o.min){ o.n--; o.items[o.n].classList.add("fit-off"); o.sync(); } }
+  const parts = [...t.querySelectorAll("[data-drop]")].sort((a, b) => a.dataset.drop - b.dataset.drop);
+  for (const p of parts){ if (!tight()) break; if (p.closest(".fit-off") || p.offsetParent === null) continue; p.classList.add("fit-off"); }
+  for (const o of lists){ while (tight() && o.n > 0){ o.n--; o.items[o.n].classList.add("fit-off"); o.sync(); } }
+  if (t.classList.contains("note-w")) noteEditable(t);
+}
+let fitRaf = 0;
+function fitSoon(){ cancelAnimationFrame(fitRaf); fitRaf = requestAnimationFrame(() => document.querySelectorAll(".hs .hw > .tile").forEach(fitTile)); }
+const fitRO = typeof ResizeObserver === "function" ? new ResizeObserver(fitSoon) : null;
+addEventListener("resize", fitSoon);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitSoon);
+/* A note widget can be edited in place when it's big enough and the whole note fits. */
+function noteEditable(t){
+  const b = t.querySelector(".nw-body"); if (!b) return;
+  if (document.activeElement === b) return;   // never switch while someone is typing
+  const editingHome = !!t.closest("#egrid");
+  const fits = !editingHome && t.clientWidth >= 180 && t.clientHeight >= 140 && b.scrollHeight <= b.clientHeight + 2;
+  b.contentEditable = fits ? "true" : "false";
+  b.classList.toggle("editable", fits); b.classList.toggle("clipped", !fits && b.scrollHeight > b.clientHeight + 2);
+  b.title = fits ? "" : "Open in Notes to edit";
+}
+
+/* =====================================================================
    HOME SCREENS: the home page is a grid of tiles. Widgets take any
    whole number of tiles wide and tall. Up to 3 named home screens are
    saved in Settings (so they can sync later); each keeps a laptop and
@@ -3874,10 +3998,12 @@ const Home = (() => {
   function inboxHTML(it){
     const split = (it.acct || "split") === "split", acct = split ? (it.view || "gmail") : it.acct;
     const cat = Mail.categories(acct)[0], list = Mail.list(acct, "inbox", cat.id).slice(0, 10);
+    const lab = a => ((it.labels || {})[a] || "").trim();   // optional labels (e.g. Personal / School), set in the widget's options
     const seg = split ? `<div class="seg acct" role="group" aria-label="Mail account">${MAIL_ACCOUNTS.map(a => { const u = Mail.unread(a.id, "inbox", Mail.categories(a.id)[0].id);
-      return `<button type="button" data-wacct="${a.id}" aria-pressed="${a.id === acct}">${a.name}<small>${a.role}</small>${u ? `<span class="badge">${u}</span>` : ""}</button>`; }).join("")}</div>` : "";
-    return `<section class="tile tinted mw inbox-w" aria-label="${acctOf(acct).name} inbox"><h2><span>${split ? "Inbox" : acctOf(acct).name + ` <small class="hw-role">${acctOf(acct).role}</small>`}</span><span class="mail-tools"><span class="tag">Sample</span><button class="btn icon sm" type="button" data-wmx="${acct}" aria-label="Open full ${acctOf(acct).name} inbox" title="Open full inbox">${EXPAND}</button></span></h2>${seg}
-      <ul class="mail">${list.map(m => `<li class="${m.unread ? "" : "read"}" data-wmail="${m.id}" tabindex="0"><span class="dot"></span><span class="from">${esc(m.from)}</span><span class="when">${mailWhen(m.at)}</span><span class="subj">${esc(m.subject)}</span></li>`).join("") || `<li class="empty">Inbox is empty.</li>`}</ul></section>`;
+      return `<button type="button" data-wacct="${a.id}" aria-pressed="${a.id === acct}">${a.name}${lab(a.id) ? `<small>${esc(lab(a.id))}</small>` : ""}${u ? `<span class="badge">${u}</span>` : ""}</button>`; }).join("")}</div>` : "";
+    const all = Mail.list(acct, "inbox", cat.id), list2 = all.slice(0, 25);
+    return `<section class="tile tinted mw inbox-w" aria-label="${acctOf(acct).name} inbox"><h2><span>${split ? "Inbox" : acctOf(acct).name + (lab(acct) ? ` <small class="hw-role">${esc(lab(acct))}</small>` : "")}</span><span class="mail-tools"><span class="tag">Sample</span><button class="btn icon sm" type="button" data-wmx="${acct}" aria-label="Open full ${acctOf(acct).name} inbox" title="Open full inbox">${EXPAND}</button></span></h2>${seg}
+      <ul class="mail" data-fitlist data-min="2">${list2.map(m => `<li class="${m.unread ? "" : "read"}" data-wmail="${m.id}" tabindex="0"><span class="dot"></span><span class="from">${esc(m.from)}</span><span class="when">${mailWhen(m.at)}</span><span class="subj">${esc(m.subject)}</span></li>`).join("") || `<li class="empty">Inbox is empty.</li>`}${list2.length ? `<li class="fit-more"><button type="button" class="more-link" data-wmx="${acct}">See all<span data-more-n data-extra="${all.length - list2.length}"></span></button></li>` : ""}</ul></section>`;
   }
   function pickItems(n){
     const d = new DOMParser().parseFromString(`<body>${n.html || ""}<\/body>`, "text/html");
@@ -3887,8 +4013,8 @@ const Home = (() => {
     const n = it.note && Notes.note(it.note);
     if (!n || n.deletedAt) return `<section class="tile tinted mw note-w"><h2><span>Note</span></h2><p class="note">This note was deleted. Choose another one in Edit home screen.</p></section>`;
     const can = it.pick !== false && pickItems(n).length >= 2;
-    return `<section class="tile tinted mw note-w" data-onote="${n.id}" aria-label="Note: ${esc(n.title || "Untitled")}"><h2><span>${esc(n.title || "Untitled")}</span><span class="nw-open">Open ›</span></h2>
-      <div class="nt-body nw-body">${cleanHTML(n.html)}</div>
+    return `<section class="tile tinted mw note-w" data-onote="${n.id}" aria-label="Note: ${esc(n.title || "Untitled")}"><h2><span>${esc(n.title || "Untitled")}</span><span class="nw-open" role="link" tabindex="0">Open ›</span></h2>
+      <div class="nt-body nw-body" data-nwid="${n.id}" spellcheck="true">${cleanHTML(n.html)}</div>
       ${can ? `<div class="nw-pick"><button type="button" class="btn small" data-wpick="${it.id}">${picked[it.id] ? "Pick again" : "Pick one for me"}</button><output>${esc(picked[it.id] || "")}</output></div>` : ""}</section>`;
   }
   function multiHTML(it){ return it.type === "inbox" ? inboxHTML(it) : it.type === "note" ? noteHTML(it) : `<section class="tile mw"><p class="note">Unknown widget.</p></section>`; }
@@ -3903,7 +4029,7 @@ const Home = (() => {
       for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) h += `<div class="cell" data-x="${x}" data-y="${y}" style="grid-column:${x+1};grid-row:${y+1}"></div>`;
     }
     h += items.map(it => `<div class="hw ${editing && ed.sel === it.id ? "sel" : ""}" data-id="${it.id}" data-type="${it.type}" style="grid-column:${it.x+1}/span ${it.w};grid-row:${it.y+1}/span ${it.h}">${editing ? `<span class="hw-tag">${it.w}×${it.h}</span><span class="hw-handle" aria-hidden="true">${RESIZE}</span>` : ""}</div>`).join("");
-    if (editing) h += `<div class="ghost" id="ghost" hidden></div>`;
+    if (editing) h += `<div class="hs-ghost" id="ghost" hidden></div>`;
     grid.innerHTML = h;
     const used = new Set();
     for (const it of items){
@@ -3911,7 +4037,9 @@ const Home = (() => {
       if (sid && !used.has(sid)){ const n = document.getElementById(sid); used.add(sid); w.appendChild(n); applyPaint(n, it.color); }
       else if (sid) w.insertAdjacentHTML("beforeend", `<section class="tile mw"><p class="note">${esc(kindOf(it).name)} is already on this screen.</p></section>`);
       else { w.insertAdjacentHTML("beforeend", multiHTML(it)); applyPaint(w.querySelector(".tile"), it.color); }
+      if (fitRO) fitRO.observe(w);
     }
+    fitSoon();
   }
 
   /* ---------- home (normal view) ---------- */
@@ -3935,10 +4063,12 @@ const Home = (() => {
     for (const it of s.layouts[bp()] || []){
       if (SINGLE[it.type]) continue;
       const w = grid.querySelector(`.hw[data-id="${it.id}"]`); if (!w) continue;
+      if (w.contains(document.activeElement) && document.activeElement.isContentEditable) continue;   // don't interrupt typing
       const keep = w.querySelector(".mail") ? w.querySelector(".tile").scrollTop : 0;
       w.innerHTML = multiHTML(it); applyPaint(w.querySelector(".tile"), it.color);
       if (keep) w.querySelector(".tile").scrollTop = keep;
     }
+    fitSoon();
   }
   const findHomeItem = id => { const s = active(); return s && (s.layouts[bp()] || []).find(i => i.id === id); };
   function openAcct(acct){ Settings.update(st => { st.mail.account = acct; }); mailState.folder = "inbox"; mailState.cat = Mail.categories(acct)[0].id; }
@@ -3965,11 +4095,26 @@ const Home = (() => {
         return;
       }
       if (t.closest("a")) return;
+      if (t.closest(".nw-body.editable") && !t.closest(".nw-open")) return;   // editing in place
       nt.note = nw.dataset.onote; nt.mobileEdit = true; nt.loaded = null; location.hash = "#notes"; return;
     }
     if (hw.dataset.type === "todo" && !t.closest("input,a,button,[data-open],label")) location.hash = "#todo";
   }, true);
+  /* typing in a note widget saves to the note */
+  let nwTimer;
+  $("#home-grid").addEventListener("input", e => {
+    const b = e.target.closest(".nw-body.editable"); if (!b) return;
+    clearTimeout(nwTimer);
+    nwTimer = setTimeout(() => { const id = b.dataset.nwid; Notes.updateNote(id, {html:cleanHTML(b.innerHTML)}, true); if (nt.loaded === id) nt.loaded = null; }, 400);
+  });
+  $("#home-grid").addEventListener("paste", e => {
+    if (!e.target.closest(".nw-body.editable")) return;
+    e.preventDefault(); const html = e.clipboardData.getData("text/html");
+    if (html) document.execCommand("insertHTML", false, cleanHTML(html)); else document.execCommand("insertText", false, e.clipboardData.getData("text/plain"));
+  });
+  $("#home-grid").addEventListener("focusout", e => { if (e.target.closest(".nw-body.editable")){ clearTimeout(nwTimer); const b = e.target; Notes.updateNote(b.dataset.nwid, {html:cleanHTML(b.innerHTML)}, true); if (nt.loaded === b.dataset.nwid) nt.loaded = null; fitSoon(); } });
   $("#home-grid").addEventListener("keydown", e => {
+    const op = e.target.closest(".nw-open"); if (op && (e.key === "Enter" || e.key === " ")){ e.preventDefault(); op.click(); return; }
     const ml = e.target.closest("[data-wmail]"); if (ml && (e.key === "Enter" || e.key === " ")){ e.preventDefault(); ml.click(); }
   });
   /* Long-press on the home screen (phone) opens the editor. */
@@ -4082,8 +4227,11 @@ const Home = (() => {
   function optsTab(it){
     if (it.type === "inbox"){
       const a = it.acct || "split";
+      const L = it.labels || {}, show = a === "split" ? ["gmail","outlook"] : [a];
       return `<div><p class="wp-l">Account</p><div class="seg" role="group" aria-label="Account">${[["gmail","Gmail"],["outlook","Outlook"],["split","Both (switchable)"]].map(([k, n]) => `<button type="button" data-wacct-opt="${k}" aria-pressed="${a === k}">${n}</button>`).join("")}</div>
-        <p class="note" style="margin-top:8px">"Both" adds Gmail / Outlook buttons on the widget so you can switch views.</p></div>`;
+        <p class="note" style="margin-top:8px">"Both" adds Gmail / Outlook buttons on the widget so you can switch views.</p></div>
+      <div><p class="wp-l">Labels (optional)</p>${show.map(k => `<div class="cp-row" style="margin-bottom:6px"><label class="note" for="wp-lab-${k}" style="width:56px">${k === "gmail" ? "Gmail" : "Outlook"}</label><input class="wp-sel" style="flex:1;width:auto" id="wp-lab-${k}" data-lab="${k}" maxlength="20" value="${esc(L[k] || "")}" placeholder="${k === "gmail" ? "e.g. Personal" : "e.g. School"}"></div>`).join("")}
+        <p class="note">Shown small next to the name. Leave blank for none. Hidden when the widget is narrow.</p></div>`;
     }
     const notes = Notes.notes().slice().sort((x, y) => (x.title || "").localeCompare(y.title || ""));
     const n = Notes.note(it.note), items = n ? pickItems(n).length : 0;
@@ -4102,14 +4250,15 @@ const Home = (() => {
       <div class="wp-body">${ed.tab === "color" ? colorTab(it) : ed.tab === "opts" ? optsTab(it) : sizeTab(it)}</div>`;
     pop.dataset.for = it.id + ed.tab;
     pop.hidden = false;
-    pop.querySelector(".wp-body").scrollTop = keep;
     placePop();
+    pop.querySelector(".wp-body").scrollTop = keep;   // after placing: sizing the panel resets its scroll
   }
   /* Beside the widget when there's room (right, then left); otherwise below or above it.
      Always at least 16px from the screen edges and below the editor toolbar. */
   function placePop(){
     if (pop.hidden) return;
     const w = egrid.querySelector(`.hw[data-id="${ed.sel}"]`); if (!w){ hidePop(); return; }
+    const bodyEl = pop.querySelector(".wp-body"), st0 = bodyEl ? bodyEl.scrollTop : 0;
     const r = w.getBoundingClientRect(), vw = document.documentElement.clientWidth, vh = innerHeight, M = 16;
     const top0 = Math.max(M, $("#etop").getBoundingClientRect().bottom + 12);
     const pw = Math.min(400, vw - 2 * M);
@@ -4128,6 +4277,7 @@ const Home = (() => {
       else { maxH = Math.min(natural, room * .6); top = vh - M - maxH; }   // the widget fills the screen: float over its lower part
     }
     pop.style.left = Math.round(left) + "px"; pop.style.top = Math.round(top) + "px"; pop.style.maxHeight = Math.max(160, Math.round(maxH)) + "px";
+    if (bodyEl) bodyEl.scrollTop = st0;
   }
   let rafP = 0;
   const schedulePlace = () => { if (!ed.on || pop.hidden) return; cancelAnimationFrame(rafP); rafP = requestAnimationFrame(placePop); };
@@ -4198,6 +4348,7 @@ const Home = (() => {
     const it = selItem(); if (!it) return;
     if (e.target.id === "wp-note"){ it.note = e.target.value; delete picked[it.id]; renderEditor(); }
     if (e.target.id === "wp-pick"){ it.pick = e.target.checked; renderEditor(); }
+    if (e.target.dataset.lab){ it.labels = {...(it.labels || {}), [e.target.dataset.lab]: e.target.value.trim()}; renderEditor(); }
   });
   pop.addEventListener("keydown", e => { if (e.key === "Enter" && e.target.id === "cs-hex"){ e.preventDefault(); pop.querySelector('[data-wp="cs-use"]').click(); } });
 
