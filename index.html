@@ -17,7 +17,7 @@
   --c1:#2563EB; --c2:#EA580C; --c3:#7C3AED; --c4:#059669; --c5:#DB2777; --c6:#B7791F; --c7:#0891B2; --c8:#DC2626; --c9:#4D7C0F; --c10:#4F46E5;
   --t-homework:#4F46E5; --t-exam:#DC2626; --t-quiz:#EA580C; --t-lab:#0D9488; --t-project:#9333EA; --t-reading:#16A34A; --t-lecture:#0284C7; --t-event:#DB2777; --t-task:#CA8A04; --t-other:#64748B; --t-review:#7C3AED; --t-no-class:#64748B;
   --pers:#475569;
-  --h-weather:#0284C7; --h-mail:#7C3AED; --h-due:#EA580C; --h-import:#059669; --h-cal:#4F46E5; --h-notes:#CA8A04; --cal-bg:#EDEFF8; --cal-cell:#F8F9FD;
+  --h-weather:#0284C7; --h-mail:#7C3AED; --h-due:#EA580C; --h-import:#059669; --h-cal:#4F46E5; --h-notes:#2563EB; --cal-bg:#EDEFF8; --cal-cell:#F8F9FD;
   --tint:8%; --tint2:16%; --chipmix:18%; --chipmix2:30%;
   --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --f-body:"Figtree", "Segoe UI", system-ui, -apple-system, sans-serif;
@@ -32,7 +32,7 @@
   --c1:#60A5FA; --c2:#FB923C; --c3:#A78BFA; --c4:#34D399; --c5:#F472B6; --c6:#FACC15; --c7:#22D3EE; --c8:#F87171; --c9:#A3E635; --c10:#818CF8;
   --t-homework:#818CF8; --t-exam:#F87171; --t-quiz:#FB923C; --t-lab:#2DD4BF; --t-project:#C084FC; --t-reading:#4ADE80; --t-lecture:#38BDF8; --t-event:#F472B6; --t-task:#FACC15; --t-other:#94A3B8; --t-review:#A78BFA; --t-no-class:#94A3B8;
   --pers:#B4C0D3;
-  --h-weather:#38BDF8; --h-mail:#A78BFA; --h-due:#FB923C; --h-import:#34D399; --h-cal:#818CF8; --h-notes:#FACC15; --cal-bg:var(--tile); --cal-cell:var(--tile-2);
+  --h-weather:#38BDF8; --h-mail:#A78BFA; --h-due:#FB923C; --h-import:#34D399; --h-cal:#818CF8; --h-notes:#60A5FA; --cal-bg:var(--tile); --cal-cell:var(--tile-2);
   --tint:12%; --tint2:24%; --chipmix:26%; --chipmix2:40%;
   --shadow:0 1px 2px rgba(0,0,0,.35), 0 8px 24px rgba(0,0,0,.22); color-scheme:dark}}
 :root[data-theme="dark"]{
@@ -43,7 +43,7 @@
   --c1:#60A5FA; --c2:#FB923C; --c3:#A78BFA; --c4:#34D399; --c5:#F472B6; --c6:#FACC15; --c7:#22D3EE; --c8:#F87171; --c9:#A3E635; --c10:#818CF8;
   --t-homework:#818CF8; --t-exam:#F87171; --t-quiz:#FB923C; --t-lab:#2DD4BF; --t-project:#C084FC; --t-reading:#4ADE80; --t-lecture:#38BDF8; --t-event:#F472B6; --t-task:#FACC15; --t-other:#94A3B8; --t-review:#A78BFA; --t-no-class:#94A3B8;
   --pers:#B4C0D3;
-  --h-weather:#38BDF8; --h-mail:#A78BFA; --h-due:#FB923C; --h-import:#34D399; --h-cal:#818CF8; --h-notes:#FACC15; --cal-bg:var(--tile); --cal-cell:var(--tile-2);
+  --h-weather:#38BDF8; --h-mail:#A78BFA; --h-due:#FB923C; --h-import:#34D399; --h-cal:#818CF8; --h-notes:#60A5FA; --cal-bg:var(--tile); --cal-cell:var(--tile-2);
   --tint:12%; --tint2:24%; --chipmix:26%; --chipmix2:40%;
   --shadow:0 1px 2px rgba(0,0,0,.35), 0 8px 24px rgba(0,0,0,.22); color-scheme:dark}
 
@@ -563,19 +563,29 @@ dialog.mailx{width:calc(100vw - 24px);max-width:none;height:calc(100dvh - 24px);
 .pz img{max-width:100%;max-height:220px;border-radius:8px;border:1px solid var(--line)}
 #pz-text{font-family:var(--f-mono);font-size:12.5px;min-height:200px}
 dialog#dlg-paste{width:min(720px,calc(100vw - 32px))}
-/* notes */
+.nc-chips button{display:inline-flex;align-items:center;gap:7px}
+.nc-chips i{width:14px;height:14px;border-radius:50%;background:var(--nc);flex:none}
+.nc-chips button[aria-pressed="true"] i{box-shadow:0 0 0 2px #fff}
+.tw{display:flex;flex-direction:column;gap:6px;padding:2px 2px 6px;border-bottom:1px solid var(--line)}
+.tw .row input{width:70px;border:1px solid var(--line);background:var(--tile-2);border-radius:8px;padding:5px 8px;font-size:13.5px}
+.tw .row .btn{padding:4px 10px}
+/* notes: folders on the left, notes as cards grouped by recency, a Docs-style editor */
 .nav-notes-dot{display:none}
-.notes{display:grid;grid-template-columns:240px minmax(240px,320px) minmax(0,1fr);gap:16px;align-items:stretch}
+.notes{display:grid;grid-template-columns:250px minmax(0,1fr);gap:16px;align-items:stretch;transition:grid-template-columns .25s ease,gap .25s ease}
 .notes > .tile{min-width:0;min-height:0}
+.notes.side-off{grid-template-columns:0 minmax(0,1fr);gap:0}
+.nt-side{transition:transform .25s ease,opacity .2s ease,padding .25s ease}
+.notes.side-off .nt-side{transform:translateX(-110%);opacity:0;padding-inline:0;pointer-events:none;overflow:hidden}
 .nt-side h5{margin:10px 8px 2px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.nt-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.nt-head{display:flex;align-items:center;gap:6px}
+.nt-head .cal-title{flex:1}
 #nt-folders{display:flex;flex-direction:column;gap:2px;overflow:auto;min-height:0}
 .nf{display:flex;align-items:center;border-radius:10px;padding-left:calc(var(--lvl) * 16px)}
 .nf:hover,.nf.on{background:var(--tile-2)}
-.nf.on{background:color-mix(in srgb,var(--h-notes) 16%,transparent)}
+.nf.on{background:color-mix(in srgb,var(--h-notes) 15%,transparent)}
 .nf-b{flex:1;min-width:0;display:grid;grid-template-columns:18px minmax(0,1fr) auto;gap:8px;align-items:center;border:0;background:none;padding:7px 8px;cursor:pointer;text-align:left;font-size:14px;color:var(--ink)}
 .nf-b svg{width:17px;height:17px;color:var(--h-notes)}
-.nf.on .nf-b{font-weight:700}
+.nf.on .nf-b{font-weight:700;color:var(--h-notes)}
 .nf-t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .nf-b b{font-family:var(--f-mono);font-size:12px;font-weight:500;color:var(--muted)}
 .nf-in{border:1px solid var(--accent);border-radius:6px;padding:2px 6px;min-width:0;width:100%;background:var(--tile)}
@@ -583,32 +593,69 @@ dialog#dlg-paste{width:min(720px,calc(100vw - 32px))}
 .nf-act button{border:0;background:none;color:var(--muted);cursor:pointer;width:24px;height:24px;border-radius:6px;font-size:14px;line-height:1}
 .nf-act button:hover{background:var(--line);color:var(--ink)}
 @media (hover:hover){.nf-act{display:none}.nf:hover .nf-act,.nf:focus-within .nf-act{display:flex}}
-.nt-lh{display:flex;gap:8px;align-items:center}
-.nt-lh input{flex:1;min-width:0;border:1px solid var(--line);background:var(--tile-2);border-radius:999px;padding:7px 12px}
-.nt-fsel{display:none;border:1px solid var(--line);background:var(--tile-2);border-radius:10px;padding:8px 10px}
-#nt-notes{list-style:none;margin:0 -8px;padding:0;overflow:auto;min-height:0;flex:1}
-.nn{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px;padding:10px 12px;border-radius:10px;cursor:pointer;border-bottom:1px solid var(--line)}
-.nn:hover{background:var(--tile-2)}
-.nn.on{background:color-mix(in srgb,var(--h-notes) 16%,transparent);border-bottom-color:transparent}
-.nn-t{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.nn-d{font-size:12px;color:var(--muted)}
-.nn-p{grid-column:1 / 3;font-size:13px;color:var(--muted);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.nn-f{grid-column:1 / 3;font-size:12px;color:var(--muted);display:inline-flex;gap:5px;align-items:center}
-.nn-f svg{width:12px;height:12px;color:var(--h-notes)}
-.nt-ed{gap:10px}
-#nt-ed-main{display:flex;flex-direction:column;gap:10px;min-height:0;flex:1}
-.nt-et{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.nt-et select{border:1px solid var(--line);background:var(--tile-2);border-radius:999px;padding:5px 10px;font-size:13px;max-width:220px}
-.nt-et .sp{flex:1}
-#nt-back{display:none}
-.nt-tb{display:flex;flex-wrap:wrap;gap:2px;padding:4px;border-radius:10px;background:var(--tile-2)}
-.nt-tb button{border:0;background:none;min-width:32px;height:30px;border-radius:7px;cursor:pointer;font-weight:600;font-size:13px;color:var(--ink);padding:0 7px}
+.nt-ib{border:0;background:none;color:var(--muted);width:34px;height:34px;border-radius:10px;display:inline-grid;place-items:center;cursor:pointer;flex:none}
+.nt-ib:hover{background:var(--tile-2);color:var(--ink)}
+.nt-ib svg{width:19px;height:19px}
+.nt-ib.on{background:color-mix(in srgb,var(--h-notes) 15%,transparent);color:var(--h-notes)}
+
+/* gallery */
+.nt-main{padding:0;gap:0;overflow:hidden}
+#nt-gal{display:flex;flex-direction:column;min-height:0;flex:1}
+.ng-head{display:flex;align-items:center;gap:10px;padding:16px 18px 10px;flex-wrap:wrap}
+.ng-t{flex:1;min-width:140px;display:flex;flex-direction:column;line-height:1.15}
+.ng-t b{font-family:var(--f-display);font-size:24px;letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ng-t span{font-size:13px;color:var(--muted)}
+.ng-head input[type=search]{border:1px solid var(--line);background:var(--tile-2);border-radius:999px;padding:7px 12px;width:220px;min-width:0}
+.nt-fsel{display:none;border:1px solid var(--line);background:var(--tile-2);border-radius:10px;padding:8px 10px;max-width:100%}
+#nt-cards{overflow:auto;min-height:0;flex:1;padding:0 18px 22px}
+.ng-g{font-family:var(--f-display);font-size:19px;font-weight:700;margin:14px 2px 10px}
+.ng-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:18px 16px}
+.nc{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;border-radius:14px;padding:0;background:none;border:0;color:var(--ink);text-align:center;min-width:0}
+.nc-th{width:100%;aspect-ratio:4/3;border-radius:12px;background:var(--tile);border:1px solid var(--line);overflow:hidden;position:relative;transition:border-color .15s,transform .15s;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.nc:hover .nc-th,.nc:focus-visible .nc-th{border-color:var(--h-notes);transform:translateY(-2px)}
+.nc-mini{position:absolute;left:0;top:0;width:220%;transform:scale(.4545);text-align:left;transform-origin:0 0;padding:22px 26px;pointer-events:none;font-size:15.5px;line-height:1.5}
+.nc-mini:empty::before{content:""}
+.nt-body.nc-mini{padding:26px 30px;overflow:hidden;min-height:0}
+.nc-t{font-weight:600;font-size:14.5px;line-height:1.25;max-width:100%;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.nc-d{font-size:12.5px;color:var(--muted);font-family:var(--f-mono);margin-top:-3px}
+.nc-f{font-size:11.5px;color:var(--h-notes);font-weight:600;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:-4px}
+.ng-empty{margin:40px auto;color:var(--muted);text-align:center;max-width:36ch}
+
+/* editor */
+#nt-ed{display:flex;flex-direction:column;min-height:0;flex:1}
+.ne-top{display:flex;align-items:center;gap:8px;padding:10px 12px 6px;flex-wrap:wrap}
+#nt-back{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block}
+.ne-top select{border:1px solid var(--line);background:var(--tile-2);border-radius:999px;padding:5px 10px;font-size:13px;max-width:180px}
+.ne-top .sp{flex:1}
+#nt-title{border:0;background:transparent;font-family:var(--f-display);font-size:22px;font-weight:700;padding:2px 16px 6px;outline:none;width:100%;min-width:0}
+#nt-title::placeholder{color:var(--muted)}
+.nt-tb{display:flex;flex-wrap:wrap;align-items:center;gap:2px;padding:4px 6px;margin:0 10px;border-radius:14px;background:var(--tile-2);overflow-x:auto;scrollbar-width:none;position:relative;flex:none}
+.nt-tb::-webkit-scrollbar{display:none}
+.nt-tb button{border:0;background:none;min-width:30px;height:30px;border-radius:7px;cursor:pointer;font-weight:600;font-size:13.5px;color:var(--ink);padding:0 6px;display:inline-grid;place-items:center;flex:none;position:relative}
 .nt-tb button:hover{background:var(--line)}
-.nt-tb .sep{width:1px;background:var(--line);margin:4px 3px}
+.nt-tb button.on{background:color-mix(in srgb,var(--h-notes) 18%,transparent);color:var(--h-notes)}
+.nt-tb svg{width:17px;height:17px}
+.nt-tb .sep{width:1px;height:20px;background:var(--line);margin:0 4px;flex:none}
+.nt-tb select{border:0;background:transparent;border-radius:7px;padding:5px 4px;font-size:13.5px;cursor:pointer;flex:none}
+.nt-tb select:hover{background:var(--line)}
+#nt-style{width:118px}
+#nt-font{width:122px}
+.nt-size{display:inline-flex;align-items:center;flex:none}
+.nt-size input{width:40px;text-align:center;border:1px solid var(--line);background:var(--tile);border-radius:6px;padding:3px 2px;font-size:13px}
+.nt-size input::-webkit-inner-spin-button{display:none}
+.nt-cbar{position:absolute;left:7px;right:7px;bottom:4px;height:3px;border-radius:2px;background:var(--cb,currentColor)}
+.nt-canvas{flex:1;min-height:0;overflow:auto;background:var(--tile-2);margin-top:8px;padding:22px 16px 60px}
+.nt-page{max-width:816px;margin:0 auto;background:var(--tile);border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.08),0 0 0 1px var(--line);padding:48px 64px;min-height:calc(100% - 4px)}
+#nt-body{flex:none;min-height:300px;overflow:visible;padding:0;overflow-wrap:anywhere}
+
+/* note text (editor, cards and the home Note widget) */
 .nt-body{flex:1;min-height:200px;overflow:auto;outline:none;font-size:15.5px;line-height:1.6;padding:4px 2px}
 .nt-body:empty::before{content:"Start writing…";color:var(--muted)}
+.nt-body h1{font-family:var(--f-display);font-size:30px;line-height:1.2;margin:.4em 0 .15em}
 .nt-body h2{font-family:var(--f-display);font-size:22px;margin:.6em 0 .2em}
 .nt-body h3{font-family:var(--f-display);font-size:18px;margin:.6em 0 .2em}
+.nt-body h4{font-size:16px;font-weight:700;margin:.6em 0 .2em}
+.nt-body p.sub{font-size:18px;color:var(--muted);margin:0 0 .5em}
 .nt-body blockquote{margin:.4em 0;padding-left:12px;border-left:3px solid var(--h-notes);color:var(--muted)}
 .nt-body a{color:var(--accent)}
 .nt-body p{margin:.3em 0}
@@ -618,22 +665,66 @@ dialog#dlg-paste{width:min(720px,calc(100vw - 32px))}
 .nt-body ul.chk > li.done{color:var(--muted);text-decoration:line-through}
 .nt-body ul.chk > li.done::before{background:var(--ok);border-color:var(--ok)}
 .nt-body ul.chk > li.done::after{content:"";position:absolute;left:6px;top:.4em;width:5px;height:9px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
-.nt-empty{margin:auto;color:var(--muted);text-align:center;max-width:36ch}
-@media (min-width:821px){
-  #pg-notes .notes{height:calc(100dvh - var(--todo-top, 110px) - 16px)}
-  #pg-notes .tile{overflow:hidden}
-  body.pg-notes{padding-bottom:0}
-  body.pg-notes .foot{display:none}
-}
+.nt-body table{border-collapse:collapse;table-layout:fixed;margin:.6em 0;max-width:none}
+.nt-body td,.nt-body th{border:1px solid color-mix(in srgb,var(--muted) 45%,transparent);padding:5px 8px;vertical-align:top;min-width:30px;overflow-wrap:anywhere}
+.nt-body th{background:var(--tile-2);text-align:left}
+#nt-body td.rz-c{cursor:col-resize}
+#nt-body td.rz-r{cursor:row-resize}
+body.nt-rz,body.nt-rz *{cursor:inherit!important;user-select:none!important}
+body.nt-rz.c{cursor:col-resize!important}
+body.nt-rz.r{cursor:row-resize!important}
+
+/* toolbar pop-ups */
+.nt-pop{position:fixed;z-index:70;background:var(--tile);border-radius:14px;box-shadow:0 14px 40px rgba(0,0,0,.22),0 0 0 1px var(--line);padding:10px;display:flex;flex-direction:column;gap:8px;min-width:180px;max-width:calc(100vw - 24px)}
+.nt-pop .wp-l{margin:0}
+.nt-pop .pal-sw{display:grid;grid-template-columns:repeat(8,26px);gap:5px}
+.nt-pop .csw{width:26px;height:26px}
+.nt-pop .row{display:flex;align-items:center;gap:8px}
+.nt-pop input[type=color]{width:40px;height:28px;border:1px solid var(--line);border-radius:6px;padding:0;background:none;cursor:pointer}
+.nt-pop .mi{border:0;background:none;text-align:left;padding:7px 10px;border-radius:8px;cursor:pointer;font-size:14px;color:var(--ink);display:flex;gap:8px;align-items:center}
+.nt-pop .mi:hover{background:var(--tile-2)}
+.nt-pop .mi.on{font-weight:700;color:var(--h-notes)}
+.nt-pop .mi.dz{color:var(--bad)}
+.nt-pop[data-kind="table"]{width:300px}
+.tg{display:grid;grid-template-columns:repeat(8,18px);gap:3px}
+.tg i{width:18px;height:18px;border:1px solid var(--line);border-radius:3px;background:var(--tile-2);cursor:pointer}
+.tg i.hl{background:color-mix(in srgb,var(--h-notes) 35%,transparent);border-color:var(--h-notes)}
+
+/* full screen: the open note covers the whole window */
+.notes.full{position:fixed;inset:0;z-index:60;height:auto!important;grid-template-columns:minmax(0,1fr);gap:0;background:var(--bg);padding:env(safe-area-inset-top,0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0)}
+.notes.full .nt-side{display:none}
+.notes.full .nt-main{border-radius:0}
+.notes.full #nt-back,.notes.full .nt-showside,.notes.full #nt-hide{display:none!important}
+html.nt-full-on{overflow:hidden}
+
+#pg-notes .notes{height:calc(100dvh - var(--todo-top, 110px) - 16px);min-height:420px}
+#pg-notes .tile{overflow:hidden}
+body.pg-notes{padding-bottom:0}
+body.pg-notes .foot{display:none}
 @media (max-width:820px){
-  .notes{grid-template-columns:1fr}
-  .nt-side{display:none}
+  .notes,.notes.side-off{grid-template-columns:minmax(0,1fr);gap:0}
+  .nt-side,#nt-hide,.nt-showside{display:none!important}
   .nt-fsel{display:block}
-  .notes .nt-ed{display:none}
-  .notes.editing .nt-list{display:none}
-  .notes.editing .nt-ed{display:flex;min-height:70vh}
-  #nt-back{display:inline-flex}
+  .ng-head{padding:12px 12px 8px}
+  .ng-t{order:1}
+  #nt-new{order:2}
+  .nt-fsel{order:3;flex:1 1 40%}
+  .ng-head input[type=search]{flex:1 1 50%;width:auto;order:4}
+  .nt-tb{flex-wrap:nowrap}
+  #nt-style{width:104px}
+  #nt-font{width:100px}
+  #nt-cards{padding:0 12px 20px}
+  .ng-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 12px}
+  .nt-canvas{padding:0;background:var(--tile)}
+  .nt-page{box-shadow:none;border-radius:0;padding:14px 16px 40px}
+  #nt-move{max-width:130px}
 }
+.nt-body h2{display:block;text-transform:none;letter-spacing:0;color:inherit;font-weight:700}
+.nt-page{overflow-x:auto}
+.nw-body h1{font-size:19px;margin:.3em 0 .1em}
+.nw-body h4{font-size:14.5px;margin:.3em 0 .1em}
+.nw-body p.sub{font-size:15px;margin:0 0 .3em}
+.nw-body table{font-size:13px;margin:.3em 0}
 
 /* ===== round 5: home screens (tile grid, editor), ⋯ menu, note and inbox widgets ===== */
 html{background:var(--bg)}
@@ -935,35 +1026,49 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
   <section id="pg-notes" data-pagebox="notes" hidden>
     <div class="notes" id="notes">
       <aside class="tile nt-side" aria-label="Folders">
-        <div class="nt-head"><h2 class="cal-title" style="color:var(--h-notes)">Notes</h2><button class="btn small" id="nt-newfolder" type="button">+ Folder</button></div>
+        <div class="nt-head"><h2 class="cal-title" style="color:var(--h-notes)">Notes</h2><button class="btn small" id="nt-newfolder" type="button">+ Folder</button><button class="nt-ib" id="nt-hide" type="button" title="Hide folders" aria-label="Hide folders"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M9 4v16M6 8h0M6 11h0"/></svg></button></div>
         <nav id="nt-folders"></nav>
       </aside>
-      <section class="tile nt-list" aria-label="Notes">
-        <select id="nt-fsel" class="nt-fsel" aria-label="Folder"></select>
-        <div class="nt-lh"><input type="search" id="nt-q" placeholder="Search all notes" aria-label="Search notes"><button class="btn primary small" id="nt-new" type="button">+ Note</button></div>
-        <span class="note" id="nt-where"></span>
-        <ul id="nt-notes"></ul>
-      </section>
-      <article class="tile nt-ed" aria-label="Editor">
-        <p class="nt-empty" id="nt-ed-empty">Pick a note, or press <b>+ Note</b> to start one.</p>
-        <div id="nt-ed-main" hidden>
-          <div class="nt-et">
+      <section class="tile nt-main" aria-label="Notes">
+        <!-- cards -->
+        <div id="nt-gal">
+          <div class="ng-head">
+            <button class="nt-ib nt-showside" type="button" title="Show folders" aria-label="Show folders" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M9 4v16M6 8h0M6 11h0"/></svg></button>
+            <select id="nt-fsel" class="nt-fsel" aria-label="Folder"></select>
+            <div class="ng-t"><b id="ng-name">All notes</b><span id="ng-count"></span></div>
+            <input type="search" id="nt-q" placeholder="Search all notes" aria-label="Search notes">
+            <button class="btn primary small" id="nt-new" type="button">+ Note</button>
+          </div>
+          <div id="nt-cards"></div>
+        </div>
+        <!-- editor -->
+        <div id="nt-ed" hidden>
+          <div class="ne-top">
+            <button class="nt-ib nt-showside" type="button" title="Show folders" aria-label="Show folders" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M9 4v16M6 8h0M6 11h0"/></svg></button>
             <button class="btn small" id="nt-back" type="button">‹ Notes</button>
             <label class="note" for="nt-move">Folder</label><select id="nt-move"></select>
             <span class="note" id="nt-saved"></span><span class="sp"></span>
+            <button class="nt-ib" id="nt-full" type="button" title="Full screen" aria-label="Full screen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
             <button class="btn small danger" id="nt-del" type="button">Delete</button>
           </div>
-          <input id="nt-title" class="d-title" placeholder="Title" aria-label="Note title" autocomplete="off">
+          <input id="nt-title" placeholder="Title" aria-label="Note title" autocomplete="off">
           <div class="nt-tb" id="nt-tb" role="toolbar" aria-label="Formatting">
-            <button type="button" data-cmd="bold" title="Bold (Ctrl+B)"><b>B</b></button><button type="button" data-cmd="italic" title="Italic (Ctrl+I)"><i>I</i></button><button type="button" data-cmd="underline" title="Underline (Ctrl+U)"><u>U</u></button><button type="button" data-cmd="strikeThrough" title="Strikethrough"><s>S</s></button><span class="sep"></span>
-            <button type="button" data-cmd="h2" title="Heading">H1</button><button type="button" data-cmd="h3" title="Subheading">H2</button><button type="button" data-cmd="blockquote" title="Quote">❝</button><span class="sep"></span>
-            <button type="button" data-cmd="insertUnorderedList" title="Bulleted list">• List</button><button type="button" data-cmd="insertOrderedList" title="Numbered list">1. List</button><button type="button" data-cmd="chk" title="Checklist">☑ Checklist</button><span class="sep"></span>
-            <button type="button" data-cmd="link" title="Link (Ctrl+click a link to open it)">Link</button><button type="button" data-cmd="removeFormat" title="Clear formatting">Clear</button>
+            <button type="button" data-cmd="undo" title="Undo (Ctrl+Z)" aria-label="Undo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button><button type="button" data-cmd="redo" title="Redo (Ctrl+Y)" aria-label="Redo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg></button><span class="sep"></span>
+            <select id="nt-style" aria-label="Text style" title="Text style"><option value="p">Normal text</option><option value="h1">Title</option><option value="sub">Subtitle</option><option value="h2">Heading 1</option><option value="h3">Heading 2</option><option value="h4">Heading 3</option></select><span class="sep"></span>
+            <select id="nt-font" aria-label="Font" title="Font"></select><span class="sep"></span>
+            <span class="nt-size"><button type="button" data-cmd="size-" title="Decrease font size" aria-label="Decrease font size">−</button><input id="nt-size" type="number" min="6" max="96" step="1" aria-label="Font size" title="Font size (pt)"><button type="button" data-cmd="size+" title="Increase font size" aria-label="Increase font size">+</button></span><span class="sep"></span>
+            <button type="button" data-cmd="bold" title="Bold (Ctrl+B)"><b>B</b></button><button type="button" data-cmd="italic" title="Italic (Ctrl+I)"><i style="font-family:Georgia,serif">I</i></button><button type="button" data-cmd="underline" title="Underline (Ctrl+U)"><u>U</u></button><button type="button" data-cmd="strikeThrough" title="Strikethrough"><s>S</s></button>
+            <button type="button" data-pop="color" title="Text color" aria-label="Text color"><span style="font-weight:700;font-size:15px;line-height:1;margin-top:-3px">A</span><span class="nt-cbar" id="nt-cbar"></span></button><button type="button" data-pop="hl" title="Highlight color" aria-label="Highlight color"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-top:-3px"><path d="m9 11-6 6v3h6l6-6"/><path d="m22 4-4-2-9 9 4 4 9-9z"/></svg><span class="nt-cbar" id="nt-hbar" style="--cb:#FFD43B"></span></button><span class="sep"></span>
+            <button type="button" data-cmd="link" title="Link (Ctrl+click a link to open it)" aria-label="Link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></button><button type="button" data-pop="table" title="Table" aria-label="Table"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 4v16M15 4v16"/></svg></button><span class="sep"></span>
+            <button type="button" data-cmd="justifyLeft" title="Align left" aria-label="Align left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 10h10M4 14h16M4 18h10"/></svg></button><button type="button" data-cmd="justifyCenter" title="Align center" aria-label="Align center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M7 10h10M4 14h16M7 18h10"/></svg></button><button type="button" data-cmd="justifyRight" title="Align right" aria-label="Align right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M10 10h10M4 14h16M10 18h10"/></svg></button><button type="button" data-pop="spacing" title="Line spacing" aria-label="Line spacing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 6h10M11 12h10M11 18h10M5 4v16M2.5 6.5 5 4l2.5 2.5M2.5 17.5 5 20l2.5-2.5"/></svg></button><span class="sep"></span>
+            <button type="button" data-cmd="insertUnorderedList" title="Bulleted list" aria-label="Bulleted list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1" fill="currentColor"/><circle cx="4.5" cy="12" r="1" fill="currentColor"/><circle cx="4.5" cy="18" r="1" fill="currentColor"/></svg></button><button type="button" data-cmd="insertOrderedList" title="Numbered list" aria-label="Numbered list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6h10M10 12h10M10 18h10M4 4h1v4M4 8h2M4 14.5a1.2 1.2 0 0 1 2 .9L4 18h2.2"/></svg></button><button type="button" data-cmd="chk" title="Checklist" aria-label="Checklist"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="6" height="6" rx="1.5"/><path d="m4.5 7 1 1 2-2M3 15h6v6H3zM13 7h8M13 18h8"/></svg></button><button type="button" data-cmd="blockquote" title="Quote" aria-label="Quote" style="font-size:17px">❝</button><span class="sep"></span>
+            <button type="button" data-cmd="removeFormat" title="Clear formatting" aria-label="Clear formatting"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h13M12 4 8 20M15 15l5 5M20 15l-5 5"/></svg></button>
           </div>
-          <div class="nt-body" id="nt-body" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Note text" spellcheck="true"></div>
+          <div class="nt-canvas" id="nt-canvas"><div class="nt-page"><div class="nt-body" id="nt-body" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Note text" spellcheck="true"></div></div></div>
         </div>
-      </article>
+      </section>
     </div>
+    <div class="nt-pop" id="nt-pop" hidden></div>
   </section>
 
   <!-- ===== RECENTLY DELETED ===== -->
@@ -1081,6 +1186,11 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
         <p class="note" id="st-status"></p>
         <div><button type="button" class="btn small" id="st-resume" hidden>Resume schedule now</button></div>
         <p class="note">The sun/moon button in the header switches the theme any time. On Automatic, that lasts until the next scheduled change.</p>
+      </div>
+      <div class="st-sec">
+        <h4>Notes color</h4>
+        <div class="chips nc-chips" id="st-ncolor" role="group" aria-label="Notes color"></div>
+        <p class="note">Used for the Notes page (folders, selected items, quotes) and the Note widget on the home screen.</p>
       </div>
       <div class="st-sec">
         <h4>Course colors</h4>
@@ -1995,6 +2105,15 @@ const Settings = (() => {
   return { get: () => s, update(fn){ fn(s); save(); } };
 })();
 
+/* Notes color: picked in Settings; sets --h-notes for light and dark. */
+const NOTE_COLORS = [["blue","Blue","#2563EB","#60A5FA"],["sky","Sky","#0284C7","#38BDF8"],["teal","Teal","#0D9488","#2DD4BF"],["green","Green","#16A34A","#4ADE80"],["sage","Sage","#4F7F67","#8FC1A9"],["amber","Amber","#CA8A04","#FACC15"],["orange","Orange","#EA580C","#FB923C"],["coral","Coral","#E0533F","#FF8A7A"],["rose","Rose","#D6457A","#F48FB1"],["violet","Violet","#7C3AED","#A78BFA"],["indigo","Indigo","#4F46E5","#818CF8"],["slate","Slate","#475569","#94A3B8"]];
+function applyNotesColor(){
+  const c = NOTE_COLORS.find(x => x[0] === Settings.get().notesColor) || NOTE_COLORS[0];
+  let el = document.getElementById("nt-color-css"); if (!el){ el = document.createElement("style"); el.id = "nt-color-css"; document.head.appendChild(el); }
+  el.textContent = `:root{--h-notes:${c[2]}}:root[data-theme="dark"]{--h-notes:${c[3]}}@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--h-notes:${c[3]}}}`;
+}
+applyNotesColor();
+
 /* Course colors: each course gets its own slot (least-used first) and keeps it. Changeable in Settings. */
 function courseIndex(c){
   const key = String(c || "").trim(); if (!key) return -1;
@@ -2068,8 +2187,11 @@ function renderSettings(){
   $("#st-courses").innerHTML = courses.length ? courses.map(c => { const ci = courseIndex(c);
     return `<div class="cc-row"><span class="cc-name" style="--cc:${courseColor(c)}">${esc(c)}</span><div class="sws" role="group" aria-label="Color for ${esc(c)}">${Array.from({length:COURSE_COLORS}, (_, k) => `<button type="button" class="sw" style="--sc:var(--c${k+1})" data-course="${esc(c)}" data-ci="${k}" aria-pressed="${k === ci}" aria-label="Color ${k+1}"></button>`).join("")}</div></div>`; }).join("")
     : `<p class="note">Courses show up here once you add school items.</p>`;
+  const nc = Settings.get().notesColor || "blue";
+  $("#st-ncolor").innerHTML = NOTE_COLORS.map(([k, n, l, d]) => `<button type="button" data-nc="${k}" aria-pressed="${k === nc}" style="--nc:${currentTheme() === "dark" ? d : l}"><i></i>${n}</button>`).join("");
   renderAISettings();
 }
+$("#st-ncolor").addEventListener("click", e => { const b = e.target.closest("[data-nc]"); if (!b) return; Settings.update(st => { st.notesColor = b.dataset.nc; }); applyNotesColor(); renderSettings(); });
 $("#btn-theme").onclick = toggleTheme;
 $("#btn-settings").onclick = () => { renderSettings(); $("#dlg-settings").showModal(); };
 $("#st-mode").addEventListener("click", e => { const b = e.target.closest("[data-mode]"); if (!b) return; Settings.update(st => { st.theme.mode = b.dataset.mode; st.theme.override = null; }); applyTheme(); renderSettings(); });
@@ -3111,21 +3233,52 @@ const Notes = (() => {
   return api;
 })();
 
-/* Only simple formatting survives a save or a paste: no scripts, styles or event attributes. */
-const NOTE_TAGS = new Set(["B","STRONG","I","EM","U","S","STRIKE","H2","H3","P","DIV","BR","UL","OL","LI","A","BLOCKQUOTE","CODE","PRE","SPAN"]);
+/* Only safe formatting survives a save or a paste: no scripts, event attributes or unknown styles.
+   Styles are rebuilt from a short list (alignment, spacing, size, font, colors, table sizes). */
+const NOTE_TAGS = new Set(["B","STRONG","I","EM","U","S","STRIKE","H1","H2","H3","H4","P","DIV","BR","UL","OL","LI","A","BLOCKQUOTE","CODE","PRE","SPAN","TABLE","COLGROUP","COL","THEAD","TBODY","TR","TD","TH"]);
+const NOTE_FONTS = [["","Default"],["Arial","Arial"],["Verdana","Verdana"],["Trebuchet MS","Trebuchet MS"],["Bricolage Grotesque","Bricolage"],["Georgia","Georgia"],["Times New Roman","Times New Roman"],["IBM Plex Mono","IBM Plex Mono"],["Courier New","Courier New"]];
+const SAFE_COLOR = /^(#[0-9a-f]{3,8}|rgba?\([\d.,%]+\)|[a-z]{3,20})$/i;
+const plainInk = c => /^(rgb\(0,0,0\)|#000(000)?|black|windowtext|inherit|initial|currentcolor)$/i.test(c);
+const blankBg = c => /^(transparent|rgba\(\d+,\d+,\d+,0\)|rgb\(255,255,255\)|#fff(fff)?|white|inherit|initial)$/i.test(c);
+function cleanStyle(el, tag){
+  const s = el.style, out = [], ns = v => String(v || "").replace(/\s+/g, "");
+  const al = s.textAlign || ({left:"left", center:"center", right:"right", justify:"justify"})[(el.getAttribute("align") || "").toLowerCase()];
+  if (/^(left|center|right|justify)$/.test(al || "")) out.push(`text-align:${al}`);
+  if (/^\d(\.\d+)?$/.test(s.lineHeight) && +s.lineHeight >= .8 && +s.lineHeight <= 3) out.push(`line-height:${s.lineHeight}`);
+  if (/^\d+(\.\d+)?(pt|px)$/.test(s.fontSize)) out.push(`font-size:${s.fontSize}`);
+  if (s.fontFamily && s.fontFamily.length < 120 && /^[\w\s,"'-]+$/.test(s.fontFamily) && !/hbx-/.test(s.fontFamily)) out.push(`font-family:${s.fontFamily}`);
+  if (/^(bold|[6-9]00)$/.test(s.fontWeight)) out.push("font-weight:700");
+  if (s.fontStyle === "italic") out.push("font-style:italic");
+  const td = `${s.textDecorationLine || ""} ${s.textDecoration || ""}`;
+  if (/underline|line-through/.test(td)) out.push(`text-decoration:${[/underline/.test(td) && "underline", /line-through/.test(td) && "line-through"].filter(Boolean).join(" ")}`);
+  const c = ns(s.color); if (c && SAFE_COLOR.test(c) && !plainInk(c) && c !== "rgb(1,2,3)") out.push(`color:${s.color}`);
+  const bg = ns(s.backgroundColor); if (bg && SAFE_COLOR.test(bg) && !blankBg(bg) && bg !== "rgb(1,2,3)") out.push(`background-color:${s.backgroundColor}`);
+  if (/^(COL|TABLE|TD|TH)$/.test(tag) && /^\d+(\.\d+)?(px|%)$/.test(s.width)) out.push(`width:${s.width}`);
+  if (/^(TR|TD|TH)$/.test(tag) && /^\d+(\.\d+)?px$/.test(s.height)) out.push(`height:${s.height}`);
+  return out.join(";");
+}
 function cleanHTML(html){
   const doc = new DOMParser().parseFromString(`<body>${html || ""}</body>`, "text/html");
   const walk = el => {
-    for (const c of [...el.children]){
+    for (let c of [...el.children]){
+      if (c.tagName === "FONT"){   // <font> from the browser's editing commands becomes a styled <span>
+        const s = doc.createElement("span");
+        if (c.getAttribute("style")) s.setAttribute("style", c.getAttribute("style"));
+        const face = c.getAttribute("face"); if (face && !/hbx-/.test(face)) s.style.fontFamily = face;
+        const col = c.getAttribute("color"); if (col && !/^#010203$/i.test(col)) s.style.color = col;
+        s.append(...c.childNodes); c.replaceWith(s); c = s;
+      }
       if (!NOTE_TAGS.has(c.tagName)){
         if (["SCRIPT","STYLE","IFRAME","OBJECT","EMBED","LINK","META","TITLE","IMG","SVG","VIDEO","AUDIO","FORM","INPUT","BUTTON","TEXTAREA","SELECT"].includes(c.tagName)){ c.remove(); continue; }
         walk(c); c.replaceWith(...c.childNodes); continue;
       }
+      const st = c.hasAttribute("style") || c.hasAttribute("align") ? cleanStyle(c, c.tagName) : "";
       for (const a of [...c.attributes]){
         const n = a.name.toLowerCase(), v = a.value.trim();
-        const keep = (c.tagName === "A" && n === "href" && /^(https?:|mailto:)/i.test(v)) || (n === "class" && /^(chk|done)$/.test(v));
+        const keep = (c.tagName === "A" && n === "href" && /^(https?:|mailto:)/i.test(v)) || (n === "class" && /^(chk|done|sub)$/.test(v));
         if (!keep) c.removeAttribute(a.name);
       }
+      if (st) c.setAttribute("style", st);
       if (c.tagName === "A"){ c.setAttribute("target", "_blank"); c.setAttribute("rel", "noopener"); }
       walk(c);
     }
@@ -3133,10 +3286,15 @@ function cleanHTML(html){
   walk(doc.body);
   return doc.body.innerHTML;
 }
-const noteText = html => { const d = new DOMParser().parseFromString(`<body>${html || ""}</body>`, "text/html"); d.querySelectorAll("li,p,div,h2,h3,br").forEach(e => e.append(" ")); return d.body.textContent.replace(/\s+/g, " ").trim(); };
+const noteText = html => { const d = new DOMParser().parseFromString(`<body>${html || ""}</body>`, "text/html"); d.querySelectorAll("li,p,div,h1,h2,h3,h4,td,th,br").forEach(e => e.append(" ")); return d.body.textContent.replace(/\s+/g, " ").trim(); };
 
-const nt = {folder:"all", note:null, loaded:null, q:"", renaming:null, mobileEdit:false};
+/* ---------- Notes page: folders, cards grouped by recency, editor ---------- */
+const NT_UI = "homebase.notesui.v1";
+const nt = {folder:"all", note:null, loaded:null, q:"", renaming:null, mobileEdit:false, side:true, full:false, range:null, size:12, color:"#E03131", hl:"#FFD43B80"};
+try { const u = JSON.parse(localStorage.getItem(NT_UI) || "{}"); nt.side = u.side !== false; } catch(e){}
+const saveNtUI = () => { try { localStorage.setItem(NT_UI, JSON.stringify({side:nt.side})); } catch(e){} };
 const FOLDER_IC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h7l2 2h9v11H3z"/></svg>';
+const ntBody = $("#nt-body");
 function noteCount(fid){
   if (fid === "all") return Notes.notes().length;
   if (fid === "unfiled") return Notes.notes().filter(n => !n.folderId).length;
@@ -3145,6 +3303,7 @@ function noteCount(fid){
 function folderTree(parentId = null, lvl = 0){
   return Notes.folders().filter(f => f.parentId === parentId).sort((a, b) => a.name.localeCompare(b.name)).flatMap(f => [{f, lvl}, ...folderTree(f.id, lvl + 1)]);
 }
+const folderName = id => id === "all" ? "All notes" : id === "unfiled" ? "Not in a folder" : ((Notes.folder(id) || {}).name || "Notes");
 function notesInView(){
   let list = Notes.notes();
   const q = nt.q.toLowerCase();
@@ -3153,13 +3312,37 @@ function notesInView(){
   else if (nt.folder !== "all"){ const ids = new Set(Notes.descendants(nt.folder)); list = list.filter(n => ids.has(n.folderId)); }
   return list.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }
+/* Most recently edited first, in groups: This week, Last week, Previous 30 days, then months, then years. Empty groups don't show. */
+function noteGroups(list){
+  const now = new Date(), sow = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay());
+  const slw = new Date(sow.getFullYear(), sow.getMonth(), sow.getDate() - 7), d30 = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30);
+  const out = [], add = (k, n) => { let g = out.find(x => x.k === k); if (!g) out.push(g = {k, notes:[]}); g.notes.push(n); };
+  for (const n of list){
+    const t = new Date(n.updatedAt);
+    add(t >= sow ? "This week" : t >= slw ? "Last week" : t >= d30 ? "Previous 30 days"
+      : t.getFullYear() === now.getFullYear() ? t.toLocaleDateString(undefined, {month:"long"}) : String(t.getFullYear()), n);
+  }
+  return out;
+}
+const cardDate = iso => { const d = new Date(iso); return ymd(d) === ymd(new Date()) ? d.toLocaleTimeString(undefined, {hour:"numeric", minute:"2-digit"}) : `${d.getMonth() + 1}/${d.getDate()}/${String(d.getFullYear()).slice(-2)}`; };
+function renderGallery(){
+  const list = notesInView();
+  $("#ng-name").textContent = nt.q ? "Search" : folderName(nt.folder);
+  $("#ng-count").textContent = nt.q ? plural(list.length, "result") : plural(list.length, "note");
+  const card = n => {
+    const f = n.folderId && n.folderId !== nt.folder ? Notes.path(n.folderId) : "";
+    return `<div class="nc" role="button" tabindex="0" data-note="${n.id}" aria-label="${esc(n.title || "Untitled")}"><span class="nc-th"><span class="nt-body nc-mini" aria-hidden="true">${cleanHTML(n.html)}</span></span><span class="nc-t">${esc(n.title || "Untitled")}</span><span class="nc-d">${cardDate(n.updatedAt)}</span>${f ? `<span class="nc-f">${esc(f)}</span>` : ""}</div>`;
+  };
+  $("#nt-cards").innerHTML = list.length ? noteGroups(list).map(g => `<h3 class="ng-g">${esc(g.k)}</h3><div class="ng-grid">${g.notes.map(card).join("")}</div>`).join("")
+    : `<p class="ng-empty">${nt.q ? "No notes match." : "No notes here yet. Press <b>+ Note</b> to start one."}</p>`;
+}
 function renderNotes(){
   if (nt.folder !== "all" && nt.folder !== "unfiled" && !(Notes.folder(nt.folder) && !Notes.folder(nt.folder).deletedAt)) nt.folder = "all";
   if (nt.note && !(Notes.note(nt.note) && !Notes.note(nt.note).deletedAt)) nt.note = null;
   /* folders */
   const tree = folderTree();
   const fRow = (id, name, lvl, special) => {
-    const on = nt.folder === id;
+    const on = nt.folder === id && !nt.q;
     const nameHTML = nt.renaming === id ? `<input class="nf-in" data-ren="${id}" value="${esc(name)}" aria-label="Folder name">` : `<span class="nf-t">${esc(name)}</span>`;
     const tag = nt.renaming === id ? "div" : "button";   // an input can't live inside a button
     return `<div class="nf ${on ? "on" : ""}" style="--lvl:${lvl}" data-nf="${id}"><${tag} ${tag === "button" ? 'type="button"' : ""} class="nf-b" data-nfgo="${id}" aria-current="${on}">${special || FOLDER_IC}${nameHTML}<b>${noteCount(id) || ""}</b></${tag}>${special ? "" : `<span class="nf-act"><button type="button" data-nfadd="${id}" title="New folder inside" aria-label="New folder inside ${esc(name)}">+</button><button type="button" data-nfren="${id}" title="Rename" aria-label="Rename ${esc(name)}">✎</button><button type="button" data-nfdel="${id}" title="Delete folder" aria-label="Delete ${esc(name)}">×</button></span>`}</div>`;
@@ -3169,31 +3352,30 @@ function renderNotes(){
   const ren = $("#nt-folders .nf-in"); if (ren && document.activeElement !== ren){ ren.focus(); ren.select(); }
   const opts = [["all","All notes"],["unfiled","Not in a folder"], ...tree.map(({f, lvl}) => [f.id, "  ".repeat(lvl) + f.name])];
   $("#nt-fsel").innerHTML = opts.map(([v, t]) => `<option value="${v}" ${v === nt.folder ? "selected" : ""}>${esc(t)}</option>`).join("");
-  /* list */
-  const list = notesInView();
-  const where = nt.q ? `Search: ${plural(list.length, "result")}` : nt.folder === "all" ? "All notes" : nt.folder === "unfiled" ? "Not in a folder" : Notes.path(nt.folder);
-  $("#nt-where").textContent = where;
-  $("#nt-notes").innerHTML = list.map(n => {
-    const txt = noteText(n.html), f = n.folderId ? Notes.path(n.folderId) : "";
-    return `<li class="nn ${n.id === nt.note ? "on" : ""}" data-note="${n.id}" tabindex="0"><span class="nn-t">${esc(n.title || "Untitled")}</span><span class="nn-d">${mailWhen(n.updatedAt)}</span><span class="nn-p">${esc(trunc(txt, 110) || "No text yet")}</span>${(nt.folder === "all" || nt.q) && f ? `<span class="nn-f">${FOLDER_IC}${esc(f)}</span>` : ""}</li>`;
-  }).join("") || `<li class="empty" style="padding:16px">${nt.q ? "No notes match." : "No notes here yet. Press + Note to start one."}</li>`;
-  /* editor */
+  /* layout */
   const n = nt.note && Notes.note(nt.note);
-  $("#notes").classList.toggle("editing", !!n && nt.mobileEdit);
-  $("#nt-ed-empty").hidden = !!n; $("#nt-ed-main").hidden = !n;
-  if (!n){ nt.loaded = null; return; }
+  if (nt.full && (!n || page !== "notes")) setNoteFull(false);
+  $("#notes").classList.toggle("side-off", !nt.side);
+  $("#notes").classList.toggle("editing", !!n);
+  $$(".nt-showside").forEach(b => b.hidden = nt.side);
+  $("#nt-gal").hidden = !!n; $("#nt-ed").hidden = !n;
+  if (!n){ nt.loaded = null; closePop(); renderGallery(); return; }
+  /* editor */
+  $("#nt-back").textContent = "‹ " + folderName(nt.folder);
   $("#nt-move").innerHTML = `<option value="">Not in a folder</option>` + tree.map(({f, lvl}) => `<option value="${f.id}">${"  ".repeat(lvl)}${esc(f.name)}</option>`).join("");
   $("#nt-move").value = n.folderId || "";
   if (nt.loaded !== n.id){
-    nt.loaded = n.id;
-    $("#nt-title").value = n.title; $("#nt-body").innerHTML = cleanHTML(n.html);
+    nt.loaded = n.id; nt.range = null;
+    $("#nt-title").value = n.title; ntBody.innerHTML = cleanHTML(n.html);
     $("#nt-saved").textContent = `Edited ${fmtDT(n.updatedAt)}`;
+    $("#nt-canvas").scrollTop = 0; syncTB();
   }
 }
 function openNote(id, focusTitle){
   nt.note = id; nt.mobileEdit = true; renderNotes();
   if (focusTitle) $("#nt-title").focus();
 }
+function closeNote(){ nt.note = null; nt.mobileEdit = false; renderNotes(); }
 function newNote(){
   const fid = nt.folder === "all" || nt.folder === "unfiled" ? null : nt.folder;
   nt.q = ""; $("#nt-q").value = "";
@@ -3202,14 +3384,33 @@ function newNote(){
 let ntTimer;
 function saveBody(){
   clearTimeout(ntTimer);
-  ntTimer = setTimeout(() => { if (!nt.loaded) return; Notes.updateNote(nt.loaded, {html:cleanHTML($("#nt-body").innerHTML)}, true); $("#nt-saved").textContent = "Saved"; renderNoteList(); }, 350);
+  ntTimer = setTimeout(() => { if (!nt.loaded) return; Notes.updateNote(nt.loaded, {html:cleanHTML(ntBody.innerHTML)}, true); $("#nt-saved").textContent = "Saved"; renderNoteList(); }, 350);
 }
 const renderNoteList = () => renderNotes();   // the open note isn't reloaded, so typing is never interrupted
 
+/* folders hidden / shown, and full screen */
+function setSide(on){ nt.side = on; saveNtUI(); renderNotes(); }
+const FULL_IC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>';
+const UNFULL_IC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>';
+function setNoteFull(on){
+  nt.full = on;
+  $("#notes").classList.toggle("full", on); document.documentElement.classList.toggle("nt-full-on", on);
+  const b = $("#nt-full"); b.innerHTML = on ? UNFULL_IC : FULL_IC; b.title = on ? "Exit full screen (Esc)" : "Full screen"; b.setAttribute("aria-label", b.title); b.classList.toggle("on", on);
+  try {
+    if (on && !document.fullscreenElement && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {});
+    if (!on && document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  } catch(e){}
+  closePop();
+}
+document.addEventListener("fullscreenchange", () => { if (!document.fullscreenElement && nt.full) setNoteFull(false); });
+
 $("#nt-new").onclick = newNote;
-$("#nt-newfolder").onclick = () => { const f = Notes.addFolder("New folder", null); nt.folder = f.id; nt.renaming = f.id; renderNotes(); };
+$("#nt-hide").onclick = () => setSide(false);
+$$(".nt-showside").forEach(b => b.onclick = () => setSide(true));
+$("#nt-full").onclick = () => setNoteFull(!nt.full);
+$("#nt-newfolder").onclick = () => { const f = Notes.addFolder("New folder", null); nt.folder = f.id; nt.renaming = f.id; nt.note = null; renderNotes(); };
 $("#nt-folders").addEventListener("click", e => {
-  const add = e.target.closest("[data-nfadd]"); if (add){ const f = Notes.addFolder("New folder", add.dataset.nfadd); nt.folder = f.id; nt.renaming = f.id; renderNotes(); return; }
+  const add = e.target.closest("[data-nfadd]"); if (add){ const f = Notes.addFolder("New folder", add.dataset.nfadd); nt.folder = f.id; nt.renaming = f.id; nt.note = null; renderNotes(); return; }
   const ren = e.target.closest("[data-nfren]"); if (ren){ nt.renaming = ren.dataset.nfren; renderNotes(); return; }
   const del = e.target.closest("[data-nfdel]"); if (del){
     const id = del.dataset.nfdel, f = Notes.folder(id), n = noteCount(id);
@@ -3217,52 +3418,327 @@ $("#nt-folders").addEventListener("click", e => {
     toast(`Deleted folder "${trunc(f.name, 24)}"${n ? ` and ${plural(n, "note")}` : ""}`, () => Notes.restore("folder", id)); return;
   }
   if (e.target.closest(".nf-in")) return;
-  const go = e.target.closest("[data-nfgo]"); if (go){ nt.folder = go.dataset.nfgo; nt.q = ""; $("#nt-q").value = ""; renderNotes(); }
+  const go = e.target.closest("[data-nfgo]"); if (go){ nt.folder = go.dataset.nfgo; nt.q = ""; $("#nt-q").value = ""; nt.note = null; nt.mobileEdit = false; renderNotes(); }
 });
 const finishRename = (inp, cancel) => { const id = inp.dataset.ren, v = inp.value.trim(); nt.renaming = null; if (!cancel && v) Notes.renameFolder(id, v); else renderNotes(); };
 $("#nt-folders").addEventListener("keydown", e => { const inp = e.target.closest(".nf-in"); if (!inp) return; if (e.key === "Enter"){ e.preventDefault(); finishRename(inp); } if (e.key === "Escape"){ e.preventDefault(); e.stopPropagation(); finishRename(inp, true); } });
 $("#nt-folders").addEventListener("focusout", e => { const inp = e.target.closest(".nf-in"); if (inp && nt.renaming) finishRename(inp); });
-$("#nt-fsel").addEventListener("change", e => { nt.folder = e.target.value; renderNotes(); });
+$("#nt-fsel").addEventListener("change", e => { nt.folder = e.target.value; nt.q = ""; $("#nt-q").value = ""; renderNotes(); });
 $("#nt-q").addEventListener("input", e => { nt.q = e.target.value.trim(); renderNotes(); });
-$("#nt-notes").addEventListener("click", e => { const li = e.target.closest("[data-note]"); if (li) openNote(li.dataset.note); });
-$("#nt-notes").addEventListener("keydown", e => { const li = e.target.closest("[data-note]"); if (li && (e.key === "Enter" || e.key === " ")){ e.preventDefault(); openNote(li.dataset.note); } });
+$("#nt-cards").addEventListener("click", e => { const c = e.target.closest("[data-note]"); if (c) openNote(c.dataset.note); });
+$("#nt-cards").addEventListener("keydown", e => { const c = e.target.closest("[data-note]"); if (c && (e.key === "Enter" || e.key === " ")){ e.preventDefault(); openNote(c.dataset.note); } });
 $("#nt-title").addEventListener("input", e => { if (!nt.loaded) return; Notes.updateNote(nt.loaded, {title:e.target.value}, true); $("#nt-saved").textContent = "Saved"; renderNoteList(); });
-$("#nt-title").addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); $("#nt-body").focus(); } });
-$("#nt-body").addEventListener("input", saveBody);
-$("#nt-body").addEventListener("paste", e => {
+$("#nt-title").addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); ntBody.focus(); } });
+$("#nt-move").addEventListener("change", e => { if (nt.loaded) Notes.updateNote(nt.loaded, {folderId:e.target.value || null}); });
+$("#nt-del").onclick = () => { const id = nt.loaded; if (!id) return; const n = Notes.note(id); if (nt.full) setNoteFull(false); Notes.removeNote(id); nt.note = null; nt.mobileEdit = false; toast(`Deleted "${trunc(n.title || "Untitled", 28)}"`, () => { Notes.restore("note", id); }); };
+$("#nt-back").onclick = closeNote;
+document.addEventListener("keydown", e => { if (e.key === "Escape" && nt.full && $("#nt-pop").hidden && !document.querySelector("dialog[open]")) setNoteFull(false); });
+
+/* ---------- editing ---------- */
+try { document.execCommand("defaultParagraphSeparator", false, "p"); } catch(e){}
+const BLK = "p,div,h1,h2,h3,h4,li,blockquote,td,th,pre";
+document.addEventListener("selectionchange", () => {
+  const s = getSelection(); if (!s.rangeCount) return;
+  const r = s.getRangeAt(0); if (!ntBody.contains(r.commonAncestorContainer)) return;
+  nt.range = r.cloneRange(); syncTBSoon();
+});
+function restoreSel(){
+  const s = getSelection();
+  if (document.activeElement === ntBody && s.rangeCount && ntBody.contains(s.getRangeAt(0).commonAncestorContainer)){ nt.range = s.getRangeAt(0).cloneRange(); return; }   // the live selection wins
+  ntBody.focus({preventScroll:true});
+  if (nt.range && ntBody.contains(nt.range.commonAncestorContainer)){ s.removeAllRanges(); s.addRange(nt.range); }
+  else if (!s.rangeCount || !ntBody.contains(s.getRangeAt(0).commonAncestorContainer)){ const r = document.createRange(); r.selectNodeContents(ntBody); r.collapse(false); s.removeAllRanges(); s.addRange(r); }
+}
+function exec(cmd, val, css){ try { document.execCommand("styleWithCSS", false, !!css); } catch(e){} document.execCommand(cmd, false, val); }
+const selEl = () => { const s = getSelection(); if (!s.rangeCount) return ntBody; let n = s.getRangeAt(0).startContainer; n = n.nodeType === 3 ? n.parentElement : n; return ntBody.contains(n) ? n : ntBody; };
+const inList = () => { const l = selEl().closest("ul,ol"); return l && ntBody.contains(l) ? l : null; };
+const inBlock = tag => { const b = selEl().closest(tag); return !!(b && ntBody.contains(b)); };
+function blocksInSel(){
+  const s = getSelection(); if (!s.rangeCount) return [];
+  const r = s.getRangeAt(0);
+  let out = [...ntBody.querySelectorAll(BLK)].filter(el => r.intersectsNode(el) && !el.querySelector(BLK));
+  if (!out.length){ const c = selEl().closest(BLK); if (c && ntBody.contains(c)) out = [c]; }
+  return out;
+}
+/* The browser's size, "no color" and "default font" commands leave markers; turn them into real styles.
+   Only attributes change, so the selection stays where it is. */
+function fixMarks(){
+  ntBody.querySelectorAll('font[size="7"]').forEach(f => { f.removeAttribute("size"); f.style.fontSize = nt.size + "pt"; });
+  ntBody.querySelectorAll("font[color]").forEach(f => { if (/^#010203$/i.test(f.getAttribute("color"))) f.removeAttribute("color"); });
+  ntBody.querySelectorAll("font[face]").forEach(f => { if (/hbx-/.test(f.getAttribute("face"))) f.removeAttribute("face"); });
+  ntBody.querySelectorAll("[style]").forEach(el => {
+    const st = el.style;
+    if (st.fontSize === "xxx-large") st.fontSize = nt.size + "pt";
+    if (/hbx-/.test(st.fontFamily)) st.fontFamily = "";
+    if (st.color.replace(/\s/g, "") === "rgb(1,2,3)") st.color = "";
+    if (st.backgroundColor.replace(/\s/g, "") === "rgb(1,2,3)") st.backgroundColor = "";
+    if (!el.getAttribute("style").trim()) el.removeAttribute("style");
+  });
+}
+const curPt = () => Math.round(parseFloat(getComputedStyle(selEl()).fontSize) * 0.75 * 2) / 2;
+const SIZES = [6,7,8,9,10,11,12,14,16,18,20,24,28,32,36,48,60,72,96];
+function setSize(pt){
+  pt = Math.max(6, Math.min(96, Math.round(+pt * 2) / 2)); if (!pt) return;
+  nt.size = pt; restoreSel(); exec("fontSize", "7", false); fixMarks(); saveBody(); syncTB();
+}
+function setStyle(v){
+  restoreSel();
+  exec("formatBlock", `<${v === "sub" ? "p" : v}>`);
+  blocksInSel().forEach(b => { if (v === "sub" && b.tagName === "P") b.classList.add("sub"); else b.classList.remove("sub"); if (!b.classList.length) b.removeAttribute("class"); });
+  saveBody(); syncTB();
+}
+function setFont(f){ restoreSel(); exec("fontName", f || "hbx-def", true); fixMarks(); saveBody(); syncTB(); }
+function setColor(kind, c){
+  restoreSel();
+  exec(kind === "hl" ? "hiliteColor" : "foreColor", c || "#010203", true); fixMarks();
+  if (c){ nt[kind === "hl" ? "hl" : "color"] = c; $(kind === "hl" ? "#nt-hbar" : "#nt-cbar").style.setProperty("--cb", c); }
+  saveBody();
+}
+function setSpacing(v){
+  restoreSel();
+  let bl = blocksInSel(); if (!bl.length){ exec("formatBlock", "<p>"); bl = blocksInSel(); }
+  bl.forEach(b => { b.style.lineHeight = v; });
+  saveBody(); syncTB();
+}
+
+/* toolbar state follows the cursor */
+$("#nt-font").innerHTML = NOTE_FONTS.map(([v, t]) => `<option value="${esc(v)}" style="font-family:${v ? `'${v}'` : "inherit"}">${esc(t)}</option>`).join("");
+let tbRaf = 0;
+const syncTBSoon = () => { cancelAnimationFrame(tbRaf); tbRaf = requestAnimationFrame(syncTB); };
+function syncTB(){
+  if (!nt.loaded) return;
+  const live = (() => { const s = getSelection(); return s.rangeCount && ntBody.contains(s.getRangeAt(0).commonAncestorContainer); })();
+  const el = selEl(), q = c => { if (!live) return false; try { return document.queryCommandState(c); } catch(e){ return false; } };
+  $$("#nt-tb [data-cmd]").forEach(b => {
+    const c = b.dataset.cmd;
+    const on = c === "chk" ? !!(inList() && inList().classList.contains("chk")) : c === "blockquote" ? inBlock("blockquote")
+      : c === "insertUnorderedList" ? q(c) && !(inList() && inList().classList.contains("chk"))
+      : ["bold","italic","underline","strikeThrough","insertOrderedList","justifyLeft","justifyCenter","justifyRight"].includes(c) ? q(c) : false;
+    b.classList.toggle("on", !!on);
+  });
+  const blk = el.closest("h1,h2,h3,h4,p,div,li,td,th");
+  $("#nt-style").value = blk && ntBody.contains(blk) ? (/^H[1-4]$/.test(blk.tagName) ? blk.tagName.toLowerCase() : blk.classList.contains("sub") ? "sub" : "p") : "p";
+  const fam = getComputedStyle(el).fontFamily.split(",")[0].replace(/["']/g, "").trim().toLowerCase();
+  const hit = NOTE_FONTS.find(([v]) => v && v.toLowerCase() === fam);
+  $("#nt-font").value = hit ? hit[0] : "";
+  if (document.activeElement !== $("#nt-size")) $("#nt-size").value = curPt();
+}
+
+$("#nt-tb").addEventListener("mousedown", e => { if (e.target.closest("button")) e.preventDefault(); });   // keep the text selection
+$("#nt-tb").addEventListener("click", e => {
+  const p = e.target.closest("[data-pop]"); if (p){ openPop(p.dataset.pop, p); return; }
+  const b = e.target.closest("[data-cmd]"); if (!b) return;
+  const c = b.dataset.cmd; restoreSel();
+  if (c === "size+" || c === "size-"){ const cur = curPt(); setSize(c === "size+" ? (SIZES.find(s => s > cur) || 96) : ([...SIZES].reverse().find(s => s < cur) || 6)); return; }
+  if (c === "blockquote") exec("formatBlock", inBlock("blockquote") ? "<div>" : "<blockquote>");
+  else if (c === "chk"){
+    let l = inList();
+    if (!l || l.nodeName !== "UL"){ exec("insertUnorderedList"); l = inList(); }
+    if (l){
+      l.classList.toggle("chk");
+      const li = selEl().closest("li");   // put the cursor at the end of the line
+      if (li){ const r = document.createRange(); r.selectNodeContents(li); r.collapse(false); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); }
+    }
+  }
+  else if (c === "link"){ const url = window.prompt("Link address (https://…)", "https://"); restoreSel(); if (url && /^(https?:|mailto:)/i.test(url.trim())) exec("createLink", url.trim()); }
+  else if (/^justify/.test(c)) exec(c, null, true);
+  else if (c === "removeFormat"){ exec("removeFormat"); blocksInSel().forEach(bl => { bl.style.lineHeight = ""; bl.style.textAlign = ""; if (!bl.getAttribute("style")) bl.removeAttribute("style"); }); }
+  else exec(c);
+  fixMarks(); saveBody(); syncTB();
+});
+$("#nt-style").addEventListener("change", e => setStyle(e.target.value));
+$("#nt-font").addEventListener("change", e => setFont(e.target.value));
+$("#nt-size").addEventListener("change", e => setSize(e.target.value));
+$("#nt-size").addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); e.target.blur(); }   /* blurring fires "change", which applies the size */ if (e.key === "Escape"){ e.target.value = curPt(); restoreSel(); } });
+
+ntBody.addEventListener("input", () => { fixMarks(); saveBody(); });
+ntBody.addEventListener("paste", e => {
   const html = e.clipboardData.getData("text/html"), text = e.clipboardData.getData("text/plain");
   e.preventDefault();
   if (html) document.execCommand("insertHTML", false, cleanHTML(html));
   else document.execCommand("insertText", false, text);
 });
-$("#nt-body").addEventListener("click", e => {
+ntBody.addEventListener("click", e => {
   const a = e.target.closest("a"); if (a && (e.ctrlKey || e.metaKey)){ window.open(a.href, "_blank", "noopener"); return; }
   const li = e.target.closest("ul.chk > li");
-  if (li && e.offsetX < 24){ li.classList.toggle("done"); saveBody(); }
+  if (li && e.clientX - li.getBoundingClientRect().left < 24){ li.classList.toggle("done"); saveBody(); }
 });
-$("#nt-move").addEventListener("change", e => { if (nt.loaded) Notes.updateNote(nt.loaded, {folderId:e.target.value || null}); });
-$("#nt-del").onclick = () => { const id = nt.loaded; if (!id) return; const n = Notes.note(id); Notes.removeNote(id); nt.note = null; nt.mobileEdit = false; toast(`Deleted "${trunc(n.title || "Untitled", 28)}"`, () => { Notes.restore("note", id); }); };
-$("#nt-back").onclick = () => { nt.mobileEdit = false; renderNotes(); };
-const inList = () => { const s = window.getSelection(); if (!s.rangeCount) return null; let n = s.anchorNode; while (n && n !== $("#nt-body")){ if (n.nodeName === "UL" || n.nodeName === "OL") return n; n = n.parentNode; } return null; };
-const inBlock = tag => { const s = window.getSelection(); let n = s.rangeCount ? s.anchorNode : null; while (n && n !== $("#nt-body")){ if (n.nodeName === tag) return true; n = n.parentNode; } return false; };
-$("#nt-tb").addEventListener("mousedown", e => { if (e.target.closest("button")) e.preventDefault(); });   // keep the text selection
-$("#nt-tb").addEventListener("click", e => {
-  const b = e.target.closest("[data-cmd]"); if (!b) return;
-  const c = b.dataset.cmd; if (document.activeElement !== $("#nt-body")){ $("#nt-body").focus(); const r = document.createRange(); r.selectNodeContents($("#nt-body")); r.collapse(false); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); }
-  if (c === "h2" || c === "h3" || c === "blockquote") document.execCommand("formatBlock", false, inBlock(c.toUpperCase()) ? "div" : c);
-  else if (c === "chk"){
-    let l = inList();
-    if (!l || l.nodeName !== "UL"){ document.execCommand("insertUnorderedList"); l = inList(); }
-    if (l){
-      l.classList.toggle("chk");
-      let li = getSelection().anchorNode; while (li && li.nodeName !== "LI") li = li.parentNode;   // put the cursor at the end of the line
-      if (li){ const r = document.createRange(); r.selectNodeContents(li); r.collapse(false); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); }
-    }
-  }
-  else if (c === "link"){ const url = window.prompt("Link address (https://…)", "https://"); if (url && /^(https?:|mailto:)/i.test(url.trim())) document.execCommand("createLink", false, url.trim()); }
-  else document.execCommand(c);
+
+/* ---------- tables ---------- */
+function tblCtx(){
+  const cell = selEl().closest("td,th"); if (!cell || !ntBody.contains(cell)) return null;
+  return {cell, tr:cell.parentElement, table:cell.closest("table"), ci:cell.cellIndex};
+}
+function caretIn(cell, all){ const r = document.createRange(); r.selectNodeContents(cell); if (!all) r.collapse(true); const s = getSelection(); s.removeAllRanges(); s.addRange(r); nt.range = r.cloneRange(); }
+function insertTable(rows, cols){
+  restoreSel();
+  const tr = `<tr>${"<td><br></td>".repeat(cols)}</tr>`;
+  exec("insertHTML", `<table style="width:100%"><colgroup>${`<col style="width:${(100 / cols).toFixed(3)}%">`.repeat(cols)}</colgroup><tbody>${tr.repeat(rows)}</tbody></table><p><br></p>`);
+  const t = [...ntBody.querySelectorAll("table")].find(x => x.contains(getSelection().anchorNode)) || [...ntBody.querySelectorAll("table")].find(x => x.nextElementSibling && x.nextElementSibling.contains(getSelection().anchorNode));
+  if (t) caretIn(t.querySelector("td"));
   saveBody();
+}
+function colsOf(table){
+  let cg = table.querySelector("colgroup"); const n = table.rows[0] ? table.rows[0].cells.length : 0;
+  if (!cg || cg.children.length !== n){
+    if (cg) cg.remove();
+    cg = document.createElement("colgroup");
+    [...(table.rows[0] || {cells:[]}).cells].forEach(c => { const col = document.createElement("col"); col.style.width = Math.round(c.getBoundingClientRect().width) + "px"; cg.append(col); });
+    table.prepend(cg);
+  }
+  return [...cg.children];
+}
+/* Columns and rows covered by the selection (start cell to end cell). */
+function tblSel(){
+  const t = tblCtx(), s = getSelection(), r = s.rangeCount ? s.getRangeAt(0) : null;
+  let n = r ? r.endContainer : null; n = n && n.nodeType === 3 ? n.parentElement : n;
+  const e = n && n.closest ? n.closest("td,th") : null, end = e && t.table.contains(e) ? e : t.cell;
+  const a = [t.cell.cellIndex, end.cellIndex], b = [t.tr.rowIndex, end.parentElement.rowIndex];
+  return {table:t.table, c0:Math.min(...a), c1:Math.max(...a), r0:Math.min(...b), r1:Math.max(...b)};
+}
+/* Current column widths in pixels. */
+function colPx(table){
+  const cols = colsOf(table), px = /px$/.test(table.style.width);
+  return [...table.rows[0].cells].map((c, i) => px && /px$/.test(cols[i].style.width) ? parseFloat(cols[i].style.width) : c.getBoundingClientRect().width);
+}
+function setColPx(table, w){
+  const cols = colsOf(table); w = w.map(x => Math.max(20, Math.round(x)));
+  cols.forEach((c, i) => c.style.width = w[i] + "px"); table.style.width = w.reduce((a, b) => a + b, 0) + "px";
+}
+function tblSet(kind){
+  const ts = nt.tsel; if (!ts || !ntBody.contains(ts.table)) return;
+  const w = colPx(ts.table);
+  if (kind === "col"){ const v = Math.max(20, Math.min(2000, +$("#tw-c").value || 0)); for (let i = ts.c0; i <= ts.c1; i++) w[i] = v; setColPx(ts.table, w); }
+  else if (kind === "even"){
+    const [a, b] = ts.c0 === ts.c1 ? [0, w.length - 1] : [ts.c0, ts.c1], avg = w.slice(a, b + 1).reduce((x, y) => x + y, 0) / (b - a + 1);
+    for (let i = a; i <= b; i++) w[i] = avg; setColPx(ts.table, w);
+  }
+  else if (kind === "row"){ const v = Math.max(20, Math.min(1000, +$("#tw-r").value || 0)); for (let i = ts.r0; i <= ts.r1; i++) ts.table.rows[i].style.height = v + "px"; }
+  saveBody();
+}
+function tblOp(op){
+  const t = tblCtx(); if (!t) return;
+  const {table, tr, ci} = t, rows = [...table.rows];
+  const blankRow = () => { const r = tr.cloneNode(true); r.removeAttribute("style"); [...r.cells].forEach(c => { c.innerHTML = "<br>"; c.removeAttribute("style"); }); return r; };
+  if (op === "rowAbove" || op === "rowBelow"){ const r = blankRow(); op === "rowAbove" ? tr.before(r) : tr.after(r); caretIn(r.cells[ci]); }
+  else if (op === "colLeft" || op === "colRight"){
+    const cols = colsOf(table), px = /px$/.test(table.style.width);
+    rows.forEach(r => { const c = r.cells[ci]; if (!c) return; const nc = document.createElement(c.tagName); nc.innerHTML = "<br>"; op === "colLeft" ? c.before(nc) : c.after(nc); });
+    const col = document.createElement("col"); op === "colLeft" ? cols[ci].before(col) : cols[ci].after(col);
+    if (px){ const all = colsOf(table), k = (all.length - 1) / all.length, tw = parseFloat(table.style.width);   /* the table keeps its width; columns make room */
+      all.forEach(c => { c.style.width = c === col ? Math.round(tw / all.length) + "px" : Math.round(parseFloat(c.style.width) * k) + "px"; }); }
+    else { const all = colsOf(table); all.forEach(c => c.style.width = (100 / all.length).toFixed(3) + "%"); table.style.width = "100%"; }
+    caretIn(tr.cells[op === "colLeft" ? ci : ci + 1]);
+  }
+  else if (op === "delRow"){ if (rows.length < 2) return tblOp("delTable"); const next = tr.nextElementSibling || tr.previousElementSibling; tr.remove(); caretIn(next.cells[Math.min(ci, next.cells.length - 1)]); }
+  else if (op === "delCol"){
+    if (tr.cells.length < 2) return tblOp("delTable");
+    const cols = colsOf(table), w = cols[ci].style.width;
+    if (/px$/.test(table.style.width) && /px$/.test(w)) table.style.width = Math.max(60, parseFloat(table.style.width) - parseFloat(w)) + "px";
+    cols[ci].remove(); rows.forEach(r => r.cells[ci] && r.cells[ci].remove());
+    if (!/px$/.test(table.style.width)){ const all = colsOf(table); all.forEach(c => c.style.width = (100 / all.length).toFixed(3) + "%"); }
+    caretIn(tr.cells[Math.min(ci, tr.cells.length - 1)]);
+  }
+  else if (op === "delTable"){ const p = document.createElement("p"); p.innerHTML = "<br>"; table.replaceWith(p); caretIn(p); }
+  saveBody();
+}
+ntBody.addEventListener("keydown", e => {
+  if (e.key !== "Tab") return;
+  const t = tblCtx(); if (!t) return;
+  e.preventDefault();
+  let cells = [...t.table.querySelectorAll("td,th")], i = cells.indexOf(t.cell) + (e.shiftKey ? -1 : 1);
+  if (i < 0) return;
+  if (i >= cells.length){ caretIn(t.table.rows[t.table.rows.length - 1].cells[0]); tblOp("rowBelow"); cells = [...t.table.querySelectorAll("td,th")]; }
+  caretIn(cells[i], true);
 });
+/* Drag a cell's right edge to change the column width, or its bottom edge to change the row height. */
+let rz = null;
+function rzHit(e){
+  const cell = e.target.closest && e.target.closest("td,th"); if (!cell || !ntBody.contains(cell)) return null;
+  const r = cell.getBoundingClientRect(), tol = e.pointerType === "touch" ? 12 : 6;
+  if (Math.abs(r.right - e.clientX) <= tol) return {kind:"c", cell};
+  if (Math.abs(r.bottom - e.clientY) <= tol) return {kind:"r", cell};
+  return null;
+}
+ntBody.addEventListener("pointermove", e => {
+  if (rz) return;
+  ntBody.querySelectorAll(".rz-c,.rz-r").forEach(x => { x.classList.remove("rz-c", "rz-r"); if (!x.className) x.removeAttribute("class"); });
+  const h = rzHit(e); if (h) h.cell.classList.add("rz-" + h.kind);
+});
+ntBody.addEventListener("pointerdown", e => {
+  const h = rzHit(e); if (!h) return;
+  e.preventDefault();
+  const table = h.cell.closest("table");
+  if (h.kind === "c"){
+    const cols = colsOf(table), w = [...table.rows[0].cells].map(c => c.getBoundingClientRect().width);
+    cols.forEach((c, i) => c.style.width = Math.round(w[i]) + "px");
+    const tw = Math.round(w.reduce((a, b) => a + b, 0)); table.style.width = tw + "px";
+    const i = h.cell.cellIndex;
+    rz = {kind:"c", table, cols, i, x:e.clientX, w0:w[i], n0:i < w.length - 1 ? w[i + 1] : null, t0:tw};
+  } else rz = {kind:"r", tr:h.cell.parentElement, y:e.clientY, h0:h.cell.parentElement.getBoundingClientRect().height};
+  document.body.classList.add("nt-rz", rz.kind);
+});
+ntBody.addEventListener("touchstart", e => { if (rz) e.preventDefault(); }, {passive:false});
+window.addEventListener("pointermove", e => {
+  if (!rz) return;
+  if (rz.kind === "c"){
+    const dx = e.clientX - rz.x;
+    if (rz.n0 != null){ const w = Math.max(30, Math.min(rz.w0 + rz.n0 - 30, rz.w0 + dx)); rz.cols[rz.i].style.width = Math.round(w) + "px"; rz.cols[rz.i + 1].style.width = Math.round(rz.w0 + rz.n0 - w) + "px"; }
+    else { const w = Math.max(30, rz.w0 + dx); rz.cols[rz.i].style.width = Math.round(w) + "px"; rz.table.style.width = Math.round(rz.t0 - rz.w0 + w) + "px"; }
+  } else rz.tr.style.height = Math.round(Math.max(24, rz.h0 + e.clientY - rz.y)) + "px";
+});
+const endRz = () => { if (!rz) return; rz = null; document.body.classList.remove("nt-rz", "c", "r"); saveBody(); };
+window.addEventListener("pointerup", endRz); window.addEventListener("pointercancel", endRz);
+
+/* ---------- toolbar pop-ups: colors, highlight, line spacing, table ---------- */
+const TEXT_COLORS = ["#E03131","#F76707","#F08C00","#2F9E44","#0C8599","#1C7ED6","#4C6EF5","#7048E8","#D6336C","#AE3EC9","#A0522D","#868E96","#FF8787","#69DB7C","#74C0FC","#B197FC"];
+const HL_COLORS = ["#FFD43B80","#FFA94D80","#FF878780","#FAA2C180","#B197FC80","#74C0FC80","#8CE99A80","#ADB5BD66"];
+const pop = $("#nt-pop");
+function closePop(){ pop.hidden = true; pop.innerHTML = ""; }
+function openPop(kind, btn){
+  if (!pop.hidden && pop.dataset.kind === kind){ closePop(); return; }
+  pop.dataset.kind = kind;
+  const sw = (c, attr) => `<button type="button" class="csw" style="--s:${c}" ${attr}="${c}" aria-label="${c}" title="${c}"></button>`;
+  if (kind === "color") pop.innerHTML = `<span class="wp-l">Text color</span><button type="button" class="mi" data-color="">Automatic</button><div class="pal-sw">${TEXT_COLORS.map(c => sw(c, "data-color")).join("")}</div><div class="row"><span class="note">Custom</span><input type="color" data-custom="color" value="${nt.color.slice(0, 7)}" aria-label="Custom text color"></div>`;
+  else if (kind === "hl") pop.innerHTML = `<span class="wp-l">Highlight</span><button type="button" class="mi" data-hl="">None</button><div class="pal-sw">${HL_COLORS.map(c => sw(c, "data-hl")).join("")}</div><div class="row"><span class="note">Custom</span><input type="color" data-custom="hl" value="#ffd43b" aria-label="Custom highlight color"></div>`;
+  else if (kind === "spacing"){
+    const cur = (blocksInSel()[0] || {style:{}}).style.lineHeight || "";
+    pop.innerHTML = `<span class="wp-l">Line spacing</span>` + [["1","Single"],["1.15","1.15"],["1.5","1.5"],["2","Double"],["","Default"]].map(([v, t]) => `<button type="button" class="mi ${cur === v ? "on" : ""}" data-lh="${v}">${t}</button>`).join("");
+  }
+  else if (kind === "table"){
+    if (tblCtx()){ const ts = nt.tsel = tblSel(), cw = Math.round(colPx(ts.table)[ts.c0]), rh = Math.round(ts.table.rows[ts.r0].getBoundingClientRect().height);
+      const cl = ts.c0 === ts.c1 ? `column ${ts.c0 + 1}` : `columns ${ts.c0 + 1}–${ts.c1 + 1}`, rl = ts.r0 === ts.r1 ? `row ${ts.r0 + 1}` : `rows ${ts.r0 + 1}–${ts.r1 + 1}`;
+      pop.innerHTML = `<div class="tw"><span class="wp-l">Column width · ${cl}</span><div class="row"><input type="number" id="tw-c" min="20" max="2000" step="1" value="${cw}" aria-label="Column width in pixels"><span class="note">px</span><button type="button" class="btn small" data-tset="col">Set</button></div>
+        <button type="button" class="mi" data-tset="even">${ts.c0 === ts.c1 ? "Make all columns the same width" : "Make these columns the same width"}</button>
+        <span class="wp-l">Row height · ${rl}</span><div class="row"><input type="number" id="tw-r" min="20" max="1000" step="1" value="${rh}" aria-label="Row height in pixels"><span class="note">px</span><button type="button" class="btn small" data-tset="row">Set</button></div>
+        <span class="note">Select across cells to size several columns or rows at once.</span></div>` + [["rowAbove","Insert row above"],["rowBelow","Insert row below"],["colLeft","Insert column left"],["colRight","Insert column right"],["delRow","Delete row","dz"],["delCol","Delete column","dz"],["delTable","Delete table","dz"]].map(([v, t, c]) => `<button type="button" class="mi ${c || ""}" data-tbl="${v}">${t}</button>`).join("") + `<span class="note">Or drag a cell's right or bottom edge to resize.</span>`; }
+    else { let g = ""; for (let r = 1; r <= 8; r++) for (let c = 1; c <= 8; c++) g += `<i data-tr="${r}" data-tc="${c}"></i>`; pop.innerHTML = `<span class="wp-l">Insert table</span><div class="tg">${g}</div><span class="note" id="tg-n">Pick a size</span>`; }
+  }
+  pop.hidden = false;
+  const r = btn.getBoundingClientRect(), w = pop.offsetWidth;
+  pop.style.left = Math.round(Math.max(12, Math.min(r.left, innerWidth - w - 12))) + "px";
+  const below = r.bottom + 6, h = pop.offsetHeight;
+  pop.style.top = Math.round(below + h > innerHeight - 8 ? Math.max(8, r.top - h - 6) : below) + "px";
+  requestAnimationFrame(() => { const pr = pop.getBoundingClientRect(), vw = document.documentElement.clientWidth; if (pr.right > vw - 12) pop.style.left = Math.max(12, vw - pr.width - 12) + "px"; });
+}
+pop.addEventListener("mousedown", e => { if (!e.target.closest("input")) e.preventDefault(); });
+pop.addEventListener("mouseover", e => { const i = e.target.closest("[data-tr]"); if (!i) return; const R = +i.dataset.tr, C = +i.dataset.tc; pop.querySelectorAll("[data-tr]").forEach(x => x.classList.toggle("hl", +x.dataset.tr <= R && +x.dataset.tc <= C)); $("#tg-n").textContent = `${R} × ${C}`; });
+pop.addEventListener("click", e => {
+  const t = e.target;
+  const c = t.closest("[data-color]"); if (c){ setColor("color", c.dataset.color); closePop(); return; }
+  const h = t.closest("[data-hl]"); if (h){ setColor("hl", h.dataset.hl); closePop(); return; }
+  const l = t.closest("[data-lh]"); if (l){ setSpacing(l.dataset.lh); closePop(); return; }
+  const g = t.closest("[data-tr]"); if (g){ closePop(); insertTable(+g.dataset.tr, +g.dataset.tc); return; }
+  const o = t.closest("[data-tbl]"); if (o){ closePop(); restoreSel(); tblOp(o.dataset.tbl); return; }
+  const ts = t.closest("[data-tset]"); if (ts){ tblSet(ts.dataset.tset); closePop(); restoreSel(); }
+});
+pop.addEventListener("keydown", e => { if (e.key === "Enter" && (e.target.id === "tw-c" || e.target.id === "tw-r")){ e.preventDefault(); tblSet(e.target.id === "tw-c" ? "col" : "row"); closePop(); restoreSel(); } });
+pop.addEventListener("change", e => { const i = e.target.closest("[data-custom]"); if (!i) return; setColor(i.dataset.custom, i.dataset.custom === "hl" ? i.value + "80" : i.value); closePop(); });
+document.addEventListener("mousedown", e => { if (!pop.hidden && !e.target.closest("#nt-pop,[data-pop]")) closePop(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !pop.hidden){ e.stopPropagation(); closePop(); restoreSel(); } }, true);
+$("#nt-tb").addEventListener("scroll", closePop);
+$("#nt-canvas").addEventListener("scroll", closePop);
+addEventListener("resize", closePop);
 Notes.subscribe(() => { if (ready){ renderNotes(); renderDeleted(); updateDelCount(); Home.refresh(); } });
 
 /* =====================================================================
