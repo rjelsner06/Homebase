@@ -7345,15 +7345,19 @@ function renderCloud(){
 }
 $("#sy-box").addEventListener("click", async e => {
   const b = e.target.closest("[data-sy]"); if (!b) return;
-  const m = t => { const el = $("#sy-msg"); if (el) el.textContent = t; };
+  const m = t => { const el = $("#sy-msg"); if (el){ el.textContent = t; el.style.color = /^⚠|^That's a secret/.test(t) ? "var(--bad)" : ""; } };
   const em = () => ($("#sy-email") || {}).value?.trim() || "", pw = () => ($("#sy-pass") || {}).value || "";
   try {
     switch (b.dataset.sy){
       case "connect": {
-        let url = $("#sy-url").value.trim().replace(/\/+$/, ""); const key = $("#sy-key").value.trim();
-        if (url && !/^https?:\/\//.test(url)) url = "https://" + url;
-        if (!/^https:\/\/[^/]+$/.test(url) || !key) return m("Enter the project URL (https://….supabase.co) and the publishable key.");
-        if (/service_role|sb_secret_/i.test(key) || /"role"\s*:\s*"service_role"/.test(atobSafe(key.split(".")[1]))) return m("That's a secret key. Use the publishable (anon) key instead, and never paste the secret key into a web page.");
+        /* Accept the URL however it was copied: with /rest/v1/ on the end, or even the dashboard address. */
+        let raw = $("#sy-url").value.trim(), url = ""; const key = $("#sy-key").value.trim();
+        if (raw && !/^https?:\/\//i.test(raw)) raw = "https://" + raw;
+        try { const x = new URL(raw), dm = x.pathname.match(/\/project\/([a-z0-9]{10,})/i);
+          url = /(^|\.)supabase\.com$/i.test(x.hostname) && dm ? `https://${dm[1].toLowerCase()}.supabase.co` : x.protocol === "https:" ? x.origin : ""; } catch(_){}
+        if (!url) return m("⚠ That project URL doesn't look right. It should look like https://abcdefghijkl.supabase.co");
+        if (!key) return m("⚠ Paste the publishable key too.");
+        if (/service_role|sb_secret_/i.test(key) || /"role"\s*:\s*"service_role"/.test(atobSafe(key.split(".")[1]))) return m("⚠ That's a secret key. Use the publishable (anon) key instead, and never paste the secret key into a web page.");
         m("Connecting…"); await Sync.setConfig({url, key}); renderCloud(); return;
       }
       case "in": if (!em() || !pw()) return m("Enter your email and password."); m("Signing in…"); await Sync.signIn(em(), pw()); m(""); return;
