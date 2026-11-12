@@ -1,4 +1,3 @@
-
 /* Homebase: CONFIG, UTILITIES ($, $$, dates), DATA LAYER (Store), CLOUD SYNC (Supabase), SETTINGS (theme, colors), derived views.
    Plain script (no modules). Shares one global scope with the other js/ files; load order is set in index.html. */
 "use strict";
@@ -716,6 +715,7 @@ const recentDone = r => r.completed && r.completedAt && Date.now() - new Date(r.
 const SMART = [
   {k:"all",       name:"All",       color:"var(--accent-2)", test:r => true, empty:"Nothing on your list.", group:true, catFilter:true},
   {k:"today",     name:"Today",     color:"var(--c1)",       test:r => r.date === todayS(), empty:"Nothing due today."},
+  {k:"week",      name:"This Week", color:"var(--c3)",       test:r => { const ws = ymd(weekStart(new Date())); return r.date >= ws && r.date <= addDays(ws, 6); }, empty:"Nothing due this week.", group:true},
   {k:"overdue",   name:"Overdue",   color:"var(--bad)",      test:r => r.date < todayS(), empty:"You're all caught up.", group:true},
   {k:"completed", name:"Completed", color:"var(--ok)",       test:recentDone, empty:"Nothing checked off in the last 24 hours.", completedList:true,
     note:"Things you checked off in the last 24 hours. After that they move to Completion history."},

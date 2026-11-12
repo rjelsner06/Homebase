@@ -1,7 +1,7 @@
 /* Homebase: Settings → Links, Types, and the Settings dialog layout.
    Plain script (no modules). Shares one global scope with the other js/ files; load order is set in index.html. */
 "use strict";
-
+ 
 /* ---------- Settings → Links ---------- */
 /* ---------- Types: your own, colors, and which go on the to-do list ---------- */
 const TYPE_SWATCHES = ["#2563EB","#0E7490","#0D9488","#16A34A","#65A30D","#CA8A04","#EA580C","#DC2626","#DB2777","#9333EA","#4F46E5","#64748B"];
@@ -95,7 +95,7 @@ $("#st-type-hidden").addEventListener("click", e => { if (!e.target.closest("#st
   };
   list.addEventListener("pointerup", end); list.addEventListener("pointercancel", end);
 })();
-
+ 
 /* ---------- Type menu in the item panel: your main types, then "Additional ›" with the rest ---------- */
 const tp = {open:false};
 /* syncTypeBtn() lives in js/todo.js, next to the item panel that uses it while loading. */
@@ -143,12 +143,13 @@ $("#dlg-item").addEventListener("cancel", e => { if (tp.open){ e.preventDefault(
 $("#dlg-item").addEventListener("close", closeTypeMenu);
 $("#d-type").addEventListener("change", syncTypeBtn);
 $("#form-item").appendChild($("#tp-menu"));
-
+ 
 /* =====================================================================
    SETTINGS LAYOUT: categories on the left (a list you tap into on a phone).
    ===================================================================== */
 const ST_CATS = [
   {k:"sync",   name:"Account & sync",     ids:["st-sync"],   icon:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/>'},
+  {k:"storage",name:"Storage",            ids:["st-storage"], icon:'<ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v6.5c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8V5.5"/><path d="M4.5 12v6.5c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8V12"/>'},
   {k:"home",   name:"Home screen",        ids:["st-home"],   icon:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>'},
   {k:"links",  name:"Links",              ids:["st-links-sec"], icon:'<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>'},
   {k:"appear", name:"Appearance",         ids:["st-appear","st-ncol","st-ccol"], icon:'<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/>'},
@@ -186,7 +187,7 @@ function openSettings(cat){
 }
 $("#dlg-settings .st-nav").addEventListener("click", e => { const b = e.target.closest("[data-stcat]"); if (b) showSettingsCat(b.dataset.stcat); });
 $("#st-back").onclick = () => $("#dlg-settings").classList.remove("cat-open");
-
+ 
 function renderLinkSettings(){
   const L = linksSorted();
   $("#st-links").innerHTML = L.map((l, i) => `<li class="lk-li" data-lid="${esc(l.id)}"><span class="lk-drag" aria-hidden="true" title="Drag to reorder"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg></span>${iconHTML(l) || '<span class="lk-ic"></span>'}<span class="lk-m"><b>${esc(l.title || linkName(l))}${l.title ? "" : ' <span class="note">(symbol only)</span>'}</b><small>${l.kind === "app" ? "Built in · your workouts sync with Homebase" : l.kind === "html" ? esc(l.fileName || "HTML file") + " · sandboxed" : esc(hostOf(l.url))}${opensTab(l) ? " · new tab" : ""}</small></span>
@@ -234,7 +235,7 @@ $("#st-link-add").onclick = () => openLinkEditor(null);
   };
   list.addEventListener("pointerup", end); list.addEventListener("pointercancel", end);
 })();
-
+ 
 const le = {id:null, kind:"url", icon:"", html:null, fileName:""};
 function openLinkEditor(id){
   const l = id ? getLink(id) : null;
@@ -285,7 +286,7 @@ $("#le-url").addEventListener("input", () => {
 });
 $("#le-file").addEventListener("change", async e => {
   const f = e.target.files[0]; if (!f) return;
-  if (f.size > 1.5 * 1024 * 1024){ $("#le-err").textContent = "That file is over 1.5 MB. Browsers only keep about 5 MB per site, so pick a smaller file."; $("#le-err").hidden = false; e.target.value = ""; return; }
+  if (f.size > 1.5 * 1024 * 1024){ $("#le-err").textContent = "That file is over 1.5 MB. Uploaded HTML files are saved with your synced data, so pick a smaller file."; $("#le-err").hidden = false; e.target.value = ""; return; }
   le.html = await f.text(); le.fileName = f.name; $("#le-err").hidden = true; renderLinkEditor();
 });
 $("#form-le").addEventListener("submit", e => {
@@ -312,4 +313,3 @@ $("#form-le").addEventListener("submit", e => {
   const nm = linkName(d); $("#dlg-le").close(); toast(cur ? `Saved “${trunc(nm, 28)}”` : `Added “${trunc(nm, 28)}” to your links`);
 });
 LinkStore.subscribe(() => { renderLinkRow(); if ($("#dlg-settings").open) renderLinkSettings(); });
-

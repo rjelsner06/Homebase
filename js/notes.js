@@ -1,4 +1,3 @@
-
 /* Homebase: NOTES: folders, cards, editor, tables, toolbar.
    Plain script (no modules). Shares one global scope with the other js/ files; load order is set in index.html. */
 "use strict";
