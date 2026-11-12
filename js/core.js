@@ -1,3 +1,4 @@
+
 /* Homebase: CONFIG, UTILITIES ($, $$, dates), DATA LAYER (Store), CLOUD SYNC (Supabase), SETTINGS (theme, colors), derived views.
    Plain script (no modules). Shares one global scope with the other js/ files; load order is set in index.html. */
 "use strict";
@@ -92,7 +93,7 @@ const typeOptions = sel => { let L; try { L = typeOrder(); } catch(e){ L = allTy
 /* =====================================================================
    DATA LAYER
    Every read and write of saved data goes through `Store`. The UI never
-   touches localStorage. Store keeps an in-memory copy (so reads are
+   touches the browser's storage (HBStore, js/storage.js). Store keeps an in-memory copy (so reads are
    instant) and hands every change to an adapter.
  
    To add sync later (Supabase / Firebase), write an adapter with:
@@ -121,8 +122,9 @@ const typeOptions = sel => { let L; try { L = typeOrder(); } catch(e){ L = allTy
 const Sync = (() => {
   const CFG = "homebase.cloud.v1", OUT = "homebase.sync.outbox.v1", META = "homebase.sync.meta.v1", T = "hb_docs";
   const SB_ESM = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
-  const rd = (k, f) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : f; } catch(e){ return f; } };
-  const wr = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(e){ return false; } };
+  /* The project address stays in localStorage (tiny). The outbox and sync bookkeeping live in IndexedDB (HBStore). */
+  const rd = (k, f) => { if (k !== CFG) return HBStore.get(k, f) || f; try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : f; } catch(e){ return f; } };
+  const wr = (k, v) => { if (k !== CFG) return HBStore.set(k, v); try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(e){ return false; } };
   const J = o => JSON.stringify(o, (k, v) => k === "_m" ? undefined : v);
   const kinds = {}, snaps = {}, dirty = new Set(), subs = new Set(), localSubs = new Set();
   let outbox = rd(OUT, {}), meta = rd(META, {}), cfg = rd(CFG, null);
@@ -364,12 +366,12 @@ const Sync = (() => {
 /* A small synced key → record store, used by links, lifts, facts and app data. */
 function DocStore(lsKey, kind, seed){
   let map = {};
-  try { map = JSON.parse(localStorage.getItem(lsKey) || "null") || {}; } catch(e){ map = {}; }
+  map = HBStore.get(lsKey, null) || {};   // lsKey is the storage key (the name is from when this lived in localStorage)
   const seeds = seed ? seed() : [];
   for (const s of seeds) if (!map[s.id]) map[s.id] = s;
   const subs = new Set();
   let warned = false;
-  const persist = () => { try { localStorage.setItem(lsKey, JSON.stringify(map)); } catch(e){ if (!warned){ warned = true; setTimeout(() => toast("This browser's storage is full. Remove big uploaded HTML files or old data."), 0); } } };
+  const persist = () => { if (!HBStore.set(lsKey, map) && HBStore.mode === "local" && !warned){ warned = true; setTimeout(() => toast("This browser's storage is full. Remove big uploaded HTML files or old data."), 0); } };
   const emit = () => subs.forEach(f => { try { f(); } catch(e){ console.error(e); } });
   const api = {
     kind,
@@ -389,18 +391,19 @@ function DocStore(lsKey, kind, seed){
   return api;
 }
  
+/* Items are kept in the browser's IndexedDB through HBStore (js/storage.js). */
 const LocalAdapter = {
   KEY: "homebase.items.v2",
   LEGACY: "homebase.events.v1",   // old format, left in place untouched as a backup
   async load(){
-    const raw = localStorage.getItem(this.KEY);
-    if (raw) return {items: JSON.parse(raw)};
-    const old = localStorage.getItem(this.LEGACY);
-    if (old) return {items: JSON.parse(old), migrated: true};
+    const items = HBStore.get(this.KEY);
+    if (Array.isArray(items)) return {items};
+    const old = HBStore.get(this.LEGACY);
+    if (Array.isArray(old)) return {items: old, migrated: true};
     return {items: null};
   },
-  async upsert(records, all){ localStorage.setItem(this.KEY, JSON.stringify(all)); },
-  async remove(ids, all){ localStorage.setItem(this.KEY, JSON.stringify(all)); },
+  async upsert(records, all){ if (!HBStore.set(this.KEY, all)) throw new Error("Not saved in this browser"); },
+  async remove(ids, all){ if (!HBStore.set(this.KEY, all)) throw new Error("Not saved in this browser"); },
 };
  
 /* Brings any record (including the old v1 format) up to the current shape. */
@@ -531,8 +534,12 @@ const Settings = (() => {
     return {...s, ...p, theme:{...s.theme, ...(p.theme || {})}, courseColors:{...(p.courseColors || {})}, importProfiles:{...(p.importProfiles || {})}, ai:{...s.ai, ...(p.ai || {})}, mail:{...s.mail, ...(p.mail || {})},
       facts:{...s.facts, ...(p.facts || {})}, types:{...(p.types || {}), custom:[...((p.types && p.types.custom) || [])], todo:{...((p.types && p.types.todo) || {})}, hidden:[...((p.types && p.types.hidden) || [])]}, remind:{...s.remind, ...(p.remind || {}), defaults:{...((p.remind && p.remind.defaults) || s.remind.defaults)}}}; };
   let s;
-  try { const raw = localStorage.getItem(KEY); s = hydrate(raw ? JSON.parse(raw) : null); } catch(e){ s = hydrate(null); }
-  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch(e){} };
+  try { s = hydrate(HBStore.get(KEY, null)); } catch(e){ s = hydrate(null); }
+  /* Settings live in IndexedDB. Only the theme is copied to localStorage, because the snippet in index.html's
+     <head> needs it before the page draws (so there's no light/dark flash). */
+  const saveTheme = () => { try { localStorage.setItem("homebase.theme.v1", JSON.stringify(s.theme)); } catch(e){} };
+  const save = () => { HBStore.set(KEY, s); saveTheme(); };
+  saveTheme();
   const hooks = new Set();
   return {
     get: () => s,
@@ -629,7 +636,7 @@ function renderSettings(){
   const nc = Settings.get().notesColor || "blue";
   $("#st-ncolor").innerHTML = NOTE_COLORS.map(([k, n, l, d]) => `<button type="button" data-nc="${k}" aria-pressed="${k === nc}" style="--nc:${currentTheme() === "dark" ? d : l}"><i></i>${n}</button>`).join("");
   renderAISettings();
-  renderCloud(); renderLinkSettings(); renderTypeSettings(); Facts.renderSettingsSec(); Rem.renderSettingsSec();
+  renderCloud(); renderLinkSettings(); renderTypeSettings(); Facts.renderSettingsSec(); Rem.renderSettingsSec(); Files.renderSettingsSec();
 }
 $("#st-ncolor").addEventListener("click", e => { const b = e.target.closest("[data-nc]"); if (!b) return; Settings.update(st => { st.notesColor = b.dataset.nc; }); applyNotesColor(); renderSettings(); });
 $("#btn-theme").onclick = toggleTheme;
@@ -709,7 +716,6 @@ const recentDone = r => r.completed && r.completedAt && Date.now() - new Date(r.
 const SMART = [
   {k:"all",       name:"All",       color:"var(--accent-2)", test:r => true, empty:"Nothing on your list.", group:true, catFilter:true},
   {k:"today",     name:"Today",     color:"var(--c1)",       test:r => r.date === todayS(), empty:"Nothing due today."},
-  {k:"week",      name:"This Week", color:"var(--c3)",       test:r => { const ws = ymd(weekStart(new Date())); return r.date >= ws && r.date <= addDays(ws, 6); }, empty:"Nothing due this week.", group:true},
   {k:"overdue",   name:"Overdue",   color:"var(--bad)",      test:r => r.date < todayS(), empty:"You're all caught up.", group:true},
   {k:"completed", name:"Completed", color:"var(--ok)",       test:recentDone, empty:"Nothing checked off in the last 24 hours.", completedList:true,
     note:"Things you checked off in the last 24 hours. After that they move to Completion history."},

@@ -1,5 +1,3 @@
-Claude
-Storage · JS
 /* Homebase: LOCAL CACHE (IndexedDB) and the SCRIPT LOADER.
    This file loads first, on its own. It opens the browser's IndexedDB database, reads everything
    saved there into memory, moves old localStorage data over the first time, and only then loads the
@@ -282,5 +280,3 @@ const HBStore = (() => {
     backupInfo, backupData, removeBackup,
   };
 })();
- 
-Claude is responding

@@ -12,8 +12,9 @@
 <link rel="stylesheet" href="css/home.css">
 <link rel="stylesheet" href="css/week.css">
 <link rel="stylesheet" href="css/settings.css">
-<script>/* set the theme before first paint (same rules as the Settings module) */
-try{var s=(JSON.parse(localStorage.getItem("homebase.settings.v1")||"{}").theme)||{},m=s.mode||"auto",t;
+<script>/* set the theme before first paint (same rules as the Settings module). The theme is copied to
+   localStorage as homebase.theme.v1; everything else is in IndexedDB. Older copies kept it in homebase.settings.v1. */
+try{var s=JSON.parse(localStorage.getItem("homebase.theme.v1")||"null")||(JSON.parse(localStorage.getItem("homebase.settings.v1")||"{}").theme)||{},m=s.mode||"auto",t;
 if(m==="light"||m==="dark")t=m;else if(m==="system")t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";
 else if(s.override&&new Date(s.override.until)>new Date())t=s.override.theme;
 else{var n=new Date(),c=n.getHours()*60+n.getMinutes(),f=function(x){x=String(x).split(":");return x[0]*60+ +x[1]},L=f(s.lightAt||"07:00"),D=f(s.darkAt||"22:00");t=(L===D||(L<D?(c>=L&&c<D):(c>=L||c<D)))?"light":"dark";}
@@ -324,6 +325,10 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
         <h4>Sync &amp; account</h4>
         <div id="sy-box"></div>
       </div>
+      <div class="st-sec" id="st-storage">
+        <h4>Storage</h4>
+        <div id="sg-box"></div>
+      </div>
       <div class="st-sec" id="st-home">
         <h4>Home screen</h4>
         <div class="hs-cur"><span>Using <b id="st-hs-name"></b></span><button type="button" class="btn small primary" id="st-hs-change">Change home screen</button></div>
@@ -557,23 +562,33 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
 <!-- The Lifts app lives in apps/lifts.html (loaded into its own frame by js/lifts.js). Edit it there. -->
  
 <datalist id="courses"></datalist>
+<input type="file" id="sg-file" multiple hidden>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toast-msg"></span><button type="button" id="toast-undo">Undo</button></div>
  
-<!-- Scripts: plain files sharing one scope. Order matters: app.js (BOOT) must be last. See README.md. -->
-<script src="js/import-core.js"></script>
-<script src="js/core.js"></script>
-<script src="js/ui.js"></script>
-<script src="js/calendar.js"></script>
-<script src="js/todo.js"></script>
-<script src="js/notes.js"></script>
-<script src="js/home.js"></script>
-<script src="js/import.js"></script>
-<script src="js/links.js"></script>
-<script src="js/lifts.js"></script>
-<script src="js/settings.js"></script>
-<script src="js/facts.js"></script>
-<script src="js/week.js"></script>
-<script src="js/reminders.js"></script>
-<script src="js/app.js"></script>
+<!-- Scripts: plain files sharing one scope. js/storage.js loads first: it opens the browser's IndexedDB cache
+     (and moves old localStorage data over the first time), then loads the files below IN THIS ORDER.
+     Order matters: app.js (BOOT) must be last. To add a file, add it to this list. See README.md.
+     "v" is added to each script's address so browsers fetch fresh copies instead of mixing old and new
+     files after a push. Change it (any new text) whenever you change files in js/. -->
+<script src="js/storage.js?v=2026-11-12a"></script>
+<script>
+HBStore.boot("2026-11-12a", [
+  "js/import-core.js",
+  "js/core.js",
+  "js/ui.js",
+  "js/calendar.js",
+  "js/todo.js",
+  "js/notes.js",
+  "js/home.js",
+  "js/import.js",
+  "js/links.js",
+  "js/lifts.js",
+  "js/settings.js",
+  "js/facts.js",
+  "js/week.js",
+  "js/reminders.js",
+  "js/files.js",
+  "js/app.js",
+]);
+</script>
 </body></html>
- 

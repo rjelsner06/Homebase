@@ -1,3 +1,4 @@
+
 /* Homebase: Links row + pop-up, Daily facts, Reminders, Types, Settings layout, Sync.
    Loaded in order by index.html (base → notes → home → settings); later files can override earlier ones. */
 /* ===== round 8: links row, link pop-up, daily facts, reminders, sync ===== */
@@ -177,3 +178,23 @@ dialog#dlg-settings{width:min(920px,calc(100vw - 32px));height:min(760px,calc(10
 .sy-dot[data-s="error"],.sy-dot[data-s="offline"]{background:var(--bad)}
 .sy-form{display:flex;flex-direction:column;gap:10px}
 dialog#dlg-choice{width:min(460px,calc(100vw - 32px))}
+/* Storage (Settings → Storage) */
+#sg-box{display:flex;flex-direction:column;gap:16px}
+#sg-box .note{margin:0}
+.sg-row{display:flex;flex-direction:column;gap:6px}
+.sg-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.sg-top b{font-size:14px}
+.sg-top .mono{font-size:12.5px;color:var(--muted)}
+.sg-bar{height:8px;border-radius:999px;background:var(--tile-2);box-shadow:inset 0 0 0 1px var(--line);overflow:hidden}
+.sg-bar i{display:block;height:100%;width:var(--p);min-width:3px;background:var(--accent);border-radius:inherit;transition:width .3s}
+.sg-row.warn .sg-bar i{background:var(--warn)}
+.sg-row.full .sg-bar i{background:var(--bad)}
+.sg-row.warn .sg-top .mono,.sg-row.full .sg-top .mono{color:var(--ink);font-weight:500}
+.sg-warn{padding:9px 12px;border-radius:10px;background:var(--warn-soft);font-size:13.5px;line-height:1.45}
+.sg-files{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.sg-files li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line)}
+.sg-files li:last-child{border-bottom:0}
+.sg-fn{display:flex;flex-direction:column;min-width:0}
+.sg-fn b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;font-weight:600}
+.sg-fn small{color:var(--muted);font-size:12px}
+.sg-fb{display:flex;gap:4px}

@@ -1,5 +1,4 @@
-Claude
-Files · JS
+
 /* Homebase: FILES (Supabase Storage) and Settings → Storage.
    Plain script (no modules). Shares one global scope with the other js/ files; load order is set in index.html.
  
@@ -254,4 +253,3 @@ const Files = (() => {
   return {upload, getUrl, open, delete:remove, remove, list, get, measure, usage:numbers, renderSettingsSec, BUCKET, MAX_FILE, fmtBytes};
 })();
  
-Claude finished the response

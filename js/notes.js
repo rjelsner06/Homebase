@@ -1,10 +1,11 @@
+
 /* Homebase: NOTES: folders, cards, editor, tables, toolbar.
    Plain script (no modules). Shares one global scope with the other js/ files; load order is set in index.html. */
 "use strict";
-
+ 
 /* =====================================================================
-   NOTES: folders (nested) and documents. Saved in this browser under
-   its own key; deleted notes and folders go to Recently Deleted.
+   NOTES: folders (nested) and documents. Saved in this browser (IndexedDB,
+   through HBStore) under its own key; deleted notes and folders go to Recently Deleted.
    ===================================================================== */
 const Notes = (() => {
   const KEY = "homebase.notes.v1";
@@ -16,12 +17,12 @@ const Notes = (() => {
       html:"<p>Make folders on the left (and folders inside folders with the <b>+</b> next to a folder's name). Click <b>+ Note</b> to start a document.</p><ul><li>Use the toolbar for headings, <b>bold</b>, lists and checklists.</li><li>Everything saves as you type.</li><li>Deleted notes and folders go to Recently Deleted for 30 days.</li></ul><ul class=\"chk\"><li class=\"done\">Click the box to check things off</li><li>Delete this note when you're done with it</li></ul>"}]};
   };
   let d;
-  try { const raw = localStorage.getItem(KEY); d = raw ? JSON.parse(raw) : seed(); d.folders ||= []; d.notes ||= []; } catch(e){ d = seed(); }
+  try { d = HBStore.get(KEY, null) || seed(); d.folders ||= []; d.notes ||= []; } catch(e){ d = seed(); }
   const subs = new Set();
-  const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(d)); } catch(e){} };
+  const persist = () => { HBStore.set(KEY, d); };
   const save = () => { persist(); Sync.touch("note"); Sync.touch("folder"); };
   const emit = () => subs.forEach(f => { try { f(); } catch(e){ console.error(e); } });
-  if (!localStorage.getItem(KEY)) persist();
+  if (!HBStore.has(KEY)) persist();
   function descendants(id){ const out = [id]; for (let i = 0; i < out.length; i++) d.folders.filter(f => f.parentId === out[i] && !f.deletedAt).forEach(f => out.push(f.id)); return out; }
   const api = {
     subscribe(f){ subs.add(f); },
@@ -92,7 +93,7 @@ const Notes = (() => {
       && rows.some(r => r.kind === "folder" && !r.deleted && r.data && r.data.name === f.name && !r.data.parentId)});
   return api;
 })();
-
+ 
 /* Only safe formatting survives a save or a paste: no scripts, event attributes or unknown styles.
    Styles are rebuilt from a short list (alignment, spacing, size, font, colors, table sizes). */
 const NOTE_TAGS = new Set(["B","STRONG","I","EM","U","S","STRIKE","H1","H2","H3","H4","P","DIV","BR","UL","OL","LI","A","BLOCKQUOTE","CODE","PRE","SPAN","TABLE","COLGROUP","COL","THEAD","TBODY","TR","TD","TH"]);
@@ -147,7 +148,7 @@ function cleanHTML(html){
   return doc.body.innerHTML;
 }
 const noteText = html => { const d = new DOMParser().parseFromString(`<body>${html || ""}<\/body>`, "text/html"); d.querySelectorAll("li,p,div,h1,h2,h3,h4,td,th,br").forEach(e => e.append(" ")); return d.body.textContent.replace(/\s+/g, " ").trim(); };
-
+ 
 /* ---------- Notes page: folders, cards grouped by recency, editor ---------- */
 const NT_UI = "homebase.notesui.v1";
 const nt = {folder:"all", note:null, loaded:null, q:"", renaming:null, mobileEdit:false, side:true, full:false, range:null, size:12, color:"#E03131", hl:"#FFD43B80"};
@@ -210,7 +211,7 @@ function renderNotes(){
   $("#nt-folders").innerHTML = fRow("all", "All notes", 0, IC.all) + fRow("unfiled", "Not in a folder", 0, '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 3h10l4 4v14H5z"/></svg>')
     + (tree.length ? `<h5>Folders</h5>` : "") + tree.map(({f, lvl}) => fRow(f.id, f.name, lvl)).join("");
   const ren = $("#nt-folders .nf-in"); if (ren && document.activeElement !== ren){ ren.focus(); ren.select(); }
-  const opts = [["all","All notes"],["unfiled","Not in a folder"], ...tree.map(({f, lvl}) => [f.id, "  ".repeat(lvl) + f.name])];
+  const opts = [["all","All notes"],["unfiled","Not in a folder"], ...tree.map(({f, lvl}) => [f.id, "  ".repeat(lvl) + f.name])];
   $("#nt-fsel").innerHTML = opts.map(([v, t]) => `<option value="${v}" ${v === nt.folder ? "selected" : ""}>${esc(t)}</option>`).join("");
   /* layout */
   const n = nt.note && Notes.note(nt.note);
@@ -222,7 +223,7 @@ function renderNotes(){
   if (!n){ nt.loaded = null; closePop(); renderGallery(); return; }
   /* editor */
   $("#nt-back").textContent = "‹ " + folderName(nt.folder);
-  $("#nt-move").innerHTML = `<option value="">Not in a folder</option>` + tree.map(({f, lvl}) => `<option value="${f.id}">${"  ".repeat(lvl)}${esc(f.name)}</option>`).join("");
+  $("#nt-move").innerHTML = `<option value="">Not in a folder</option>` + tree.map(({f, lvl}) => `<option value="${f.id}">${"  ".repeat(lvl)}${esc(f.name)}</option>`).join("");
   $("#nt-move").value = n.folderId || "";
   if (nt.loaded !== n.id){
     nt.loaded = n.id; nt.range = null;
@@ -247,7 +248,7 @@ function saveBody(){
   ntTimer = setTimeout(() => { if (!nt.loaded) return; Notes.updateNote(nt.loaded, {html:cleanHTML(ntBody.innerHTML)}, true); $("#nt-saved").textContent = "Saved"; renderNoteList(); }, 350);
 }
 const renderNoteList = () => renderNotes();   // the open note isn't reloaded, so typing is never interrupted
-
+ 
 /* folders hidden / shown, and full screen */
 function setSide(on){ nt.side = on; saveNtUI(); renderNotes(); }
 const FULL_IC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>';
@@ -263,7 +264,7 @@ function setNoteFull(on){
   closePop();
 }
 document.addEventListener("fullscreenchange", () => { if (!document.fullscreenElement && nt.full) setNoteFull(false); });
-
+ 
 $("#nt-new").onclick = newNote;
 $("#nt-hide").onclick = () => setSide(false);
 $$(".nt-showside").forEach(b => b.onclick = () => setSide(true));
@@ -293,7 +294,7 @@ $("#nt-move").addEventListener("change", e => { if (nt.loaded) Notes.updateNote(
 $("#nt-del").onclick = () => { const id = nt.loaded; if (!id) return; const n = Notes.note(id); if (nt.full) setNoteFull(false); Notes.removeNote(id); nt.note = null; nt.mobileEdit = false; toast(`Deleted "${trunc(n.title || "Untitled", 28)}"`, () => { Notes.restore("note", id); }); };
 $("#nt-back").onclick = closeNote;
 document.addEventListener("keydown", e => { if (e.key === "Escape" && nt.full && $("#nt-pop").hidden && !document.querySelector("dialog[open]")) setNoteFull(false); });
-
+ 
 /* ---------- editing ---------- */
 try { document.execCommand("defaultParagraphSeparator", false, "p"); } catch(e){}
 const BLK = "p,div,h1,h2,h3,h4,li,blockquote,td,th,pre";
@@ -360,7 +361,7 @@ function setSpacing(v){
   bl.forEach(b => { b.style.lineHeight = v; });
   saveBody(); syncTB();
 }
-
+ 
 /* toolbar state follows the cursor */
 $("#nt-font").innerHTML = NOTE_FONTS.map(([v, t]) => `<option value="${esc(v)}" style="font-family:${v ? `'${v}'` : "inherit"}">${esc(t)}</option>`).join("");
 let tbRaf = 0;
@@ -383,7 +384,7 @@ function syncTB(){
   $("#nt-font").value = hit ? hit[0] : "";
   if (document.activeElement !== $("#nt-size")) $("#nt-size").value = curPt();
 }
-
+ 
 $("#nt-tb").addEventListener("mousedown", e => { if (e.target.closest("button")) e.preventDefault(); });   // keep the text selection
 $("#nt-tb").addEventListener("click", e => {
   const p = e.target.closest("[data-pop]"); if (p){ openPop(p.dataset.pop, p); return; }
@@ -410,7 +411,7 @@ $("#nt-style").addEventListener("change", e => setStyle(e.target.value));
 $("#nt-font").addEventListener("change", e => setFont(e.target.value));
 $("#nt-size").addEventListener("change", e => setSize(e.target.value));
 $("#nt-size").addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); e.target.blur(); }   /* blurring fires "change", which applies the size */ if (e.key === "Escape"){ e.target.value = curPt(); restoreSel(); } });
-
+ 
 ntBody.addEventListener("input", () => { fixMarks(); saveBody(); });
 ntBody.addEventListener("paste", e => {
   const html = e.clipboardData.getData("text/html"), text = e.clipboardData.getData("text/plain");
@@ -423,7 +424,7 @@ ntBody.addEventListener("click", e => {
   const li = e.target.closest("ul.chk > li");
   if (li && e.clientX - li.getBoundingClientRect().left < 24){ li.classList.toggle("done"); saveBody(); }
 });
-
+ 
 /* ---------- tables ---------- */
 function tblCtx(){
   const cell = selEl().closest("td,th"); if (!cell || !ntBody.contains(cell)) return null;
@@ -549,7 +550,7 @@ window.addEventListener("pointermove", e => {
 });
 const endRz = () => { if (!rz) return; rz = null; document.body.classList.remove("nt-rz", "c", "r"); saveBody(); };
 window.addEventListener("pointerup", endRz); window.addEventListener("pointercancel", endRz);
-
+ 
 /* ---------- toolbar pop-ups: colors, highlight, line spacing, table ---------- */
 const TEXT_COLORS = ["#E03131","#F76707","#F08C00","#2F9E44","#0C8599","#1C7ED6","#4C6EF5","#7048E8","#D6336C","#AE3EC9","#A0522D","#868E96","#FF8787","#69DB7C","#74C0FC","#B197FC"];
 const HL_COLORS = ["#FFD43B80","#FFA94D80","#FF878780","#FAA2C180","#B197FC80","#74C0FC80","#8CE99A80","#ADB5BD66"];
@@ -600,4 +601,3 @@ $("#nt-tb").addEventListener("scroll", closePop);
 $("#nt-canvas").addEventListener("scroll", closePop);
 addEventListener("resize", closePop);
 Notes.subscribe(() => { if (ready){ renderNotes(); renderDeleted(); updateDelCount(); Home.refresh(); } });
-
