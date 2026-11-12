@@ -1,0 +1,84 @@
+/* Homebase: This Week widget on the home screen (tasks due this week by day + weekly goals).
+   Loaded after home.css by index.html. Wide tiles show both halves side by side; narrow ones (phone) switch with Tasks / Goals. */
+.twk-w{--hue:var(--accent)}
+.hw .twk-w{gap:8px}
+.twk-w h2 .twk-nav{display:inline-flex;gap:2px;align-items:center;flex:none}
+.twk-w h2 .twk-nav .btn{padding:3px 9px;font-size:13px}
+.twk-w h2 .twk-nav .btn.ghost{font-size:17px;line-height:1;padding:2px 9px 4px}
+.twk-sub{font-size:12.5px;color:var(--muted);display:flex;gap:2px 12px;flex-wrap:wrap}
+.twk-sub b{color:var(--ink);font-weight:700;font-family:var(--f-mono)}
+.twk-seg{align-self:flex-start}
+.twk-seg button b{font-family:var(--f-mono);font-weight:500;margin-left:6px;opacity:.8}
+ 
+.hw .twk-w > .twk-cols{flex:1 1 0;min-height:0;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr);gap:16px}
+.twk-pane{min-height:0;overflow:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:8px;padding:0 2px 4px}
+.twk-pane > *{flex-shrink:0}
+.twk-ph{display:flex;justify-content:space-between;gap:8px;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.twk-ph span + span{text-transform:none;letter-spacing:0;font-weight:500}
+.twk-empty{font-size:13.5px;color:var(--muted);margin:0;padding:6px 2px}
+ 
+/* Part A: tasks by day */
+.twk-days,.twk-ts,.twk-gl{list-style:none;margin:0;padding:0}
+.twk-days{display:flex;flex-direction:column;gap:3px}
+.twk-dg{border-radius:10px;padding:3px 6px 3px 8px}
+.twk-dg.today{background:color-mix(in srgb,var(--accent) 13%,transparent);box-shadow:inset 3px 0 0 var(--accent)}
+.twk-dg.over{background:color-mix(in srgb,var(--bad) 10%,transparent);box-shadow:inset 3px 0 0 var(--bad)}
+.twk-dh{display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);padding:3px 0;min-height:22px}
+.twk-dh b{font-family:var(--f-mono);font-weight:600;color:var(--ink);letter-spacing:0}
+.twk-dh em{font-style:normal;font-size:10.5px;letter-spacing:.04em;background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:0 7px}
+.twk-dc{margin-left:auto;text-transform:none;letter-spacing:0;font-weight:500;white-space:nowrap}
+.twk-dg.today .twk-dh{color:var(--accent)}
+.twk-dg.over .twk-dh,.twk-dg.over .twk-dh b{color:var(--bad)}
+.twk-dg.empty .twk-dh{opacity:.55}
+.twk-dg.past.empty{display:none}   /* nothing left to see on an empty day that has passed */
+.twk-dg.past:not(.over) .twk-dh{opacity:.6}
+.twk-t{display:grid;grid-template-columns:auto minmax(0,1fr) auto;column-gap:9px;align-items:center;padding:4px 2px;border-radius:7px;cursor:pointer}
+.twk-t:hover{background:color-mix(in srgb,var(--ink) 5%,transparent)}
+.twk-t .ckb{grid-row:1 / 3;width:19px;height:19px}
+.twk-t .ckb:checked::after{width:4px;height:9px}
+.twk-tt{font-size:14px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.twk-tt .ti{display:inline-block;vertical-align:-2px;margin-right:5px;color:var(--tc)}
+.twk-tt .ti svg{width:12px;height:12px;display:block}
+.twk-tm{font-size:12px;font-family:var(--f-mono);color:var(--muted);white-space:nowrap;display:inline-flex;gap:4px;align-items:center}
+.twk-tm .flag{width:12px;height:12px}
+.twk-m{grid-column:2 / 4;font-size:12px;font-weight:600;color:var(--cc);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.3}
+.twk-t.late .twk-tm{color:var(--bad);font-family:var(--f-body);font-weight:600}
+.twk-t.done .twk-tt{text-decoration:line-through;color:var(--muted);font-weight:500}
+.twk-t.done .twk-m,.twk-t.done .twk-tm{opacity:.6}
+ 
+/* Part B: weekly goals */
+.twk-gl{display:flex;flex-direction:column;gap:1px}
+.twk-g{--cc:var(--accent);display:flex;align-items:center;gap:6px;padding:2px 2px;border-radius:9px;min-width:0}
+.twk-g.dragging{background:var(--tile);box-shadow:var(--shadow),0 0 0 1px var(--line);position:relative;z-index:2}
+.twk-h{border:0;background:none;color:var(--muted);cursor:grab;touch-action:none;padding:6px 3px;font-size:15px;line-height:1;border-radius:6px;flex:none;opacity:.7;-webkit-user-select:none;user-select:none}
+.twk-h:hover,.twk-h:focus-visible{opacity:1;background:color-mix(in srgb,var(--ink) 7%,transparent)}
+.twk-g.dragging .twk-h{cursor:grabbing}
+.twk-g .ckb{width:19px;height:19px}
+.twk-g .ckb:checked::after{width:4px;height:9px}
+.twk-g .ckb:disabled{opacity:.35;cursor:default}
+.twk-gt{flex:1;min-width:0;border:0;background:transparent;border-radius:6px;padding:5px 4px;font-size:14px;font-weight:500}
+.twk-gt:focus{outline:none;background:color-mix(in srgb,var(--tile) 75%,transparent);box-shadow:inset 0 0 0 1.5px var(--accent)}
+.twk-g.done .twk-gt{text-decoration:line-through;color:var(--muted)}
+.twk-g.carried .twk-gt{color:var(--muted);font-style:italic}
+.twk-tag{font-size:11.5px;color:var(--muted);white-space:nowrap;flex:none}
+.twk-g .x{flex:none;font-size:17px;padding:3px 7px;opacity:.55}
+@media (hover:hover){.twk-g .x{opacity:0}.twk-g:hover .x,.twk-g .x:focus-visible{opacity:.8}}
+.twk-addr{display:flex;gap:6px;align-items:center}
+.twk-add{flex:1;min-width:0;border:1px dashed color-mix(in srgb,var(--ink) 28%,transparent);background:transparent;border-radius:10px;padding:6px 10px;font-size:14px}
+.twk-add:focus{outline:none;border-style:solid;border-color:var(--accent);background:color-mix(in srgb,var(--tile) 75%,transparent)}
+.twk-addr .btn{padding:4px 12px;font-size:16px;line-height:1.2}
+.twk-banner{display:flex;align-items:center;justify-content:space-between;gap:6px 10px;flex-wrap:wrap;font-size:13px;font-weight:600;background:var(--warn-soft);color:var(--ink);border-radius:10px;padding:6px 6px 6px 10px}
+.twk-carry{align-self:flex-start;color:var(--accent);padding-left:4px}
+/* iPhone Safari zooms into text boxes under 16px */
+@media (pointer:coarse){.twk-w input[type=text]{font-size:16px}}
+ 
+/* narrow tiles (phone): one half at a time */
+@container (max-width:519px){
+  .hw .twk-w > .twk-cols{grid-template-columns:minmax(0,1fr)}
+  .twk-w[data-pane="tasks"] .twk-goals,.twk-w[data-pane="goals"] .twk-tasks{display:none}
+  .twk-ph{display:none}
+}
+@container (min-width:520px){.twk-seg{display:none!important}}
+@container (max-width:300px){.twk-tag{display:none}.twk-w h2 .twk-nav .btn:not(.ghost){padding:3px 7px}}
+@container (max-height:250px){.hw .twk-w{padding:12px 14px;gap:6px}}
+ 
