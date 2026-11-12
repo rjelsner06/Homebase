@@ -1,10 +1,10 @@
-/* Homebase: LIFTS: bridge between Homebase storage and the Lifts frame (the app itself is apps/lifts.html).
+/* Homebase: LIFTS: bridge between Homebase storage and the Lifts frame (the app itself is Apps/lifts.html).
    Plain script (no modules). Shares one global scope with the other js/ files; load order is set in index.html. */
 "use strict";
 
 /* =====================================================================
    LIFTS: the Two-Day Lift Log, built in. It runs in its own frame (its
-   code and styles are in apps/lifts.html), and its
+   code and styles are in Apps/lifts.html), and its
    saved workouts go through Homebase's synced storage instead of Claude's.
    ===================================================================== */
 const LiftDB = (() => {
@@ -34,18 +34,18 @@ const LIFT_BRIDGE = `window.claude={use:function(n){var B=parent.HB_LIFTS;if(!B)
 function liftDoc(){
   return `<!doctype html><html lang="en" data-theme="${currentTheme()}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Lifts</title><script>${LIFT_BRIDGE}<\/script><\/head><body>${$("#tpl-lifts").innerHTML}<\/body><\/html>`;
 }
-/* apps/lifts.html is fetched once at startup and kept in a <template id="tpl-lifts">, exactly as when it lived inside
+/* Apps/lifts.html is fetched once at startup and kept in a <template id="tpl-lifts">, exactly as when it lived inside
    index.html. (fetch works on Live Server and GitHub Pages; it does not work if index.html is opened as a plain file.) */
-const liftTemplate = fetch("apps/lifts.html", {cache:"no-cache"})
+const liftTemplate = fetch("Apps/lifts.html", {cache:"no-cache"})
   .then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
   /* VS Code's Live Server slips its auto-reload script into every .html file it serves (before the first </body>, </svg>
      or </head>, even one inside the Lifts code). Take it back out so Lifts runs exactly as on GitHub Pages. */
   .then(html => html.replace(/<!-- Code injected by live-server -->[\s\S]*?<\/script>(\r?\n)?/g, ""))
   .then(html => { const t = document.createElement("template"); t.id = "tpl-lifts"; t.innerHTML = html; document.body.appendChild(t); });
-liftTemplate.catch(e => console.error("Lifts: couldn't load apps/lifts.html", e));
+liftTemplate.catch(e => console.error("Lifts: couldn't load Apps/lifts.html", e));
 function setLiftDoc(f){
   liftTemplate.then(() => { f.srcdoc = liftDoc(); },
-    () => { f.srcdoc = `<!doctype html><meta charset="utf-8"><body style="font:15px -apple-system,sans-serif;padding:24px">Couldn't load the Lifts app (apps/lifts.html). Check your connection and reload.</body>`; });
+    () => { f.srcdoc = `<!doctype html><meta charset="utf-8"><body style="font:15px -apple-system,sans-serif;padding:24px">Couldn't load the Lifts app (Apps/lifts.html). Check your connection and reload.</body>`; });
 }
 function ensureLiftFrame(){
   if (liftFrame) return liftFrame;
@@ -53,4 +53,3 @@ function ensureLiftFrame(){
   $("#lx-body").appendChild(f); setLiftDoc(f); liftFrame = f; return f;
 }
 window.HB_onTheme = t => { try { if (liftFrame && liftFrame.contentDocument) liftFrame.contentDocument.documentElement.dataset.theme = t; } catch(e){} };
-

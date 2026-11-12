@@ -105,9 +105,9 @@ label.btn{cursor:pointer}
 .chip.off .t{text-decoration:line-through}
 .rv li select[data-f="ncAll"]{grid-column:3}
 @media (max-width:700px){
-  /* phone: a day's items and the to-do list scroll inside their widget */
-  .hw .wk-col,.hw .wk-items,.hw .dayview,.hw .day{overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
-  .hw #t-due #home-todo{flex:1 1 0;min-height:60px;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+  /* phone: a day's items and the to-do list scroll inside their widget; at the top or bottom of the list the page scrolls on */
+  .hw .wk-col,.hw .wk-items,.hw .dayview,.hw .day{overflow-y:auto;overscroll-behavior:auto;-webkit-overflow-scrolling:touch}
+  .hw #t-due #home-todo{flex:1 1 0;min-height:60px;overflow-y:auto;overscroll-behavior:auto;-webkit-overflow-scrolling:touch}
 }
 /* round 10: Settings in categories, type order, type menu */
 dialog#dlg-settings{width:min(920px,calc(100vw - 32px));height:min(760px,calc(100dvh - 48px))}

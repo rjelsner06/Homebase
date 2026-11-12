@@ -224,4 +224,3 @@ const ThisWeek = (() => {
    settings arrive from another device that never had it; removing the widget afterwards keeps it removed. */
 Home.ensureWidget("weekWidgetAdded", "week", {laptop:[4,3], phone:[4,4]});
 Settings.onReplace(() => setTimeout(() => Home.ensureWidget("weekWidgetAdded", "week", {laptop:[4,3], phone:[4,4]}), 0));
- 

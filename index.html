@@ -5,7 +5,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<!-- PDF.js runs its worker in the background; the worker address is set in js/import.js and js/note-files.js. -->
+<!-- PDF.js runs its worker in the background; the worker address is set in js/import.js and js/notefiles.js. -->
 <!-- Styles: see README.md for what each file holds. Order matters. -->
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/notes.css">
@@ -579,7 +579,7 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
     <div class="dlg-f"><button class="btn" value="b" id="ch-b"></button><button class="btn primary" value="a" id="ch-a"></button></div>
   </form>
 </dialog>
-<!-- The Lifts app lives in apps/lifts.html (loaded into its own frame by js/lifts.js). Edit it there. -->
+<!-- The Lifts app lives in Apps/lifts.html (loaded into its own frame by js/lifts.js). Edit it there. -->
  
 <datalist id="courses"></datalist>
 <input type="file" id="sg-file" multiple hidden>
@@ -590,9 +590,9 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
      Order matters: app.js (BOOT) must be last. To add a file, add it to this list. See README.md.
      "v" is added to each script's address so browsers fetch fresh copies instead of mixing old and new
      files after a push. Change it (any new text) whenever you change files in js/. -->
-<script src="js/storage.js?v=2026-11-12c"></script>
+<script src="js/storage.js?v=2026-11-12d"></script>
 <script>
-HBStore.boot("2026-11-12c", [
+HBStore.boot("2026-11-12d", [
   "js/import-core.js",
   "js/core.js",
   "js/ui.js",
@@ -608,7 +608,7 @@ HBStore.boot("2026-11-12c", [
   "js/week.js",
   "js/reminders.js",
   "js/files.js",
-  "js/note-files.js",
+  "js/notefiles.js",
   "js/viewer.js",
   "js/app.js",
 ]);

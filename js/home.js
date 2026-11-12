@@ -290,6 +290,23 @@ const Home = (() => {
   }, true);
   /* typing in a note widget saves to the note */
   let nwTimer;
+  /* Scrolling the page with the mouse over a widget. A widget part that can still scroll (a long list) scrolls
+     first, as before; once it's at its end, or if nothing under the mouse scrolls, the page scrolls instead of stopping. */
+  $("#home-grid").addEventListener("wheel", e => {
+    if (e.ctrlKey || e.defaultPrevented) return;
+    const k = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? innerHeight : 1, dy = e.deltaY * k;
+    if (!dy || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+    let trapped = false;
+    for (let el = e.target; el && el !== e.currentTarget; el = el.parentElement){
+      if (el.nodeType !== 1) continue;
+      const cs = getComputedStyle(el);
+      if (!/(auto|scroll)/.test(cs.overflowY) || el.scrollHeight <= el.clientHeight + 1) continue;
+      if (dy > 0 ? el.scrollTop + el.clientHeight < el.scrollHeight - 1 : el.scrollTop > 0) return;   // this part scrolls itself
+      if (/contain|none/.test(cs.overscrollBehaviorY)) trapped = true;
+    }
+    if (!trapped) return;                                    // the browser passes the scroll to the page by itself
+    e.preventDefault(); scrollBy(0, dy);
+  }, {passive:false});
   $("#home-grid").addEventListener("input", e => {
     const b = e.target.closest(".nw-body.editable"); if (!b) return;
     clearTimeout(nwTimer);

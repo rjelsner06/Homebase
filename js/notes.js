@@ -6,7 +6,7 @@
    NOTES: folders (nested) and documents. Saved in this browser (IndexedDB,
    through HBStore) under its own key; deleted notes and folders go to Recently Deleted.
    A note can also be an imported file (PDF, Word, PowerPoint): it then has a "file" part
-   and an "annotations" place (see js/note-files.js); it opens in the viewer (js/viewer.js).
+   and an "annotations" place (see js/notefiles.js); it opens in the viewer (js/viewer.js).
    ===================================================================== */
 const Notes = (() => {
   const KEY = "homebase.notes.v1";
