@@ -156,4 +156,11 @@ body.pg-notes .foot{display:none}
 .nw-body h4{font-size:14.5px;margin:.3em 0 .1em}
 .nw-body p.sub{font-size:15px;margin:0 0 .3em}
 .nw-body table{font-size:13px;margin:.3em 0}
-
+/* delete button on a note card: shows on hover (laptop), always on touch screens (iPhone) */
+.nc{position:relative}
+.nc-del{position:absolute;top:7px;right:7px;z-index:2;width:30px;height:30px;display:grid;place-items:center;border:0;border-radius:50%;padding:0;cursor:pointer;color:var(--bad);background:color-mix(in srgb,var(--tile) 92%,transparent);box-shadow:0 1px 4px rgba(0,0,0,.18),0 0 0 1px var(--line);opacity:0;transform:scale(.9);transition:opacity .15s,transform .15s}
+.nc-del svg{width:15px;height:15px}
+.nc:hover .nc-del,.nc:focus-within .nc-del{opacity:1;transform:none}
+.nc-del:hover{background:var(--bad);color:#fff}
+.nc-del:focus-visible{opacity:1;outline:2px solid var(--bad);outline-offset:2px}
+@media (hover:none){.nc-del{opacity:.92;transform:none;width:28px;height:28px}}

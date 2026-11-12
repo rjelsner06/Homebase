@@ -234,7 +234,7 @@ function renderGallery(){
   $("#ng-count").textContent = nt.q ? plural(list.length, "result") : plural(list.length, "note");
   const card = n => {
     const f = n.folderId && n.folderId !== nt.folder ? Notes.path(n.folderId) : "";
-    return `<div class="nc" role="button" tabindex="0" data-note="${n.id}" aria-label="${esc(n.title || "Untitled")}${n.file ? ", " + esc(n.file.ext.toUpperCase()) + " file" : ""}">${n.file ? fileThumb(n.file) : `<span class="nc-th"><span class="nt-body nc-mini" aria-hidden="true">${cleanHTML(n.html)}</span></span>`}<span class="nc-t">${esc(n.title || "Untitled")}</span><span class="nc-d">${cardDate(n.updatedAt)}</span>${f ? `<span class="nc-f">${esc(f)}</span>` : ""}</div>`;
+    return `<div class="nc" role="button" tabindex="0" data-note="${n.id}" aria-label="${esc(n.title || "Untitled")}${n.file ? ", " + esc(n.file.ext.toUpperCase()) + " file" : ""}">${n.file ? fileThumb(n.file) : `<span class="nc-th"><span class="nt-body nc-mini" aria-hidden="true">${cleanHTML(n.html)}</span></span>`}<span class="nc-t">${esc(n.title || "Untitled")}</span><span class="nc-d">${cardDate(n.updatedAt)}</span>${f ? `<span class="nc-f">${esc(f)}</span>` : ""}<button type="button" class="nc-del" data-ncdel="${n.id}" title="Delete" aria-label="Delete ${esc(n.title || "Untitled")}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button></div>`;
   };
   $("#nt-cards").innerHTML = list.length ? noteGroups(list).map(g => `<h3 class="ng-g">${esc(g.k)}</h3><div class="ng-grid">${g.notes.map(card).join("")}</div>`).join("")
     : `<p class="ng-empty">${nt.q ? "No notes match." : "No notes here yet. Press <b>+ Note</b> to start one."}</p>`;
@@ -331,8 +331,23 @@ $("#nt-folders").addEventListener("keydown", e => { const inp = e.target.closest
 $("#nt-folders").addEventListener("focusout", e => { const inp = e.target.closest(".nf-in"); if (inp && nt.renaming) finishRename(inp); });
 $("#nt-fsel").addEventListener("change", e => { nt.folder = e.target.value; nt.q = ""; $("#nt-q").value = ""; renderNotes(); });
 $("#nt-q").addEventListener("input", e => { nt.q = e.target.value.trim(); renderNotes(); });
-$("#nt-cards").addEventListener("click", e => { const c = e.target.closest("[data-note]"); if (c) openNote(c.dataset.note); });
-$("#nt-cards").addEventListener("keydown", e => { const c = e.target.closest("[data-note]"); if (c && (e.key === "Enter" || e.key === " ")){ e.preventDefault(); openNote(c.dataset.note); } });
+/* delete straight from the gallery (goes to Recently Deleted, with Undo) */
+function deleteNoteNow(id){
+  const n = Notes.note(id); if (!n) return;
+  Notes.removeNote(id);
+  if (nt.note === id){ nt.note = null; nt.mobileEdit = false; }
+  toast(`Deleted "${trunc(n.title || "Untitled", 28)}"`, () => Notes.restore("note", id));
+}
+$("#nt-cards").addEventListener("click", e => {
+  const d = e.target.closest("[data-ncdel]"); if (d){ e.stopPropagation(); deleteNoteNow(d.dataset.ncdel); return; }
+  const c = e.target.closest("[data-note]"); if (c) openNote(c.dataset.note);
+});
+$("#nt-cards").addEventListener("keydown", e => {
+  if (e.target.closest("[data-ncdel]")) return;   // Enter/Space on the delete button clicks it
+  const c = e.target.closest("[data-note]"); if (!c) return;
+  if (e.key === "Enter" || e.key === " "){ e.preventDefault(); openNote(c.dataset.note); }
+  if (e.key === "Delete" || e.key === "Backspace"){ e.preventDefault(); deleteNoteNow(c.dataset.note); }
+});
 $("#nt-title").addEventListener("input", e => { if (!nt.loaded) return; Notes.updateNote(nt.loaded, {title:e.target.value}, true); $("#nt-saved").textContent = "Saved"; renderNoteList(); });
 $("#nt-title").addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); ntBody.focus(); } });
 $("#nt-move").addEventListener("change", e => { if (nt.loaded) Notes.updateNote(nt.loaded, {folderId:e.target.value || null}); });
