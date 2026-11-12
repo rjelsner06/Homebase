@@ -2,3 +2,5 @@ Needed sites
 
 https://ollama.com/dashboard/setup?use=local
 https://supabase.com/dashboard/organizations
+IndexedDB - handled by Claude
+Need to attach Claude Code to website
