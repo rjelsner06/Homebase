@@ -1,9 +1,10 @@
+S
 /* Homebase: CONFIG, UTILITIES ($, $$, dates), DATA LAYER (Store), CLOUD SYNC (Supabase), SETTINGS (theme, colors), derived views.
    Plain script (no modules). Shares one global scope with the other js/ files; load order is set in index.html. */
 "use strict";
-
-
-
+ 
+ 
+ 
 /* =====================================================================
    CONFIG
    ===================================================================== */
@@ -44,7 +45,7 @@ const CATEGORIES = [
   {name:"Personal", hasCourse:false, look:"outline", color:"var(--pers)"},
 ];
 const PURGE_DAYS = 30;
-
+ 
 /* =====================================================================
    UTILITIES
    ===================================================================== */
@@ -88,13 +89,13 @@ function typeTodo(t){
   return !CALENDAR_ONLY.has(t);
 }
 const typeOptions = sel => { let L; try { L = typeOrder(); } catch(e){ L = allTypes(); } if (sel && !L.includes(sel)) L = [...L, sel]; return L.map(t => `<option ${t === sel ? "selected" : ""}>${esc(t)}</option>`).join(""); };
-
+ 
 /* =====================================================================
    DATA LAYER
    Every read and write of saved data goes through `Store`. The UI never
    touches localStorage. Store keeps an in-memory copy (so reads are
    instant) and hands every change to an adapter.
-
+ 
    To add sync later (Supabase / Firebase), write an adapter with:
      load()               -> Promise<{items: Record[] | null, migrated?: bool}>
      upsert(records, all) -> Promise   (insert or replace these records)
@@ -106,7 +107,7 @@ const typeOptions = sel => { let L; try { L = typeOrder(); } catch(e){ L = allTy
    CLOUD SYNC (Supabase). Optional. Everything still saves to this
    browser first; when you're signed in, each change is also sent to your
    Supabase project and other devices pick it up live.
-
+ 
    How it works: every kind of data ("item", "note", "folder", "settings",
    "link", "workout", "factday", "appdata", ...) registers here with
      all()   -> the local records, each with an id
@@ -114,7 +115,7 @@ const typeOptions = sel => { let L; try { L = typeOrder(); } catch(e){ L = allTy
      apply(upserts, deletedIds) -> store records that came from the cloud
    Modules call Sync.touch(kind) after they save; Sync diffs against the
    last copy it saw and queues just the changed records. Newer wins.
-
+ 
    The Supabase project URL and publishable key are typed in Settings and
    kept in this browser's storage. Nothing secret lives in this file.
    ===================================================================== */
@@ -132,7 +133,7 @@ const Sync = (() => {
   const msg = e => (e && (e.message || e.error_description || e.msg)) || String(e || "Unknown error");
   const key = (k, id) => k + "\u0001" + id;
   const queueing = () => !!(cfg && meta.userId && !meta.out);
-
+ 
   /* ---------- local side ---------- */
   function register(kind, def){ kinds[kind] = def; snaps[kind] = new Map(def.all().map(o => [o.id, J(o)])); }
   function touch(kind){
@@ -164,7 +165,7 @@ const Sync = (() => {
     const def = kinds[kind]; if (!def) return;
     for (const o of def.all()){ const r = force && force.get(o.id); if (!force || !r || def.m(o) > r.m) outbox[key(kind, o.id)] = {kind, id:o.id, data:{...o, _m:def.m(o)}, deleted:false}; }
   }
-
+ 
   /* ---------- applying records from the cloud ---------- */
   function receive(rows, forceKinds){
     runTouches();
@@ -193,7 +194,7 @@ const Sync = (() => {
     } finally { applying--; }
     if (dirty.size){ clearTimeout(touchT); touchT = setTimeout(runTouches, 300); }
   }
-
+ 
   /* ---------- talking to Supabase ---------- */
   async function pull(since){
     const out = [];
@@ -317,7 +318,7 @@ const Sync = (() => {
   document.addEventListener("visibilitychange", () => { if (!document.hidden && user) catchUp(); });
   addEventListener("online", () => { if (user) catchUp(); });
   setInterval(() => { if (user && Object.keys(outbox).length) flush(); }, 30000);
-
+ 
   const api = {
     register, touch, flush:() => { runTouches(); return flush(); },
     subscribe(f){ subs.add(f); return () => subs.delete(f); },
@@ -360,7 +361,7 @@ const Sync = (() => {
   };
   return api;
 })();
-
+ 
 /* A small synced key → record store, used by links, lifts, facts and app data. */
 function DocStore(lsKey, kind, seed){
   let map = {};
@@ -388,7 +389,7 @@ function DocStore(lsKey, kind, seed){
   });
   return api;
 }
-
+ 
 const LocalAdapter = {
   KEY: "homebase.items.v2",
   LEGACY: "homebase.events.v1",   // old format, left in place untouched as a backup
@@ -402,7 +403,7 @@ const LocalAdapter = {
   async upsert(records, all){ localStorage.setItem(this.KEY, JSON.stringify(all)); },
   async remove(ids, all){ localStorage.setItem(this.KEY, JSON.stringify(all)); },
 };
-
+ 
 /* Brings any record (including the old v1 format) up to the current shape. */
 function normalize(r){
   const nowIso = new Date().toISOString();
@@ -443,7 +444,7 @@ function normalize(r){
   if (r.sample) out.sample = true;
   return out;
 }
-
+ 
 const Store = (() => {
   let adapter = LocalAdapter, cache = [], persistent = true;
   const subs = new Set();
@@ -516,7 +517,7 @@ const Store = (() => {
   };
   return api;
 })();
-
+ 
 /* =====================================================================
    SETTINGS (theme, course colors). Kept apart from items; it can sync
    the same way later by swapping save/load for an adapter.
@@ -542,7 +543,7 @@ const Settings = (() => {
     onReplace(f){ hooks.add(f); },
   };
 })();
-
+ 
 /* Notes color: picked in Settings; sets --h-notes for light and dark. */
 const NOTE_COLORS = [["blue","Blue","#2563EB","#60A5FA"],["sky","Sky","#0284C7","#38BDF8"],["teal","Teal","#0D9488","#2DD4BF"],["green","Green","#16A34A","#4ADE80"],["sage","Sage","#4F7F67","#8FC1A9"],["amber","Amber","#CA8A04","#FACC15"],["orange","Orange","#EA580C","#FB923C"],["coral","Coral","#E0533F","#FF8A7A"],["rose","Rose","#D6457A","#F48FB1"],["violet","Violet","#7C3AED","#A78BFA"],["indigo","Indigo","#4F46E5","#818CF8"],["slate","Slate","#475569","#94A3B8"]];
 function applyNotesColor(){
@@ -551,7 +552,7 @@ function applyNotesColor(){
   el.textContent = `:root{--h-notes:${c[2]}}:root[data-theme="dark"]{--h-notes:${c[3]}}@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--h-notes:${c[3]}}}`;
 }
 applyNotesColor();
-
+ 
 /* Course colors: each course gets its own slot (least-used first) and keeps it. Changeable in Settings. */
 function courseIndex(c){
   const key = String(c || "").trim(); if (!key) return -1;
@@ -564,7 +565,7 @@ function courseIndex(c){
   return Settings.get().courseColors[key];
 }
 function courseColor(c){ const i = courseIndex(c); return i < 0 ? "var(--t-other)" : `var(--c${i + 1})`; }
-
+ 
 /* Theme: Automatic (time of day), Light, Dark, or Match device. A manual switch on Automatic lasts until the next scheduled change. */
 const SUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
 const MOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>';
@@ -611,7 +612,7 @@ function toggleTheme(){
   toast(o ? `${cap(next)} mode until ${fmtClock(o.until)}, then back to the schedule` : `${cap(next)} mode`);
 }
 if (mq && mq.addEventListener) mq.addEventListener("change", applyTheme);
-
+ 
 function renderSettings(){
   if (ready) $("#st-hs-name").textContent = Home.activeName();
   const th = Settings.get().theme, t = currentTheme(), ov = overrideActive();
@@ -641,7 +642,7 @@ $("#st-mode").addEventListener("click", e => { const b = e.target.closest("[data
 }));
 $("#st-resume").onclick = () => { Settings.update(st => { st.theme.override = null; }); applyTheme(); renderSettings(); };
 $("#st-courses").addEventListener("click", e => { const b = e.target.closest("[data-ci]"); if (!b) return; Settings.update(st => { st.courseColors[b.dataset.course] = +b.dataset.ci; }); renderSettings(); if (ready) renderAll(); });
-
+ 
 function seed(){
   const t = todayS();
   const S = (title, course, type, d, time, x={}) => ({title, category:"School", course, type, date:addDays(t,d), time, sample:true, ...x});
@@ -662,7 +663,7 @@ function seed(){
     P("IEEE PES plant tour","Event",5,"13:00",{endTime:"16:00"}),
   ];
 }
-
+ 
 /* =====================================================================
    DERIVED VIEWS OF THE DATA
    ===================================================================== */
@@ -692,7 +693,7 @@ function createSeries(base, days, until){
 function allCourses(){ return [...new Set(Store.all().map(r => r.course).filter(Boolean))].sort(); }
 function itemsByDate(cf = "both"){ const m = {}; for (const r of Store.all()){ const sc = catDef(r.category).hasCourse; if ((cf === "school" && !sc) || (cf === "personal" && sc)) continue; (m[r.date] ||= []).push(r); } for (const k in m) m[k].sort(calSort); return m; }
 function relLabel(n){ if (n<0) return [`${-n} day${n===-1?"":"s"} late`,"over"]; if (n===0) return ["Today","today"]; if (n===1) return ["Tomorrow","soon"]; if (n<=3) return [`In ${n} days`,"soon"]; return [`In ${n} days`,""]; }
-
+ 
 const IC = {
   today:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/><circle cx="12" cy="15" r="1.5" fill="currentColor"/></svg>',
   week:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4M8 15h8"/></svg>',
@@ -704,11 +705,12 @@ const IC = {
   completed:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>',
 };
 const FLAG = '<svg class="flag" viewBox="0 0 24 24" role="img" aria-label="Flagged"><path d="M6 21V4h10l-1.5 3.5L16 11H6" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
-
+ 
 const recentDone = r => r.completed && r.completedAt && Date.now() - new Date(r.completedAt).getTime() < MS_DAY;   // checked off within the last 24 hours
 const SMART = [
   {k:"all",       name:"All",       color:"var(--accent-2)", test:r => true, empty:"Nothing on your list.", group:true, catFilter:true},
   {k:"today",     name:"Today",     color:"var(--c1)",       test:r => r.date === todayS(), empty:"Nothing due today."},
+  {k:"week",      name:"This Week", color:"var(--c3)",       test:r => { const ws = ymd(weekStart(new Date())); return r.date >= ws && r.date <= addDays(ws, 6); }, empty:"Nothing due this week.", group:true},
   {k:"overdue",   name:"Overdue",   color:"var(--bad)",      test:r => r.date < todayS(), empty:"You're all caught up.", group:true},
   {k:"completed", name:"Completed", color:"var(--ok)",       test:recentDone, empty:"Nothing checked off in the last 24 hours.", completedList:true,
     note:"Things you checked off in the last 24 hours. After that they move to Completion history."},
@@ -726,4 +728,5 @@ function smartItems(k){
   return list.filter(isActive).sort(listSort);
 }
 const smartCount = k => { const s = listDef(k); const l = smartItems(k); return s.completedList ? l.length : l.filter(r => !r.completed).length; };
-
+ 
+ 
