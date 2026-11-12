@@ -1,4 +1,3 @@
-
 /* Homebase: FILES (Supabase Storage) and Settings → Storage.
    Plain script (no modules). Shares one global scope with the other js/ files; load order is set in index.html.
  
@@ -143,6 +142,30 @@ const Files = (() => {
  
   /* ---------- Settings → Storage ---------- */
   let stMsg = "", busy = false;
+  /* The files list folds up, with search and sort. The open/closed state and sort are remembered in this browser. */
+  const FUI = "homebase.filesui.v1";
+  const fui = {open:false, sort:"new", q:"", ...(HBStore.get(FUI, {}) || {})}; fui.q = "";
+  const saveFui = () => HBStore.set(FUI, {open:fui.open, sort:fui.sort});
+  const SORTS = [["new","Newest first"],["old","Oldest first"],["az","Name A–Z"],["za","Name Z–A"],["big","Largest first"],["small","Smallest first"],["type","File type"],["opened","Opened most recently"],["offline","On this device first"]];
+  const extOf = f => ((String(f.name).match(/\.([a-z0-9]{1,6})$/i) || [])[1] || "").toUpperCase() || (String(f.type || "").split("/").pop() || "file").slice(0, 6).toUpperCase();
+  const byName = (a, b) => String(a.name).localeCompare(String(b.name), undefined, {numeric:true, sensitivity:"base"});
+  function filesShown(){
+    const idx = HBStore.fileIndex(), q = fui.q.trim().toLowerCase();
+    let L = list();
+    if (q) L = L.filter(f => `${f.name} ${extOf(f)} ${f.type || ""}`.toLowerCase().includes(q));
+    const at = f => (idx[f.fileId] && idx[f.fileId].at) || 0, t = f => String(f.createdAt || "");
+    const cmp = {new:(a, b) => t(b).localeCompare(t(a)), old:(a, b) => t(a).localeCompare(t(b)), az:byName, za:(a, b) => byName(b, a),
+      big:(a, b) => (+b.size || 0) - (+a.size || 0), small:(a, b) => (+a.size || 0) - (+b.size || 0), type:(a, b) => extOf(a).localeCompare(extOf(b)) || byName(a, b),
+      opened:(a, b) => at(b) - at(a) || t(b).localeCompare(t(a)), offline:(a, b) => (!!idx[b.fileId] - !!idx[a.fileId]) || t(b).localeCompare(t(a))}[fui.sort] || ((a, b) => t(b).localeCompare(t(a)));
+    return L.sort(cmp);
+  }
+  function fileListHTML(){
+    const idx = HBStore.fileIndex(), all = list().length, L = filesShown();
+    const row = f => `<li><span class="sg-ext" aria-hidden="true">${esc(extOf(f))}</span><span class="sg-fn"><b title="${esc(f.name)}">${esc(f.name)}</b><small>${fmtBytes(f.size)} · added ${day(f.createdAt)}${idx[f.fileId] ? " · on this device" : ""}</small></span><span class="sg-fb"><button type="button" class="btn small" data-sg="open" data-id="${esc(f.fileId)}">Open</button><button type="button" class="btn small danger" data-sg="del" data-id="${esc(f.fileId)}" aria-label="Delete ${esc(f.name)}">Delete</button></span></li>`;
+    return (fui.q && all ? `<p class="note sg-fcount">${L.length} of ${plural(all, "file")}</p>` : "")
+      + (L.length ? `<ul class="sg-files">${L.map(row).join("")}</ul>` : `<p class="note">${all ? "No files match." : "No files yet."}</p>`);
+  }
+  const drawFileList = () => { const el = $("#sg-flist"); if (el) el.innerHTML = fileListHTML(); };
   const day = t => new Date(t).toLocaleDateString(undefined, {month:"short", day:"numeric"});
   function meter(label, used, cap, capLabel, note){
     const p = cap ? Math.min(1, used / cap) : 0, cls = p >= .95 ? "full" : p >= WARN_AT ? "warn" : "";
@@ -171,10 +194,11 @@ const Files = (() => {
       + meter("Supabase file storage", n.files.used, LIMIT.files, "1 GB", filesNote)
       + meter("This browser's cache", n.local.used, n.local.cap, n.local.cap ? "" : "", localNote);
  
-    /* files */
-    const fl = list(), idx = HBStore.fileIndex();
-    h += `<div class="sg-row"><div class="sg-top"><b>Files</b><span class="mono">${fl.length}</span></div>`
-      + (fl.length ? `<ul class="sg-files">${fl.map(f => `<li><span class="sg-fn"><b title="${esc(f.name)}">${esc(f.name)}</b><small>${fmtBytes(f.size)} · ${day(f.createdAt)}${idx[f.fileId] ? " · on this device" : ""}</small></span><span class="sg-fb"><button type="button" class="btn small" data-sg="open" data-id="${esc(f.fileId)}">Open</button><button type="button" class="btn small danger" data-sg="del" data-id="${esc(f.fileId)}">Delete</button></span></li>`).join("")}</ul>` : `<p class="note">No files yet.</p>`)
+    /* files: a fold-up list with search and sort */
+    const fl = list(), mine = fl.reduce((n, f) => n + (+f.size || 0), 0);
+    h += `<div class="sg-row"><details class="sg-fd" id="sg-fd" ${fui.open ? "open" : ""}><summary><svg class="sg-car" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg><b>Files</b><span class="mono">${plural(fl.length, "file")}${fl.length ? " · " + fmtBytes(mine) : ""}</span></summary>`
+      + (fl.length ? `<div class="sg-ftools"><input type="search" id="sg-q" placeholder="Search files" aria-label="Search files" value="${esc(fui.q)}" autocomplete="off" spellcheck="false"><select id="sg-sort" aria-label="Sort files">${SORTS.map(([k, n]) => `<option value="${k}" ${k === fui.sort ? "selected" : ""}>${n}</option>`).join("")}</select></div>` : "")
+      + `<div id="sg-flist">${fileListHTML()}</div></details>`
       + `<div class="rv-tools"><button type="button" class="btn small primary" data-sg="upload" ${busy ? "disabled" : ""}>Upload a file</button><span class="note" id="sg-st">${esc(stMsg)}</span></div>`
       + `<p class="note">Up to 50 MB each, kept in your private hb-files bucket in Supabase (only your account can read it). Files you open are also kept on this device, up to ${fmtBytes(HBStore.FILE_CACHE_MAX)}, so they open offline.</p></div>`;
  
@@ -186,7 +210,9 @@ const Files = (() => {
  
     h += `<div class="rv-tools"><button type="button" class="btn small" data-sg="refresh">Check again</button><button type="button" class="btn small ghost" data-sg="clear" ${n.local.cachedN ? "" : "disabled"}>Remove saved files from this device</button></div>`
       + `<p class="note">Live Server (127.0.0.1:5500) and GitHub Pages count as different sites, so each keeps its own cache. Both fill themselves from Supabase after you sign in.</p>`;
+    const a = document.activeElement, keep = a && a.id === "sg-q" ? [a.selectionStart, a.selectionEnd] : null;
     box.innerHTML = h;
+    if (keep){ const q = $("#sg-q"); if (q){ q.focus(); try { q.setSelectionRange(keep[0], keep[1]); } catch(_){} } }
   }
   const say = t => { stMsg = t; const el = $("#sg-st"); if (el) el.textContent = t; };
   $("#sg-box").addEventListener("click", async e => {
@@ -220,6 +246,9 @@ const Files = (() => {
         HBStore.removeBackup(); renderSettingsSec(); toast("Old copy removed"); return;
     }
   });
+  $("#sg-box").addEventListener("input", e => { if (e.target.id === "sg-q"){ fui.q = e.target.value; drawFileList(); } });
+  $("#sg-box").addEventListener("change", e => { if (e.target.id === "sg-sort"){ fui.sort = e.target.value; saveFui(); drawFileList(); } });
+  $("#sg-box").addEventListener("toggle", e => { if (e.target.id === "sg-fd"){ fui.open = e.target.open; saveFui(); } }, true);
   $("#sg-file").addEventListener("change", async e => {
     const fs = [...e.target.files]; e.target.value = ""; if (!fs.length) return;
     busy = true; const bad = [];
@@ -230,7 +259,7 @@ const Files = (() => {
     busy = false;
     const ok = fs.length - bad.length;
     say(bad.length ? (ok ? `Uploaded ${plural(ok, "file")}. ` : "") + bad.join(" ") : `Uploaded ${plural(ok, "file")}.`);
-    if (ok) toast(`Uploaded ${plural(ok, "file")}`);
+    if (ok){ toast(`Uploaded ${plural(ok, "file")}`); fui.open = true; saveFui(); }
     U.at = 0; renderSettingsSec();
   });
  
@@ -252,4 +281,3 @@ const Files = (() => {
  
   return {upload, getUrl, open, delete:remove, remove, list, get, measure, usage:numbers, renderSettingsSec, BUCKET, MAX_FILE, fmtBytes};
 })();
- 
