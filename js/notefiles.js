@@ -323,4 +323,3 @@ ${text.slice(0, cap)}`;
  
   return {open, attachPdf, summarize, lib, openPdf, docxOptions, kindOf, extOf, baseName, KINDS};
 })();
- 

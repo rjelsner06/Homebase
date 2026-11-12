@@ -234,8 +234,9 @@ const Files = (() => {
       }
       case "del": {
         const f = get(id); if (!f) return;
-        if (!(await confirmBox({title:`Delete “${trunc(f.name, 40)}”?`, body:"It's removed from Supabase and from all your devices. This can't be undone.", ok:"Delete"}))) return;
-        try { await remove(id); say(""); toast(`Deleted “${trunc(f.name, 30)}”`); renderSettingsSec(); } catch(err){ say(err.message); }
+        const used = Notes.usingFile(id), uses = used.map(n => `“${trunc(n.title || "Untitled", 30)}”`).join(", ");
+        if (!(await confirmBox({title:`Delete “${trunc(f.name, 40)}”?`, body:"It's removed from Supabase and from all your devices. This can't be undone." + (used.length ? ` The note ${uses} in Notes uses it and is updated or removed too.` : ""), ok:"Delete"}))) return;
+        try { await remove(id); if (used.length) Notes.fileGone(id); say(""); toast(`Deleted “${trunc(f.name, 30)}”`); renderSettingsSec(); } catch(err){ say(err.message); }
         return;
       }
       case "refresh": U.at = 0; say(""); await measure(); return;

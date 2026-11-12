@@ -5,6 +5,8 @@
 /* =====================================================================
    NOTES: folders (nested) and documents. Saved in this browser (IndexedDB,
    through HBStore) under its own key; deleted notes and folders go to Recently Deleted.
+   A note can also be an imported file (PDF, Word, PowerPoint): it then has a "file" part
+   and an "annotations" place (see js/note-files.js); it opens in the viewer (js/viewer.js).
    ===================================================================== */
 const Notes = (() => {
   const KEY = "homebase.notes.v1";
@@ -22,6 +24,19 @@ const Notes = (() => {
   const save = () => { persist(); Sync.touch("note"); Sync.touch("folder"); };
   const emit = () => subs.forEach(f => { try { f(); } catch(e){ console.error(e); } });
   if (!HBStore.has(KEY)) persist();
+  /* Files of notes deleted for good are removed from Supabase too. If that can't happen right now
+     (signed out, offline), they wait in a small list and go the next time sync is connected. */
+  const DROP = "homebase.filedrop.v1";
+  function dropFiles(ids){ if (!ids.length) return; HBStore.set(DROP, [...new Set([...(HBStore.get(DROP, []) || []), ...ids])]); flushDrops(); }
+  let dropping = false;
+  async function flushDrops(){
+    const q = HBStore.get(DROP, []) || [];
+    if (dropping || !q.length || typeof Files === "undefined" || !Sync.live()) return;
+    dropping = true; const left = [];
+    for (const fid of q){ try { await Files.delete(fid); } catch(e){ left.push(fid); } }
+    HBStore.set(DROP, left); dropping = false;
+  }
+  Sync.onReady(() => setTimeout(flushDrops, 3000));
   function descendants(id){ const out = [id]; for (let i = 0; i < out.length; i++) d.folders.filter(f => f.parentId === out[i] && !f.deletedAt).forEach(f => out.push(f.id)); return out; }
   const api = {
     subscribe(f){ subs.add(f); },
@@ -34,6 +49,8 @@ const Notes = (() => {
     addFolder(name, parentId = null){ const f = {id:uid(), name, parentId, createdAt:now(), deletedAt:null}; d.folders.push(f); save(); emit(); return f; },
     renameFolder(id, name){ const f = api.folder(id); if (f && name){ f.name = name; save(); emit(); } },
     addNote(folderId = null){ const n = {id:uid(), folderId, title:"", html:"", createdAt:now(), updatedAt:now(), deletedAt:null}; d.notes.push(n); save(); emit(); return n; },
+    /* an imported file: html stays empty, so anything that only knows text notes still works */
+    addFile(folderId = null, {id, title, file}){ const n = {id:id || uid(), folderId, title:title || "", html:"", file, annotations:{}, createdAt:now(), updatedAt:now(), deletedAt:null}; d.notes.push(n); save(); emit(); return n; },
     updateNote(id, patch, quiet){ const n = api.note(id); if (!n) return; Object.assign(n, patch, {updatedAt:now()}); save(); if (!quiet) emit(); },
     removeNote(id){ const n = api.note(id); if (n){ n.deletedAt = now(); n.delBatch = null; save(); emit(); } },
     /* A folder goes to Recently Deleted with everything inside it, as one entry. */
@@ -47,7 +64,7 @@ const Notes = (() => {
       const roots = d.folders.filter(f => f.deletedAt && f.delRoot), rb = new Set(roots.map(f => f.delBatch));
       return [
         ...roots.map(f => ({kind:"folder", id:f.id, title:f.name, deletedAt:f.deletedAt, count:d.notes.filter(n => n.delBatch === f.delBatch).length})),
-        ...d.notes.filter(n => n.deletedAt && !rb.has(n.delBatch)).map(n => ({kind:"note", id:n.id, title:n.title || "Untitled", deletedAt:n.deletedAt, folder:n.folderId ? api.path(n.folderId) : ""})),
+        ...d.notes.filter(n => n.deletedAt && !rb.has(n.delBatch)).map(n => ({kind:"note", id:n.id, title:n.title || "Untitled", deletedAt:n.deletedAt, folder:n.folderId ? api.path(n.folderId) : "", fileExt:n.file ? n.file.ext : ""})),
       ];
     },
     restore(kind, id){
@@ -63,9 +80,27 @@ const Notes = (() => {
       save(); emit();
     },
     purge(kind, id){
-      if (kind === "folder"){ const b = (api.folder(id) || {}).delBatch; if (!b) return; d.folders = d.folders.filter(f => f.delBatch !== b); d.notes = d.notes.filter(n => n.delBatch !== b); }
-      else d.notes = d.notes.filter(n => n.id !== id);
+      let gone;
+      if (kind === "folder"){ const b = (api.folder(id) || {}).delBatch; if (!b) return; gone = d.notes.filter(n => n.delBatch === b); d.folders = d.folders.filter(f => f.delBatch !== b); d.notes = d.notes.filter(n => n.delBatch !== b); }
+      else { gone = d.notes.filter(n => n.id === id); d.notes = d.notes.filter(n => n.id !== id); }
       save(); emit();
+      dropFiles(gone.filter(n => n.file).flatMap(n => [n.file.fileId, n.file.original && n.file.original.fileId]).filter(Boolean));
+    },
+    /* file notes that use a stored file (in Recently Deleted too) */
+    usingFile: fid => d.notes.filter(n => n.file && (n.file.fileId === fid || (n.file.original && n.file.original.fileId === fid))),
+    /* a stored file was deleted (Settings → Storage): a note keeps whatever file it still has, or goes */
+    fileGone(fid){
+      let ch = false;
+      for (const n of [...d.notes]){
+        if (!n.file) continue;
+        if (n.file.original && n.file.original.fileId === fid){ n.file = {...n.file, original:null}; n.updatedAt = now(); ch = true; }
+        else if (n.file.fileId === fid){
+          if (n.file.original){ n.file = {...n.file, ...n.file.original, thumbHtml:"", original:null}; n.updatedAt = now(); }
+          else d.notes = d.notes.filter(x => x !== n);
+          ch = true;
+        }
+      }
+      if (ch){ save(); emit(); }
     },
     purgeExpired(){
       const cutoff = Date.now() - PURGE_DAYS * MS_DAY;
@@ -74,7 +109,7 @@ const Notes = (() => {
   };
   /* sync: notes and folders from another device (a note you're typing in is left alone) */
   const applyTo = arr => (u, dl) => {
-    const ae = document.activeElement, typing = arr === "notes" && ae && (ae.id === "nt-body" || ae.id === "nt-title") ? nt.note : null;
+    const ae = document.activeElement, typing = arr === "notes" && ae && (ae.id === "nt-body" || ae.id === "nt-title" || ae.id === "dv-title") ? nt.note : null;
     const ds = new Set(dl); if (typing) ds.delete(typing);
     for (const o of u){
       if (o.id === typing) continue;
@@ -167,7 +202,7 @@ const folderName = id => id === "all" ? "All notes" : id === "unfiled" ? "Not in
 function notesInView(){
   let list = Notes.notes();
   const q = nt.q.toLowerCase();
-  if (q) list = list.filter(n => (n.title + " " + noteText(n.html)).toLowerCase().includes(q));
+  if (q) list = list.filter(n => (n.title + " " + (n.file ? n.file.name + " " + (n.file.text || "") : noteText(n.html))).toLowerCase().includes(q));
   else if (nt.folder === "unfiled") list = list.filter(n => !n.folderId);
   else if (nt.folder !== "all"){ const ids = new Set(Notes.descendants(nt.folder)); list = list.filter(n => ids.has(n.folderId)); }
   return list.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
@@ -185,13 +220,21 @@ function noteGroups(list){
   return out;
 }
 const cardDate = iso => { const d = new Date(iso); return ymd(d) === ymd(new Date()) ? d.toLocaleTimeString(undefined, {hour:"numeric", minute:"2-digit"}) : `${d.getMonth() + 1}/${d.getDate()}/${String(d.getFullYear()).slice(-2)}`; };
+/* the picture on a file's card: its first page, with a type badge and the page count */
+function fileThumb(f){
+  const ext = String(f.ext || "").toLowerCase(), img = /^data:image\/(jpeg|png);base64,/.test(f.thumb || "") ? f.thumb : "";
+  const inner = img ? `<img class="nc-img" src="${img}" alt="" loading="lazy" decoding="async">`
+    : f.thumbHtml ? `<span class="nt-body nc-mini" aria-hidden="true">${cleanHTML(f.thumbHtml)}</span>`
+    : `<span class="nc-ph"><span class="ft-badge big" data-ft="${esc(ext)}">${esc(ext.toUpperCase())}</span></span>`;
+  return `<span class="nc-th nc-file">${inner}${img || f.thumbHtml ? `<span class="ft-badge nc-b" data-ft="${esc(ext)}">${esc(ext.toUpperCase())}</span>` : ""}${f.pages ? `<span class="nc-pp">${f.pages} ${ext === "pptx" ? "sl." : "pp."}</span>` : ""}</span>`;
+}
 function renderGallery(){
   const list = notesInView();
   $("#ng-name").textContent = nt.q ? "Search" : folderName(nt.folder);
   $("#ng-count").textContent = nt.q ? plural(list.length, "result") : plural(list.length, "note");
   const card = n => {
     const f = n.folderId && n.folderId !== nt.folder ? Notes.path(n.folderId) : "";
-    return `<div class="nc" role="button" tabindex="0" data-note="${n.id}" aria-label="${esc(n.title || "Untitled")}"><span class="nc-th"><span class="nt-body nc-mini" aria-hidden="true">${cleanHTML(n.html)}</span></span><span class="nc-t">${esc(n.title || "Untitled")}</span><span class="nc-d">${cardDate(n.updatedAt)}</span>${f ? `<span class="nc-f">${esc(f)}</span>` : ""}</div>`;
+    return `<div class="nc" role="button" tabindex="0" data-note="${n.id}" aria-label="${esc(n.title || "Untitled")}${n.file ? ", " + esc(n.file.ext.toUpperCase()) + " file" : ""}">${n.file ? fileThumb(n.file) : `<span class="nc-th"><span class="nt-body nc-mini" aria-hidden="true">${cleanHTML(n.html)}</span></span>`}<span class="nc-t">${esc(n.title || "Untitled")}</span><span class="nc-d">${cardDate(n.updatedAt)}</span>${f ? `<span class="nc-f">${esc(f)}</span>` : ""}</div>`;
   };
   $("#nt-cards").innerHTML = list.length ? noteGroups(list).map(g => `<h3 class="ng-g">${esc(g.k)}</h3><div class="ng-grid">${g.notes.map(card).join("")}</div>`).join("")
     : `<p class="ng-empty">${nt.q ? "No notes match." : "No notes here yet. Press <b>+ Note</b> to start one."}</p>`;
@@ -218,8 +261,10 @@ function renderNotes(){
   $("#notes").classList.toggle("side-off", !nt.side);
   $("#notes").classList.toggle("editing", !!n);
   $$(".nt-showside").forEach(b => b.hidden = nt.side);
-  $("#nt-gal").hidden = !!n; $("#nt-ed").hidden = !n;
+  $("#nt-gal").hidden = !!n; $("#nt-ed").hidden = !n || !!n.file; $("#nt-view").hidden = !(n && n.file);
+  if (!(n && n.file) && typeof DocView !== "undefined" && DocView.openId) DocView.hide();
   if (!n){ nt.loaded = null; closePop(); renderGallery(); return; }
+  if (n.file){ nt.loaded = null; closePop(); if (typeof DocView !== "undefined") DocView.show(n); return; }
   /* editor */
   $("#nt-back").textContent = "‹ " + folderName(nt.folder);
   $("#nt-move").innerHTML = `<option value="">Not in a folder</option>` + tree.map(({f, lvl}) => `<option value="${f.id}">${"  ".repeat(lvl)}${esc(f.name)}</option>`).join("");
@@ -256,6 +301,7 @@ function setNoteFull(on){
   nt.full = on;
   $("#notes").classList.toggle("full", on); document.documentElement.classList.toggle("nt-full-on", on);
   const b = $("#nt-full"); b.innerHTML = on ? UNFULL_IC : FULL_IC; b.title = on ? "Exit full screen (Esc)" : "Full screen"; b.setAttribute("aria-label", b.title); b.classList.toggle("on", on);
+  if (typeof DocView !== "undefined" && DocView.openId){ const vn = Notes.note(DocView.openId); if (vn && vn.file) DocView.show(vn); }
   try {
     if (on && !document.fullscreenElement && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {});
     if (!on && document.fullscreenElement) document.exitFullscreen().catch(() => {});

@@ -1,4 +1,3 @@
-
 /* Homebase: HOME SCREENS: tile grid and widget fitting, plus the ⋯ menu, page routing (#home, #notes…) and global events.
    Plain script (no modules). Shares one global scope with the other js/ files; load order is set in index.html. */
 "use strict";
@@ -194,6 +193,8 @@ const Home = (() => {
   function noteHTML(it){
     const n = it.note && Notes.note(it.note);
     if (!n || n.deletedAt) return `<section class="tile tinted mw note-w"><h2><span>Note</span></h2><p class="note">This note was deleted. Choose another one in Edit home screen.</p></section>`;
+    if (n.file) return `<section class="tile tinted mw note-w nw-filew" data-onote="${n.id}" aria-label="File: ${esc(n.title || "Untitled")}"><h2><span>${esc(n.title || "Untitled")}</span><span class="nw-open" role="link" tabindex="0">Open ›</span></h2>
+      <div class="nw-file">${fileThumb(n.file)}</div></section>`;
     const can = it.pickOn === true && pickItems(n).length >= 2;
     return `<section class="tile tinted mw note-w" data-onote="${n.id}" aria-label="Note: ${esc(n.title || "Untitled")}"><h2><span>${esc(n.title || "Untitled")}</span><span class="nw-open" role="link" tabindex="0">Open ›</span></h2>
       <div class="nt-body nw-body" data-nwid="${n.id}" spellcheck="true">${cleanHTML(n.html)}</div>
@@ -816,5 +817,3 @@ function renderAll(){
   updateDelCount();
   $("#store-note").textContent = Store.persistent ? Sync.statusText() : "This browser is blocking storage, so changes last until you close the page.";
 }
- 
- 

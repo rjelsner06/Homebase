@@ -5,13 +5,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
+<!-- PDF.js runs its worker in the background; the worker address is set in js/import.js and js/note-files.js. -->
 <!-- Styles: see README.md for what each file holds. Order matters. -->
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/notes.css">
 <link rel="stylesheet" href="css/home.css">
 <link rel="stylesheet" href="css/week.css">
 <link rel="stylesheet" href="css/settings.css">
+<link rel="stylesheet" href="css/viewer.css">
 <script>/* set the theme before first paint (same rules as the Settings module). The theme is copied to
    localStorage as homebase.theme.v1; everything else is in IndexedDB. Older copies kept it in homebase.settings.v1. */
 try{var s=JSON.parse(localStorage.getItem("homebase.theme.v1")||"null")||(JSON.parse(localStorage.getItem("homebase.settings.v1")||"{}").theme)||{},m=s.mode||"auto",t;
@@ -182,6 +183,7 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
             <select id="nt-fsel" class="nt-fsel" aria-label="Folder"></select>
             <div class="ng-t"><b id="ng-name">All notes</b><span id="ng-count"></span></div>
             <input type="search" id="nt-q" placeholder="Search all notes" aria-label="Search notes">
+            <button class="btn small" id="nt-import" type="button" title="Import PDF, Word or PowerPoint files (or drop them here)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4M7 9l5-5 5 5"/><path d="M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg>Import</button>
             <button class="btn primary small" id="nt-new" type="button">+ Note</button>
           </div>
           <div id="nt-cards"></div>
@@ -211,6 +213,8 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
           </div>
           <div class="nt-canvas" id="nt-canvas"><div class="nt-page"><div class="nt-body" id="nt-body" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Note text" spellcheck="true"></div></div></div>
         </div>
+        <!-- file viewer (built by js/viewer.js) -->
+        <div id="nt-view" hidden></div>
       </section>
     </div>
     <div class="nt-pop" id="nt-pop" hidden></div>
@@ -471,6 +475,22 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
   </form>
 </dialog>
  
+<dialog id="dlg-nimp" aria-labelledby="ni-h">
+  <div class="dlg">
+    <div class="dlg-h"><h3 id="ni-h">Import files into Notes</h3><button class="x" type="button" aria-label="Close" id="ni-x">×</button></div>
+    <div class="dlg-b">
+      <p class="note">PDF, Word (.docx) and PowerPoint (.pptx), up to 50 MB each. Pick several at once, or drop them here. The original files are kept in your Supabase file storage, so you can always download them.</p>
+      <ul class="ni-list" id="ni-list"></ul>
+      <div><button type="button" class="btn small" id="ni-more">+ Add files</button></div>
+      <div class="field"><label for="ni-folder">Put them in</label><select id="ni-folder"></select></div>
+      <p class="ni-warn" id="ni-pptx" hidden><b>PowerPoint:</b> slides can't be shown reliably in a browser, so a .pptx on its own is kept for download only. To read it in the viewer, export it from PowerPoint as a PDF (File → Export → PDF) and import the PDF with the same name together with the .pptx: they're kept together as one note. You can also attach the PDF later from the viewer.</p>
+      <label class="switch" id="ni-ai-row" hidden><input type="checkbox" id="ni-ai"><span id="ni-ai-l">Also make an editable text summary with AI</span></label>
+      <p class="ni-warn" id="ni-sign" hidden>Files are kept in your Supabase project, so sign in to sync first. <button type="button" class="linkb" id="ni-signin">Account &amp; sync settings</button></p>
+    </div>
+    <div class="dlg-f"><span class="sp"></span><button class="btn" type="button" id="ni-cancel">Cancel</button><button class="btn primary" type="button" id="ni-go">Import</button></div>
+  </div>
+</dialog>
+<input type="file" id="ni-file" multiple accept=".pdf,.docx,.pptx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.presentationml.presentation" hidden>
 <dialog id="dlg-calx" aria-label="Calendar"></dialog>
 <dialog id="dlg-confirm" aria-labelledby="cf-title">
   <form class="dlg" method="dialog">
@@ -570,9 +590,9 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
      Order matters: app.js (BOOT) must be last. To add a file, add it to this list. See README.md.
      "v" is added to each script's address so browsers fetch fresh copies instead of mixing old and new
      files after a push. Change it (any new text) whenever you change files in js/. -->
-<script src="js/storage.js?v=2026-11-12b"></script>
+<script src="js/storage.js?v=2026-11-12c"></script>
 <script>
-HBStore.boot("2026-11-12a", [
+HBStore.boot("2026-11-12c", [
   "js/import-core.js",
   "js/core.js",
   "js/ui.js",
@@ -588,6 +608,8 @@ HBStore.boot("2026-11-12a", [
   "js/week.js",
   "js/reminders.js",
   "js/files.js",
+  "js/note-files.js",
+  "js/viewer.js",
   "js/app.js",
 ]);
 </script>

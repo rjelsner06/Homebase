@@ -1,7 +1,7 @@
 /* Homebase: Home to-do tile, To-do page, All items, Recently Deleted, item detail panel.
    Plain script (no modules). Shares one global scope with the other js/ files; load order is set in index.html. */
 "use strict";
-
+ 
 /* =====================================================================
    HOME: compact to-do tile
    ===================================================================== */
@@ -18,7 +18,7 @@ function renderHomeTodo(){
   fitSoon();
   $("#duecount").textContent = `${plural(open, "item")} due this week`;
 }
-
+ 
 /* =====================================================================
    TO-DO PAGE (Reminders-style)
    ===================================================================== */
@@ -57,7 +57,7 @@ $("#todo-add").onclick = () => openDetail(null, {date: todayS(), category: todoS
 /* Only the list scrolls on wide screens: size the page to the window below the header. */
 function fitTodo(){ const el = page === "notes" ? $("#pg-notes .notes") : $("#pg-todo .todo-page"); if (!el || el.closest("[data-pagebox]").hidden) return; document.documentElement.style.setProperty("--todo-top", Math.max(0, el.getBoundingClientRect().top + window.scrollY) + "px"); }
 window.addEventListener("resize", fitTodo);
-
+ 
 /* =====================================================================
    ALL ITEMS PAGE (filters, search, selection, bulk)
    ===================================================================== */
@@ -125,7 +125,7 @@ $("#it-all").addEventListener("change", e => { itSel.setAll(itOrder, e.target.ch
 [["#it-q","q"],["#it-cat","cat"],["#it-course","course"],["#it-type","type"],["#it-from","from"],["#it-to","to"],["#it-status","status"]].forEach(([s,k]) =>
   $(s).addEventListener(s === "#it-q" ? "input" : "change", e => { itemsState[k] = e.target.value; renderItems(); }));
 $("#it-reset").onclick = () => { Object.keys(itemsState).forEach(k => itemsState[k] = ""); ["#it-q","#it-cat","#it-type","#it-from","#it-to","#it-status"].forEach(s => $(s).value = ""); renderItems(); };
-
+ 
 /* =====================================================================
    RECENTLY DELETED: calendar items, notes and note folders, with
    multi-select, select all, and select-all-of-a-type.
@@ -135,8 +135,8 @@ function delEntries(){
   const items = Store.deleted().map(r => ({key:"i:" + r.id, kind:"item", id:r.id, title:r.title, type:r.type, color:itemColor(r),
     sub:`${catLabel(r)} · ${r.type} · ${fmtDate(r.date)}`, deletedAt:r.deletedAt}));
   const notes = Notes.deletedEntries().map(e => ({key:(e.kind === "folder" ? "f:" : "n:") + e.id, kind:e.kind, id:e.id, title:e.title,
-    type:e.kind === "folder" ? "Notes folder" : "Note", color:"var(--h-notes)",
-    sub:e.kind === "folder" ? `Notes folder · ${plural(e.count, "note")} inside` : `Note${e.folder ? " · " + e.folder : ""}`, deletedAt:e.deletedAt}));
+    type:e.kind === "folder" ? "Notes folder" : e.fileExt ? "File in Notes" : "Note", color:"var(--h-notes)",
+    sub:e.kind === "folder" ? `Notes folder · ${plural(e.count, "note")} inside` : `${e.fileExt ? e.fileExt.toUpperCase() + " file" : "Note"}${e.folder ? " · " + e.folder : ""}`, deletedAt:e.deletedAt}));
   return [...items, ...notes].sort((a, b) => b.deletedAt.localeCompare(a.deletedAt));
 }
 const delTotal = () => Store.deleted().length + Notes.deletedEntries().length;
@@ -193,7 +193,7 @@ $("#del-empty").onclick = async () => {
   const keys = delEntries().map(e => e.key); if (!keys.length) return;
   if (await confirmBox({title:`Delete ${plural(keys.length, "item")} permanently?`, body:"Everything in Recently Deleted will be gone for good. This can't be undone.", ok:"Delete all"})){ delSel.clear(); purgeKeys(keys); renderAll(); }
 };
-
+ 
 /* =====================================================================
    ITEM DETAIL PANEL (view / edit / create)
    ===================================================================== */
@@ -221,7 +221,7 @@ function commit(patch){
     if (Object.keys(own).length) Store.update(detail.id, own);
   } else Store.update(detail.id, patch);
 }
-
+ 
 function openDetail(id, preset = {}){
   if (id){ const r = Store.get(id); if (!r || r.deletedAt) return; detail.id = id; detail.draft = null; }
   else {
@@ -361,4 +361,3 @@ $("#dlg-item").addEventListener("close", () => {
   }
   detail.id = null; detail.draft = null; detail.applyAll = false;
 });
-
