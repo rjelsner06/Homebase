@@ -1,4 +1,3 @@
-S
 /* Homebase: CONFIG, UTILITIES ($, $$, dates), DATA LAYER (Store), CLOUD SYNC (Supabase), SETTINGS (theme, colors), derived views.
    Plain script (no modules). Shares one global scope with the other js/ files; load order is set in index.html. */
 "use strict";
@@ -730,3 +729,4 @@ function smartItems(k){
 const smartCount = k => { const s = listDef(k); const l = smartItems(k); return s.completedList ? l.length : l.filter(r => !r.completed).length; };
  
  
+Claude finished the response
