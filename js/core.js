@@ -727,6 +727,3 @@ function smartItems(k){
   return list.filter(isActive).sort(listSort);
 }
 const smartCount = k => { const s = listDef(k); const l = smartItems(k); return s.completedList ? l.length : l.filter(r => !r.completed).length; };
- 
- 
-Claude finished the response
