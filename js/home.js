@@ -1,7 +1,8 @@
+
 /* Homebase: HOME SCREENS: tile grid and widget fitting, plus the ⋯ menu, page routing (#home, #notes…) and global events.
    Plain script (no modules). Shares one global scope with the other js/ files; load order is set in index.html. */
 "use strict";
-
+ 
 /* =====================================================================
    FIT: home widgets never scroll. Each tile drops its extras in order
    (data-drop="1" goes first) and lists show as many rows as fit, with a
@@ -43,7 +44,7 @@ function noteEditable(t){
   b.classList.toggle("editable", fits); b.classList.toggle("clipped", !fits && b.scrollHeight > b.clientHeight + 2);
   b.title = fits ? "" : "Open in Notes to edit";
 }
-
+ 
 /* =====================================================================
    HOME SCREENS: the home page is a grid of tiles. Widgets take any
    whole number of tiles wide and tall. Up to 3 named home screens are
@@ -65,6 +66,7 @@ const Home = (() => {
     {k:"inbox",    type:"inbox", acct:"split",   name:"Inbox (both)", desc:"Switch between Gmail and Outlook", def:[2,3]},
     {k:"note",     type:"note",     name:"Note",            desc:"Any of your notes, live",      def:[2,2]},
     {k:"facts",    type:"facts",    name:"Daily facts",     desc:"A few facts a day from your topics", def:[2,2]},
+    {k:"week",     type:"week",     name:"This Week",       desc:"Tasks due this week by day, plus weekly goals", def:[4,3]},
     {k:"import",   type:"import",   name:"Import schedule", desc:"Drop a PDF, CSV or .ics",      def:[2,2]},
   ];
   const kindOf = it => it.type === "inbox" ? KINDS.find(k => k.acct === (it.acct || "split")) : KINDS.find(k => k.type === it.type);
@@ -97,7 +99,7 @@ const Home = (() => {
   const clone = o => JSON.parse(JSON.stringify(o));
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const W = (type, x, y, w, h, extra = {}) => ({id:uid(), type, x, y, w, h, color:{k:"default"}, ...extra});
-
+ 
   /* ---------- storage (inside Settings) ---------- */
   function seedScreens(){
     const laptop = [W("clock",0,0,2,1), W("weather",2,0,2,1), W("inbox",4,0,2,2,{acct:"split", view:"gmail"}), W("todo",6,0,2,5),
@@ -115,7 +117,7 @@ const Home = (() => {
   const saveStore = fn => Settings.update(st => fn(st.screens));
   const active = () => { const S = store(); return S.list.find(s => s.id === S.activeId) || null; };
   const bp = () => innerWidth < PHONE_MAX ? "phone" : "laptop";
-
+ 
   /* ---------- colors ---------- */
   const rgb = h => { h = String(h).replace("#", ""); if (h.length === 3) h = h.split("").map(c => c + c).join(""); return [0,2,4].map(i => parseInt(h.slice(i, i+2), 16) || 0); };
   const mixc = (a, b, t) => a.map((v, i) => Math.round(v*t + b[i]*(1-t)));
@@ -153,7 +155,7 @@ const Home = (() => {
     if (p.glass){ el.classList.add("glass"); return; }
     for (const [k, v] of Object.entries(p.vars)){ el.style.setProperty(k, v); el._pv.push(k); }
   }
-
+ 
   /* ---------- grid ---------- */
   const overlaps = (a, b) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
   function fits(items, r, cols, ignore){ if (r.x < 0 || r.y < 0 || r.w < 1 || r.h < 1 || r.x + r.w > cols) return false; return !items.some(i => i.id !== ignore && overlaps(i, r)); }
@@ -172,7 +174,7 @@ const Home = (() => {
   }
   const park = () => $("#w-park");
   function parkAll(){ for (const id of Object.values(SINGLE)){ const n = document.getElementById(id); if (n && n.parentElement !== park()) park().appendChild(n); } }
-
+ 
   /* ---------- multi-instance widgets ---------- */
   const picked = {};
   function inboxHTML(it){
@@ -197,8 +199,8 @@ const Home = (() => {
       <div class="nt-body nw-body" data-nwid="${n.id}" spellcheck="true">${cleanHTML(n.html)}</div>
       ${can ? `<div class="nw-pick"><button type="button" class="btn small" data-wpick="${it.id}">${picked[it.id] ? "Pick again" : "Pick one for me"}</button><output>${esc(picked[it.id] || "")}</output></div>` : ""}</section>`;
   }
-  function multiHTML(it){ return it.type === "inbox" ? inboxHTML(it) : it.type === "note" ? noteHTML(it) : it.type === "facts" ? Facts.widget(it) : `<section class="tile mw"><p class="note">Unknown widget.</p></section>`; }
-
+  function multiHTML(it){ return it.type === "inbox" ? inboxHTML(it) : it.type === "note" ? noteHTML(it) : it.type === "facts" ? Facts.widget(it) : it.type === "week" ? ThisWeek.widget(it) : `<section class="tile mw"><p class="note">Unknown widget.</p></section>`; }
+ 
   /* ---------- building a grid (home or editor) ---------- */
   function build(grid, items, cols, editing){
     parkAll();
@@ -221,7 +223,7 @@ const Home = (() => {
     }
     fitSoon();
   }
-
+ 
   /* ---------- home (normal view) ---------- */
   let homeSig = null;
   function render(force){
@@ -237,16 +239,20 @@ const Home = (() => {
     build(grid, items, COLS[b], false);
   }
   /* Re-draws inbox and note widgets in place (calendar, to-do etc. update themselves). */
-  function refresh(){
+  /* force: redraw even a widget someone is typing in (used right after that widget saved what was typed). */
+  function refresh(force){
     if (!ready || ed.on) return;
     const grid = $("#home-grid"), s = active(); if (!s) return;
     for (const it of s.layouts[bp()] || []){
       if (SINGLE[it.type]) continue;
       const w = grid.querySelector(`.hw[data-id="${it.id}"]`); if (!w) continue;
-      if (w.contains(document.activeElement) && document.activeElement.isContentEditable) continue;   // don't interrupt typing
-      const keep = w.querySelector(".mail") ? w.querySelector(".tile").scrollTop : 0;
+      const ae = document.activeElement;
+      if (!force && w.contains(ae) && (ae.isContentEditable || ae.matches("input:not([type=checkbox]),textarea,select"))) continue;   // don't interrupt typing
+      if (w.querySelector("[data-busy]")) continue;   // mid-drag
+      const keep = w.querySelector(".mail") ? w.querySelector(".tile").scrollTop : 0, keeps = [...w.querySelectorAll("[data-keepscroll]")].map(e => e.scrollTop);
       w.innerHTML = multiHTML(it); applyPaint(w.querySelector(".tile"), it.color);
       if (keep) w.querySelector(".tile").scrollTop = keep;
+      w.querySelectorAll("[data-keepscroll]").forEach((e, i) => { if (keeps[i]) e.scrollTop = keeps[i]; });
     }
     fitSoon();
   }
@@ -301,7 +307,7 @@ const Home = (() => {
   /* Long-press on the home screen (phone) opens the editor. */
   let lp = null;
   $("#home-grid").addEventListener("pointerdown", e => {
-    if (e.pointerType === "mouse") return;
+    if (e.pointerType === "mouse" || e.target.closest("[data-nolp]")) return;   // drag handles and text boxes keep their own long-press
     const sx = e.clientX, sy = e.clientY;
     lp = {sx, sy, t:setTimeout(() => { lp = null; suppressClick = Date.now() + 500; try { navigator.vibrate && navigator.vibrate(12); } catch(_){} enter(store().activeId, "edit"); }, 600)};
   });
@@ -310,7 +316,7 @@ const Home = (() => {
   ["pointerup","pointercancel","pointerleave"].forEach(ev => $("#home-grid").addEventListener(ev, lpCancel));
   addEventListener("scroll", lpCancel, {passive:true});
   $("#home-empty-go").onclick = () => { const s = active(); s ? enter(s.id, "edit") : enter(null, "blank"); };
-
+ 
   /* =====================================================================
      EDITOR
      ===================================================================== */
@@ -318,7 +324,7 @@ const Home = (() => {
   const egrid = $("#egrid");
   const edCols = () => COLS[ed.bp], edItems = () => ed.layouts[ed.bp], selItem = () => edItems().find(i => i.id === ed.sel);
   const dirty = () => JSON.stringify(ed.layouts) !== ed.orig;
-
+ 
   function enter(id, mode){
     const S = store(), src = S.list.find(s => s.id === id);
     if (mode !== "edit" && S.list.length >= MAX){ toast(`You can save ${MAX} home screens. Delete one to make room.`); return; }
@@ -371,7 +377,7 @@ const Home = (() => {
     if (innerWidth < PHONE_MAX && r.height < innerHeight * .45 && Math.abs(r.top - top) > 4) scrollBy({top:r.top - top, behavior:"smooth"});
     else if (r.bottom > innerHeight || r.top < top) scrollBy({top:r.top - top, behavior:"smooth"});
   }
-
+ 
   /* ---------- the widget panel, placed beside whatever is selected ---------- */
   const pop = $("#wpop");
   const hasOpts = it => it.type === "inbox" || it.type === "note";
@@ -462,7 +468,7 @@ const Home = (() => {
   let rafP = 0;
   const schedulePlace = () => { if (!ed.on || pop.hidden) return; cancelAnimationFrame(rafP); rafP = requestAnimationFrame(placePop); };
   addEventListener("scroll", schedulePlace, {passive:true});
-
+ 
   function setColor(it, col){
     const t = normColor(it.color).t;
     it.color = clone(col);
@@ -486,10 +492,11 @@ const Home = (() => {
     Settings.update(st => { st.myColors = [c, ...(st.myColors || [])].slice(0, 30); });
     toast("Saved to My colors"); renderPop();
   }
-  const tooSmall = (type, w, h) => type === "calendar" && w === 1 && h === 1;   // the calendar needs at least 2 tiles
+  const tooSmall = (type, w, h) => (type === "calendar" && w === 1 && h === 1) || (type === "week" && (w < 2 || h < 2));   // the calendar needs at least 2 tiles, This Week 2×2
+  const tooSmallMsg = type => type === "week" ? "This Week needs at least 2×2 tiles." : "The calendar needs at least 2 tiles.";
   function resizeTo(it, w, h){
     const cols = edCols(); w = clamp(w, 1, cols); h = clamp(h, 1, 16);
-    if (tooSmall(it.type, w, h)){ toast("The calendar needs at least 2 tiles."); return; }
+    if (tooSmall(it.type, w, h)){ toast(tooSmallMsg(it.type)); return; }
     const r = {x:Math.min(it.x, cols - w), y:it.y, w, h};
     if (!fits(edItems(), r, cols, it.id)){ toast("Not enough room there. Move it or make room first."); return; }
     Object.assign(it, r); renderEditor();
@@ -543,7 +550,7 @@ const Home = (() => {
     if (e.target.dataset.lab){ it.labels = {...(it.labels || {}), [e.target.dataset.lab]: e.target.value.trim()}; renderEditor(); }
   });
   pop.addEventListener("keydown", e => { if (e.key === "Enter" && e.target.id === "cs-hex"){ e.preventDefault(); pop.querySelector('[data-wp="cs-use"]').click(); } });
-
+ 
   /* ---------- placing and moving by tapping a tile ---------- */
   function addItem(p, r){
     if (!r){ toast("No open spot. Remove or shrink something first."); return; }
@@ -567,7 +574,7 @@ const Home = (() => {
     }
     if (ed.sel){ ed.sel = null; renderEditor(); }
   });
-
+ 
   /* ---------- drag to move, drag the corner to resize ---------- */
   let drag = null;
   const ghost = () => $("#ghost");
@@ -605,12 +612,12 @@ const Home = (() => {
     const d = drag; drag = null; hideGhost();
     if (!cancel && d.mode === "move" && !d.moved){ if (ed.sel !== d.it.id) return select(d.it.id); return renderEditor(); }
     if (!cancel && d.r && d.ok) Object.assign(d.it, d.r);
-    else if (!cancel && d.r && !d.ok) toast(tooSmall(d.it.type, d.r.w, d.r.h) ? "The calendar needs at least 2 tiles." : "That overlaps another widget.");
+    else if (!cancel && d.r && !d.ok) toast(tooSmall(d.it.type, d.r.w, d.r.h) ? tooSmallMsg(d.it.type) : "That overlaps another widget.");
     renderEditor();
   };
   egrid.addEventListener("pointerup", e => endDrag(e, false));
   egrid.addEventListener("pointercancel", e => endDrag(e, true));
-
+ 
   /* ---------- toolbar ---------- */
   $("#ed-bp").addEventListener("click", e => { const b = e.target.closest("[data-bp]"); if (!b) return; ed.bp = b.dataset.bp; ed.sel = ed.placing = ed.moving = null; renderEditor(); });
   $("#ed-add").onclick = () => openGallery();
@@ -650,7 +657,7 @@ const Home = (() => {
   $("#sv-name").addEventListener("input", () => $("#sv-err").hidden = true);
   $("#dlg-save").addEventListener("close", () => { if (ed.on) renderPop(); });
   document.addEventListener("keydown", e => { if (e.key === "Escape" && ed.on && !document.querySelector("dialog[open]") && (ed.sel || ed.placing || ed.moving)){ ed.sel = ed.placing = ed.moving = null; renderEditor(); } });
-
+ 
   /* ---------- widget gallery ---------- */
   const gal = {k:"clock", w:2, h:1, note:null};
   function openGallery(){
@@ -679,7 +686,7 @@ const Home = (() => {
   const galPick = () => { const k = KINDS.find(x => x.k === gal.k); return {type:k.type, acct:k.acct, name:k.name, w:Math.min(gal.w, edCols()), h:gal.h, note:gal.note}; };
   $("#ga-place").onclick = () => { ed.placing = galPick(); $("#dlg-gallery").close(); renderEditor(); };
   $("#ga-auto").onclick = () => { const p = galPick(); $("#dlg-gallery").close(); addItem(p, firstFree(edItems(), p.w, p.h, edCols())); };
-
+ 
   /* ---------- Settings → Change home screen ---------- */
   function thumb(layout, cols){
     const rows = Math.max(3, ...layout.map(i => i.y + i.h));
@@ -714,15 +721,35 @@ const Home = (() => {
   });
   $("#st-hs-change").onclick = openScreens;
   $("#btn-edit-home").onclick = () => { const s = active(); s ? enter(s.id, "edit") : enter(null, "blank"); };
-
+ 
   let rz;
   addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { if (ed.on) renderEditor(); else render(); }, 120); });
   addEventListener("beforeunload", e => { if (ed.on && dirty()){ e.preventDefault(); e.returnValue = ""; } });
-
-  return {render, refresh, openScreens, activeName:() => (active() || {}).name || "none", get editing(){ return ed.on; }};
+ 
+  /* Puts a new kind of widget on every saved home screen once (first open spot, laptop and phone).
+     The flag lives in Settings, so it syncs and a widget you remove later doesn't come back. */
+  function ensureWidget(flag, type, size){
+    store();
+    if (Settings.get()[flag]) return;
+    Settings.update(st => {
+      st[flag] = true;
+      for (const scr of (st.screens && st.screens.list) || []){
+        for (const k of ["laptop","phone"]){
+          const L = (scr.layouts ||= {})[k] ||= [];
+          if (L.some(i => i.type === type)) continue;
+          const [w, h] = size[k], r = firstFree(L, Math.min(w, COLS[k]), h, COLS[k]);
+          if (r) L.push(W(type, r.x, r.y, r.w, r.h));
+        }
+        scr.updatedAt = new Date().toISOString();
+      }
+    });
+    homeSig = null; if (ready) render(true);
+  }
+ 
+  return {render, refresh, openScreens, ensureWidget, activeName:() => (active() || {}).name || "none", get editing(){ return ed.on; }};
 })();
-
-
+ 
+ 
 /* =====================================================================
    GLOBAL EVENT WIRING
    ===================================================================== */
@@ -736,12 +763,12 @@ document.addEventListener("keydown", e => {
 });
 document.addEventListener("change", e => {
   const t = e.target.closest?.("[data-toggle]"); if (!t) return;
-  const fromHome = !!t.closest("#home-todo"), id = t.dataset.toggle, r = Store.update(id, {completed: t.checked});
+  const fromHome = !!t.closest("#home-todo, .twk-w"), id = t.dataset.toggle, r = Store.update(id, {completed: t.checked});
   if (t.checked && fromHome) toast(`Done: "${trunc(r.title, 30)}"`, () => Store.update(id, {completed:false}));
 });
 $("#btn-add").onclick = () => openDetail(null, {date: defaultAddDate(), category: page === "todo" ? (todoState.cat || "Personal") : "School"});
 $("#clear-samples").onclick = () => softDelete(Store.all().filter(r => r.sample).map(r => r.id));
-
+ 
 /* ---------- ⋯ menu: To-do, All items, Deleted ---------- */
 const moreB = $("#more-b"), moreM = $("#more-m");
 function closeMore(){ moreM.hidden = true; moreB.setAttribute("aria-expanded", "false"); }
@@ -757,7 +784,7 @@ moreB.addEventListener("click", e => {
 document.addEventListener("click", e => { if (!moreM.hidden && !e.target.closest("#more-m")) closeMore(); });
 document.addEventListener("keydown", e => { if (e.key === "Escape" && !moreM.hidden){ closeMore(); moreB.focus(); } });
 addEventListener("resize", closeMore);
-
+ 
 /* ---------- pages (hash routing) ---------- */
 const PAGES = ["home","todo","notes","items","deleted"];
 let page = "home";
@@ -776,7 +803,7 @@ function route(){
   if (page === "todo" || page === "notes") requestAnimationFrame(fitTodo);
 }
 window.addEventListener("hashchange", () => { route(); window.scrollTo(0, 0); const sc = $("#todo-scroll"); if (sc) sc.scrollTop = 0; });
-
+ 
 function renderAll(){
   renderCal(); renderHomeTodo(); renderTodoPage(); renderNotes(); renderItems(); renderDeleted();
   $("#courses").innerHTML = allCourses().map(c => `<option value="${esc(c)}">`).join("");
@@ -789,4 +816,5 @@ function renderAll(){
   updateDelCount();
   $("#store-note").textContent = Store.persistent ? Sync.statusText() : "This browser is blocking storage, so changes last until you close the page.";
 }
-
+ 
+ 

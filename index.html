@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/notes.css">
 <link rel="stylesheet" href="css/home.css">
+<link rel="stylesheet" href="css/week.css">
 <link rel="stylesheet" href="css/settings.css">
 <script>/* set the theme before first paint (same rules as the Settings module) */
 try{var s=(JSON.parse(localStorage.getItem("homebase.settings.v1")||"{}").theme)||{},m=s.mode||"auto",t;
@@ -18,7 +19,7 @@ else if(s.override&&new Date(s.override.until)>new Date())t=s.override.theme;
 else{var n=new Date(),c=n.getHours()*60+n.getMinutes(),f=function(x){x=String(x).split(":");return x[0]*60+ +x[1]},L=f(s.lightAt||"07:00"),D=f(s.darkAt||"22:00");t=(L===D||(L<D?(c>=L&&c<D):(c>=L||c<D)))?"light":"dark";}
 document.documentElement.dataset.theme=t;}catch(e){}</script>
 </head><body>
-
+ 
 <div class="wrap">
   <header class="top">
     <a class="brand" href="#home"><i><b></b><b></b><b></b><b></b></i>Homebase</a>
@@ -39,7 +40,7 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
     </div>
   </header>
   <nav class="linkrow" id="linkrow" aria-label="Links" hidden></nav>
-
+ 
   <!-- ===== HOME ===== -->
   <main id="pg-home" data-pagebox="home">
     <div class="hs" id="home-grid"></div>
@@ -67,7 +68,7 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
       </div>
       <div class="clock-foot" data-drop="1"><span id="wk"></span><span id="duecount"></span></div>
     </section>
-
+ 
     <section class="tile tinted" id="t-weather" aria-label="Weather">
       <h2 data-drop="5"><span class="wx-loc">West Lafayette</span><span class="tag" id="wx-tag" hidden>Sample</span></h2>
       <div class="wx-now">
@@ -78,8 +79,8 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
       <div class="wx-days" id="wx-days" data-drop="3"></div>
       <p class="note" id="wx-note" data-drop="1" hidden>Live weather loads from Open-Meteo once you host this page yourself.</p>
     </section>
-
-
+ 
+ 
     <section class="tile" id="t-cal" aria-label="Calendar" data-fitbody="#cal-body" data-fitratio=".55">
       <div class="cal-head">
         <h2 class="cal-title" id="cal-title"></h2>
@@ -99,13 +100,13 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
       <div class="legend" id="legend" aria-label="Legend" data-drop="1"></div>
       <div id="cal-body"></div>
     </section>
-
+ 
     <section class="tile tinted" id="t-due" aria-label="To-do">
       <h2><span>To-do</span><a class="btn small" href="#todo">Open list</a></h2>
       <div class="mini-smart" id="home-smart" data-drop="1"></div>
       <ul class="todo compact" id="home-todo" data-fitlist data-min="2" data-phonescroll></ul>
     </section>
-
+ 
     <section class="tile tinted" id="t-import" aria-label="Import schedule">
       <h2 data-drop="4"><span>Import a schedule</span></h2>
       <label class="drop" id="drop" for="file">
@@ -120,7 +121,7 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
     </div>
   </main>
   <div class="wpop" id="wpop" role="dialog" aria-label="Widget options" hidden></div>
-
+ 
   <!-- ===== TO-DO ===== -->
   <section id="pg-todo" data-pagebox="todo" hidden>
     <div class="todo-page">
@@ -142,7 +143,7 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
       </div>
     </div>
   </section>
-
+ 
   <!-- ===== ALL ITEMS ===== -->
   <section id="pg-items" data-pagebox="items" hidden>
     <div class="tile">
@@ -164,7 +165,7 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
       </div>
     </div>
   </section>
-
+ 
   <!-- ===== NOTES ===== -->
   <section id="pg-notes" data-pagebox="notes" hidden>
     <div class="notes" id="notes">
@@ -213,7 +214,7 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
     </div>
     <div class="nt-pop" id="nt-pop" hidden></div>
   </section>
-
+ 
   <!-- ===== RECENTLY DELETED ===== -->
   <section id="pg-deleted" data-pagebox="deleted" hidden>
     <div class="tile">
@@ -227,13 +228,13 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
       <ul class="items" id="del-list"></ul>
     </div>
   </section>
-
+ 
   <div class="foot">
     <span id="store-note">Saved in this browser.</span>
     <button class="btn small ghost" id="clear-samples" type="button">Remove sample items</button>
   </div>
 </div>
-
+ 
 <!-- item detail / create -->
 <dialog id="dlg-item" aria-labelledby="d-head-t">
   <form class="dlg" id="form-item" method="dialog" novalidate autocomplete="off">
@@ -288,13 +289,13 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
     <div class="dlg-f" id="d-foot"></div>
   </form>
 </dialog>
-
+ 
 <dialog id="dlg-screens" aria-labelledby="sc-h"><div class="dlg">
   <div class="dlg-h"><h3 id="sc-h">Change home screen</h3><button class="x" type="button" data-close aria-label="Close">×</button></div>
   <div class="dlg-b" id="sc-list"></div>
   <div class="dlg-f" id="sc-foot"></div>
 </div></dialog>
-
+ 
 <dialog id="dlg-gallery" aria-labelledby="ga-h"><div class="dlg">
   <div class="dlg-h"><h3 id="ga-h">Add a widget</h3><button class="x" type="button" data-close aria-label="Close">×</button></div>
   <div class="dlg-b">
@@ -304,7 +305,7 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
   </div>
   <div class="dlg-f"><button class="btn" type="button" id="ga-auto">Add to first open spot</button><button class="btn primary" type="button" id="ga-place">Choose a spot</button></div>
 </div></dialog>
-
+ 
 <dialog id="dlg-save" aria-labelledby="sv-h"><form class="dlg" id="form-save" novalidate autocomplete="off">
   <div class="dlg-h"><h3 id="sv-h">Save home screen</h3><button class="x" type="button" data-close aria-label="Close">×</button></div>
   <div class="dlg-b">
@@ -314,7 +315,7 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
   </div>
   <div class="dlg-f"><button class="btn" type="button" data-close>Keep editing</button><span class="sp"></span><button class="btn" type="button" id="sv-copy" hidden>Save as a new screen</button><button class="btn primary" type="submit">Save</button></div>
 </form></dialog>
-
+ 
 <dialog id="dlg-settings" aria-labelledby="st-h">
   <form class="dlg" method="dialog">
     <div class="dlg-h"><h3 id="st-h">Settings</h3><button class="x" type="button" data-close aria-label="Close">×</button></div>
@@ -409,7 +410,7 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
     <div class="dlg-f"><button class="btn primary" type="button" data-close>Done</button></div>
   </form>
 </dialog>
-
+ 
 <dialog id="dlg-review" aria-labelledby="rv-title">
   <form class="dlg" id="form-review" method="dialog" autocomplete="off">
     <div class="dlg-h"><h3 id="rv-title">Review import</h3><button class="x" type="button" data-close aria-label="Close">×</button></div>
@@ -439,7 +440,7 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
     <div class="dlg-f"><span class="note" id="rv-foot-note"></span><span class="sp"></span><button class="btn" type="button" data-close>Cancel</button><button class="btn primary" type="submit" id="rv-add">Add selected</button></div>
   </form>
 </dialog>
-
+ 
 <dialog id="dlg-paste" aria-labelledby="pz-h">
   <form class="dlg" id="form-paste" method="dialog" autocomplete="off">
     <div class="dlg-h"><h3 id="pz-h">Paste a schedule</h3><button class="x" type="button" data-close aria-label="Close">×</button></div>
@@ -453,7 +454,7 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
     <div class="dlg-f"><button class="btn" type="button" data-close>Cancel</button><button class="btn primary" type="submit" id="pz-go">Find dates</button></div>
   </form>
 </dialog>
-
+ 
 <dialog id="dlg-prompt" aria-labelledby="pr-h">
   <form class="dlg" method="dialog">
     <div class="dlg-h"><h3 id="pr-h">Conversion prompt</h3><button class="x" type="button" data-close aria-label="Close">×</button></div>
@@ -464,7 +465,7 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
     <div class="dlg-f"><span class="note" id="pr-st"></span><span class="sp"></span><button class="btn" type="button" data-close>Done</button><button class="btn primary" type="button" id="pr-copy">Copy prompt</button></div>
   </form>
 </dialog>
-
+ 
 <dialog id="dlg-calx" aria-label="Calendar"></dialog>
 <dialog id="dlg-confirm" aria-labelledby="cf-title">
   <form class="dlg" method="dialog">
@@ -473,7 +474,7 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
     <div class="dlg-f"><button class="btn" value="cancel">Cancel</button><button class="btn danger solid" value="ok" id="cf-ok">Delete</button></div>
   </form>
 </dialog>
-
+ 
 <dialog id="dlg-mail" class="mailx" aria-label="Mail">
   <div class="mx" id="mx">
     <header class="mx-top">
@@ -493,7 +494,7 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
     </div>
   </div>
 </dialog>
-
+ 
 <dialog id="dlg-link" class="linkx" aria-labelledby="lx-t">
   <div class="lx">
     <header class="lx-top">
@@ -507,7 +508,7 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
     <div class="lx-body" id="lx-body"></div>
   </div>
 </dialog>
-
+ 
 <dialog id="dlg-le" aria-labelledby="le-h"><form class="dlg" id="form-le" novalidate autocomplete="off">
   <div class="dlg-h"><h3 id="le-h">Add a link</h3><button class="x" type="button" data-close aria-label="Close">×</button></div>
   <div class="dlg-b">
@@ -522,7 +523,7 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
   </div>
   <div class="dlg-f"><button class="btn" type="button" data-close>Cancel</button><button class="btn primary" type="submit">Save</button></div>
 </form></dialog>
-
+ 
 <dialog id="dlg-facts" aria-labelledby="fx-h"><div class="dlg">
   <div class="dlg-h"><h3 id="fx-h">Daily facts</h3><button class="x" type="button" data-close aria-label="Close">×</button></div>
   <div class="dlg-b">
@@ -532,7 +533,7 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
   </div>
   <div class="dlg-f"><button class="btn" type="button" id="fx-settings">Topics and refill</button><span class="sp"></span><button class="btn primary" type="button" data-close>Done</button></div>
 </div></dialog>
-
+ 
 <div class="tp-menu" id="tp-menu" role="menu" aria-label="Type" hidden></div>
 <dialog id="dlg-type" aria-labelledby="ty-h"><form class="dlg" id="form-type" novalidate autocomplete="off">
   <div class="dlg-h"><h3 id="ty-h">New type</h3><button class="x" type="button" data-close aria-label="Close">×</button></div>
@@ -545,7 +546,7 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
   </div>
   <div class="dlg-f"><button class="btn" type="button" data-close>Cancel</button><button class="btn primary" type="submit">Add type</button></div>
 </form></dialog>
-
+ 
 <dialog id="dlg-choice" aria-labelledby="ch-title">
   <form class="dlg" method="dialog">
     <div class="dlg-h"><h3 id="ch-title"></h3></div>
@@ -554,10 +555,10 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
   </form>
 </dialog>
 <!-- The Lifts app lives in apps/lifts.html (loaded into its own frame by js/lifts.js). Edit it there. -->
-
+ 
 <datalist id="courses"></datalist>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toast-msg"></span><button type="button" id="toast-undo">Undo</button></div>
-
+ 
 <!-- Scripts: plain files sharing one scope. Order matters: app.js (BOOT) must be last. See README.md. -->
 <script src="js/import-core.js"></script>
 <script src="js/core.js"></script>
@@ -571,6 +572,8 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
 <script src="js/lifts.js"></script>
 <script src="js/settings.js"></script>
 <script src="js/facts.js"></script>
+<script src="js/week.js"></script>
 <script src="js/reminders.js"></script>
 <script src="js/app.js"></script>
 </body></html>
+ 

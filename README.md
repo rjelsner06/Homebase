@@ -13,6 +13,7 @@ css/base.css          Layout, header, widgets (clock, weather, mail, to-do), cal
                       import, pages, dialogs, colors and light/dark themes.
 css/notes.css         Notes page: folders, note cards, the editor, toolbar pop-ups, full screen.
 css/home.css          Home screens: the tile grid, edit mode, the widget panel, the ⋯ menu.
+css/week.css          The This Week widget (tasks by day, weekly goals).
 css/settings.css      Links row and link pop-up, Daily facts, Reminders, Types, Settings layout, Sync.
 js/import-core.js     Pure import logic: turns PDF / CSV / .ics text into items (no page access).
 js/core.js            The foundation: config (types, categories), helpers ($, $$, esc, dates),
@@ -31,6 +32,8 @@ js/links.js           Settings sync wiring, small helpers (downloadText, safeJSO
 js/lifts.js           Connects Lifts to Homebase's synced storage and loads apps/lifts.html.
 js/settings.js        Settings → Links and Types, the type menu, the Settings dialog layout.
 js/facts.js           Daily facts (from your local Ollama model).
+js/week.js            The This Week widget: tasks due this week by day, weekly goals (synced
+                      as kind "weekgoal").
 js/reminders.js       Reminders pushed to your iPhone through ntfy.
 js/app.js             Settings → Sync & account, setup links, and BOOT (starts everything).
 apps/lifts.html       The Lifts app itself (its own HTML, CSS and JS). Runs in its own frame.
@@ -55,6 +58,7 @@ apps/lifts.html       The Lifts app itself (its own HTML, CSS and JS). Runs in i
 | Links row and link pop-up | `js/links.js` |
 | The Lifts app | `apps/lifts.html` (its storage bridge: `js/lifts.js`) |
 | Daily facts | `js/facts.js` |
+| This Week widget (tasks by day, weekly goals) | `js/week.js` + `css/week.css` |
 | Reminders (ntfy) | `js/reminders.js` |
 | Sync & account settings | `js/app.js` |
 | Any page markup, buttons or dialogs | `index.html` |
