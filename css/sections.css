@@ -1,0 +1,118 @@
+/* Homebase: SECTIONS: tabs and ⋯ menu, a section's page, the Lifts page, Settings → Sections, the section editor. (js/sections.js) */
+
+/* ---------- symbols ---------- */
+.sx-ic{display:inline-grid;place-items:center;width:18px;height:18px;font-size:15px;line-height:1;flex:none;color:var(--accent)}
+.sx-ic svg{width:16px;height:16px}
+
+/* ---------- top bar and ⋯ menu ---------- */
+.tabs a .nv-ic{width:16px;height:16px;font-size:14px;color:inherit}   /* a section's color tints its symbol (inline style) */
+.tabs a .nv-ic svg{width:15px;height:15px}
+.tabs a[aria-current="page"] .nv-ic{color:#fff !important}
+.nv-dot{width:7px;height:7px;border-radius:50%;background:var(--sc);flex:none}
+.tabs a[aria-current="page"] .nv-dot{background:#fff;opacity:.85}
+.cnt.al{background:var(--bad);color:#fff}
+:root[data-theme="dark"] .cnt.al{color:#1B0B00}
+.tabs a[aria-current="page"] .cnt.al{background:color-mix(in srgb,var(--accent-ink) 20%,transparent);color:inherit}
+.more-m .mm-n{display:inline-flex;align-items:center;gap:9px;min-width:0}
+.more-m .mm-ic{width:18px}
+.mm-sep{border:0;border-top:1px solid var(--line);margin:4px 6px}
+.mm-edit{display:flex;align-items:center;gap:9px;border:0;background:transparent;padding:9px 12px;border-radius:9px;color:var(--muted);font-weight:600;font-size:13.5px;cursor:pointer;text-align:left}
+.mm-edit:hover{background:var(--tile-2);color:var(--ink)}
+.mm-edit svg{width:16px;height:16px}
+
+/* ---------- a section's page ---------- */
+.sx-page{display:flex;flex-direction:column;gap:14px}
+.sx-head{display:flex;align-items:center;gap:10px;padding:0 4px}
+.sx-head .sx-ic{width:30px;height:30px;font-size:24px;color:var(--sxc)}
+.sx-head .sx-ic svg{width:26px;height:26px}
+.sx-head .sp{flex:1}
+.sx-head .cal-title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sx-blocks{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;align-items:start}
+.sx-blk{box-shadow:var(--shadow),inset 0 3px 0 0 color-mix(in srgb,var(--sxc) 70%,transparent)}
+.sx-blk.wide{grid-column:1 / -1}
+.sx-blk h2 .sx-bh{display:inline-flex;align-items:center;gap:7px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sx-blk h2 .sx-bh svg{width:15px;height:15px;flex:none}
+.sx-blk h2 .sx-bh .lk-ic,.sx-blk h2 .sx-bh .sx-ic{color:var(--sxc)}
+.sx-ha{display:inline-flex;gap:4px;flex:none}
+.sx-empty{align-items:flex-start}
+.sx-empty p{margin:0}
+@media (max-width:560px){.sx-blocks{grid-template-columns:minmax(0,1fr)}}
+
+/* notes folder */
+.sx-notes{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.sx-note{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;width:100%;border:0;background:transparent;padding:9px 6px;border-radius:9px;cursor:pointer;text-align:left;color:var(--ink);border-bottom:1px solid var(--line)}
+.sx-notes li:last-child .sx-note{border-bottom:0}
+.sx-note:hover{background:var(--tile-2)}
+.sx-nic{color:var(--muted);display:grid;place-items:center}
+.sx-nic svg{width:16px;height:16px}
+.sx-nt{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sx-nd{font-size:12px;color:var(--muted);font-family:var(--f-mono)}
+.sx-all{margin-top:6px}
+
+/* links */
+.sx-links{display:flex;flex-wrap:wrap;gap:8px}
+
+/* text */
+.sx-text{white-space:normal;line-height:1.55;overflow-wrap:anywhere}
+
+/* widgets */
+.sx-big{margin:0;color:var(--muted)}
+.sx-big b{font-family:var(--f-display);font-size:30px;color:var(--ink);margin-right:4px}
+.sx-gl{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:3px}
+.sx-blk .more-link{font-size:13px;font-weight:600;color:var(--accent);text-decoration:none}
+
+/* embedded apps */
+.sx-blk[data-type="app"]{padding:12px}
+.sx-frame{position:relative;border-radius:12px;overflow:hidden;background:var(--tile-2)}
+.sx-frame[data-h="m"]{height:520px}
+.sx-frame[data-h="l"]{height:780px}
+.sx-frame[data-h="full"]{height:calc(100dvh - 160px)}
+.sx-frame[data-h="auto"]{height:auto}
+.sx-frame iframe,.lifts-pg iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#fff}
+.sx-frame iframe.lift-f,.lifts-pg iframe.lift-f{background:transparent}
+.sx-noframe{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:16px}
+.sx-pad{padding:16px}
+@media (max-width:560px){.sx-frame[data-h="m"]{height:460px}.sx-frame[data-h="l"]{height:640px}}
+
+/* the Lifts page */
+.lifts-pg{position:relative;padding:0;overflow:hidden;height:calc(100dvh - 120px);min-height:420px}
+body.pg-lifts{padding-bottom:16px}
+body.pg-lifts .foot{display:none}
+
+/* ---------- Settings → Sections ---------- */
+.sx-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.sx-li{display:grid;grid-template-columns:18px 22px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.sx-li:last-child{border-bottom:0}
+.sx-li.dragging{background:color-mix(in srgb,var(--accent) 10%,var(--tile));border-radius:10px;box-shadow:var(--shadow);position:relative;z-index:2}
+.sx-li.dragging .lk-drag{cursor:grabbing}
+.sx-m{display:flex;flex-direction:column;min-width:0}
+.sx-m b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sx-m small{color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sx-b{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+.sx-pl button{padding:4px 9px;font-size:12.5px}
+.sx-pl button:disabled{opacity:.4;cursor:default}
+#st-sections .switch{margin:4px 0 2px;font-weight:500;font-size:13.5px}
+@media (max-width:600px){.sx-li{grid-template-columns:18px 22px minmax(0,1fr)}.sx-b{grid-column:1 / 4;justify-content:flex-start}}
+
+/* ---------- the section editor ---------- */
+#dlg-sx .le-icons .sx-ic{color:var(--ink)}
+.sw.sx-none{background:var(--tile-2);border:1px dashed var(--muted);position:relative}
+.sw.sx-none[aria-pressed="true"]{border-style:solid;border-color:var(--ink)}
+#sx-place button:disabled{opacity:.4;cursor:default}
+.sx-blist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.sx-bi{border:1px solid var(--line);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;gap:8px;background:color-mix(in srgb,var(--tile-2) 45%,var(--tile))}
+.sx-bt{display:flex;align-items:center;gap:8px}
+.sx-bt .sp{flex:1}
+.sx-bf{display:flex;flex-direction:column;gap:8px}
+.sx-bf select,.sx-bf input:not([type=checkbox]),.sx-bf textarea{border:1px solid var(--line);background:var(--tile);border-radius:10px;padding:8px 10px;width:100%;min-width:0;font-size:16px}
+.sx-bf textarea{resize:vertical;min-height:70px}
+.sx-chks{display:flex;flex-wrap:wrap;gap:6px}
+.sx-chk{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:4px 10px 4px 8px;font-size:13.5px;font-weight:600;cursor:pointer;background:var(--tile)}
+.sx-chk input{margin:0;width:16px;height:16px;accent-color:var(--accent)}
+.sx-chk:has(input:checked){border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--tile))}
+.sx-hseg{align-self:flex-start}
+.sx-addrow{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.sx-addrow .sx-ic{color:var(--accent);width:16px;height:16px}
+.sx-addrow .sx-ic svg{width:14px;height:14px}
+.sx-bnone{padding:6px 2px}
+.sx-blk h2 a{text-decoration:none;color:inherit}
