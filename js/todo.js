@@ -140,7 +140,7 @@ function delEntries(){
   return [...items, ...notes].sort((a, b) => b.deletedAt.localeCompare(a.deletedAt));
 }
 const delTotal = () => Store.deleted().length + Notes.deletedEntries().length;
-function updateDelCount(){ const n = delTotal(); $("#nav-del").textContent = n || ""; $("#nav-del").hidden = !n; }
+function updateDelCount(){ setNavCount("deleted", delTotal()); }   // the number on the Deleted tab (js/sections.js)
 function restoreKeys(keys){ for (const k of keys){ const [t, id] = [k[0], k.slice(2)]; if (t === "i") Store.restore([id]); else Notes.restore(t === "f" ? "folder" : "note", id); } }
 function purgeKeys(keys){ const items = keys.filter(k => k[0] === "i").map(k => k.slice(2)); if (items.length) Store.purge(items); keys.filter(k => k[0] !== "i").forEach(k => Notes.purge(k[0] === "f" ? "folder" : "note", k.slice(2))); }
 function renderDeleted(){

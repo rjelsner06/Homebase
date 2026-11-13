@@ -151,6 +151,7 @@ const ST_CATS = [
   {k:"sync",   name:"Account & sync",     ids:["st-sync"],   icon:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/>'},
   {k:"storage",name:"Storage",            ids:["st-storage"], icon:'<ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v6.5c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8V5.5"/><path d="M4.5 12v6.5c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8V12"/>'},
   {k:"home",   name:"Home screen",        ids:["st-home"],   icon:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>'},
+  {k:"sections",name:"Sections",          ids:["st-sections"], icon:'<rect x="3" y="4" width="18" height="4" rx="1.5"/><rect x="3" y="10" width="18" height="4" rx="1.5"/><rect x="3" y="16" width="11" height="4" rx="1.5"/>'},
   {k:"links",  name:"Links",              ids:["st-links-sec"], icon:'<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>'},
   {k:"appear", name:"Appearance",         ids:["st-appear","st-ncol","st-ccol"], icon:'<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/>'},
   {k:"types",  name:"Types",              ids:["st-types"],  icon:'<path d="M4 4h7l9 9-7 7-9-9z"/><circle cx="8.5" cy="8.5" r="1.5"/>'},

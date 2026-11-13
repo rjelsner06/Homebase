@@ -333,7 +333,7 @@ const Grocery = (() => {
   function render(){
     if (!ready) return;
     const all = items(), open = all.filter(i => !i.checked);
-    const nc = $("#nav-groc"); if (nc){ nc.textContent = open.length || ""; nc.hidden = !open.length; }
+    setNavCount("grocery", open.length);   // the number on the Grocery tab (js/sections.js)
     if (page !== "grocery") return;
     if (ui.store && !storeById(ui.store)){ ui.store = ""; saveUi(); }
     const S = stores(), vis = all.filter(inView), vOpen = vis.filter(i => !i.checked).sort(byName), vCart = vis.filter(i => i.checked).sort((a, b) => b.checkedAt - a.checkedAt);

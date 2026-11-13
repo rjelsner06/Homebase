@@ -52,4 +52,13 @@ function ensureLiftFrame(){
   const f = document.createElement("iframe"); f.id = "lx-lifts"; f.title = "Lifts";
   $("#lx-body").appendChild(f); setLiftDoc(f); liftFrame = f; return f;
 }
-window.HB_onTheme = t => { try { if (liftFrame && liftFrame.contentDocument) liftFrame.contentDocument.documentElement.dataset.theme = t; } catch(e){} };
+/* Extra Lifts frames: the Lifts section page (#lifts) and Lifts embedded in a section of your own (js/sections.js).
+   Each one reads and saves the same synced workouts, so they always agree. */
+const liftFrames = new Set();
+function makeLiftFrame(host){
+  const f = document.createElement("iframe"); f.title = "Lifts"; f.className = "lift-f";
+  host.appendChild(f); setLiftDoc(f); liftFrames.add(f); return f;
+}
+window.HB_onTheme = t => {
+  for (const f of [liftFrame, ...liftFrames]) try { if (f && f.contentDocument) f.contentDocument.documentElement.dataset.theme = t; } catch(e){}
+};

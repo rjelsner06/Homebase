@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="css/grocery.css?v=2">
 <link rel="stylesheet" href="css/settings.css">
 <link rel="stylesheet" href="css/viewer.css">
+<link rel="stylesheet" href="css/sections.css">
 <script>/* set the theme before first paint (same rules as the Settings module). The theme is copied to
    localStorage as homebase.theme.v1; everything else is in IndexedDB. Older copies kept it in homebase.settings.v1. */
 try{var s=JSON.parse(localStorage.getItem("homebase.theme.v1")||"null")||(JSON.parse(localStorage.getItem("homebase.settings.v1")||"{}").theme)||{},m=s.mode||"auto",t;
@@ -26,17 +27,11 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
 <div class="wrap">
   <header class="top">
     <a class="brand" href="#home"><i><b></b><b></b><b></b><b></b></i>Homebase</a>
-    <nav class="tabs" aria-label="Pages">
-      <a href="#home" data-page="home">Home</a>
-      <a href="#notes" data-page="notes">Notes</a>
-      <a href="#grocery" data-page="grocery">Grocery <span class="cnt" id="nav-groc" hidden></span></a>
-      <button type="button" class="more-b" id="more-b" aria-haspopup="true" aria-expanded="false" aria-label="More pages" title="To-do, All items, Deleted">⋯<span class="more-dot" id="more-dot" hidden></span></button>
+    <!-- Sections: the tabs and the ⋯ menu are drawn by js/sections.js (Settings → Sections to change them) -->
+    <nav class="tabs" id="nav-tabs" aria-label="Sections">
+      <button type="button" class="more-b" id="more-b" aria-haspopup="true" aria-expanded="false" aria-label="More sections" title="More">⋯<span class="more-dot" id="more-dot" hidden></span></button>
     </nav>
-    <div class="more-m" id="more-m" role="menu" hidden>
-      <a href="#todo" data-page="todo" role="menuitem">To-do <span class="cnt" id="nav-todo"></span></a>
-      <a href="#items" data-page="items" role="menuitem">All items</a>
-      <a href="#deleted" data-page="deleted" role="menuitem">Deleted <span class="cnt" id="nav-del"></span></a>
-    </div>
+    <div class="more-m" id="more-m" role="menu" hidden></div>
     <div class="actions">
       <button class="btn icon" id="btn-edit-home" type="button" aria-label="Edit home screen" title="Edit home screen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 20l1-3 4.5-4.5a1.4 1.4 0 0 1 2 2L17 19z"/></svg></button><button class="btn icon" id="btn-theme" type="button" aria-label="Switch theme"></button><button class="btn icon" id="btn-settings" type="button" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
       <button class="btn" id="btn-import-top" type="button">Import schedule</button>
@@ -248,6 +243,19 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
     </div>
   </section>
 
+  <!-- ===== LIFTS (as a page; js/sections.js puts the Lifts app in it) ===== -->
+  <section id="pg-lifts" data-pagebox="lifts" hidden>
+    <div class="tile lifts-pg" id="lifts-host"></div>
+  </section>
+
+  <!-- ===== A SECTION OF YOUR OWN (#s/<id>; js/sections.js fills it in) ===== -->
+  <section id="pg-sec" data-pagebox="sec" hidden>
+    <div class="sx-page" id="sx-page">
+      <div class="sx-head"><span id="sx-hic"></span><h2 class="cal-title" id="sx-title"></h2><span class="sp"></span><button class="btn small" id="sx-edit" type="button">Edit</button></div>
+      <div class="sx-blocks" id="sx-blocks"></div>
+    </div>
+  </section>
+
   <!-- ===== RECENTLY DELETED ===== -->
   <section id="pg-deleted" data-pagebox="deleted" hidden>
     <div class="tile">
@@ -365,6 +373,12 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
         <h4>Home screen</h4>
         <div class="hs-cur"><span>Using <b id="st-hs-name"></b></span><button type="button" class="btn small primary" id="st-hs-change">Change home screen</button></div>
         <p class="note">Save up to 3 home screens. Each keeps its own laptop and phone layout. On a phone you can also press and hold the home screen to edit it.</p>
+      </div>
+      <div class="st-sec" id="st-sections">
+        <div class="st-h"><h4>Sections</h4><button type="button" class="btn small primary" id="sx-add" aria-label="New section" title="New section">+</button></div>
+        <label class="switch"><input type="checkbox" id="sx-navic"><span>Show symbols in the top bar</span></label>
+        <ul class="sx-list" id="sx-list"></ul>
+        <p class="note">Bar = in the top bar. More = in the ⋯ menu. Hidden = not shown (its page still works from links like "See all"). Drag ⋮⋮ (or use ↑ ↓) to change the order. Changes show on all your devices.</p>
       </div>
       <div class="st-sec" id="st-links-sec">
         <div class="st-h"><h4>Links</h4><button type="button" class="btn small primary" id="st-link-add" aria-label="Add a link" title="Add a link">+</button></div>
@@ -603,6 +617,26 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
   <div class="dlg-f"><button class="btn" type="button" id="fx-settings">Topics and refill</button><span class="sp"></span><button class="btn primary" type="button" data-close>Done</button></div>
 </div></dialog>
  
+<!-- section editor (js/sections.js) -->
+<dialog id="dlg-sx" aria-labelledby="sx-h"><form class="dlg" id="form-sx" novalidate autocomplete="off">
+  <div class="dlg-h"><h3 id="sx-h">New section</h3><button class="x" type="button" data-close aria-label="Close">×</button></div>
+  <div class="dlg-b">
+    <div class="field"><label for="sx-name">Name</label><input id="sx-name" maxlength="30" enterkeyhint="done"></div>
+    <div class="field"><label>Symbol</label><div class="le-icons" id="sx-icpick" role="group" aria-label="Symbol"></div>
+      <div class="cp-row" style="margin-top:6px"><input id="sx-emoji" class="hexin" maxlength="8" placeholder="Any emoji" aria-label="Custom emoji"></div></div>
+    <div class="field"><label>Color</label><div class="sws" id="sx-colors" role="group" aria-label="Color"></div></div>
+    <div class="field"><label>Where it shows</label><div class="seg" id="sx-place" role="group" aria-label="Where it shows"><button type="button" data-pl="main">Top bar</button><button type="button" data-pl="more">More (⋯)</button><button type="button" data-pl="hidden">Hidden</button></div></div>
+    <p class="note" id="sx-bnote">This is a built-in section: you can rename it and change its symbol, color and where it shows.</p>
+    <div id="sx-content">
+      <div class="field"><label>What's in it</label></div>
+      <ul class="sx-blist" id="sx-blist"></ul>
+      <div class="sx-addrow" id="sx-addrow" role="group" aria-label="Add a part"></div>
+    </div>
+    <p class="err" id="sx-err" hidden></p>
+  </div>
+  <div class="dlg-f"><button class="btn danger" type="button" id="sx-del">Delete</button><span class="sp"></span><button class="btn" type="button" data-close>Cancel</button><button class="btn primary" type="submit">Save</button></div>
+</form></dialog>
+
 <!-- grocery item (js/grocery.js) -->
 <dialog id="dlg-groc" aria-labelledby="gi-h"><form class="dlg" id="form-groc" novalidate autocomplete="off">
   <div class="dlg-h"><h3 id="gi-h"><span id="gi-emoji" aria-hidden="true"></span><span id="gi-h-t">Item</span></h3><button class="x" type="button" data-close aria-label="Close">×</button></div>
@@ -658,9 +692,9 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
      Order matters: app.js (BOOT) must be last. To add a file, add it to this list. See README.md.
      "v" is added to each script's address so browsers fetch fresh copies instead of mixing old and new
      files after a push. Change it (any new text) whenever you change files in js/. -->
-<script src="js/storage.js?v=2026-11-12h"></script>
+<script src="js/storage.js?v=2026-11-12i"></script>
 <script>
-HBStore.boot("2026-11-12h", [
+HBStore.boot("2026-11-12i", [
   "js/import-core.js",
   "js/core.js",
   "js/ui.js",
@@ -675,6 +709,7 @@ HBStore.boot("2026-11-12h", [
   "js/facts.js",
   "js/week.js",
   "js/grocery.js",
+  "js/sections.js",
   "js/reminders.js",
   "js/files.js",
   "js/notefiles.js",

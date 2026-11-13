@@ -788,7 +788,7 @@ document.addEventListener("change", e => {
 $("#btn-add").onclick = () => page === "grocery" ? Grocery.focusAdd() : openDetail(null, {date: defaultAddDate(), category: page === "todo" ? (todoState.cat || "Personal") : "School"});
 $("#clear-samples").onclick = () => softDelete(Store.all().filter(r => r.sample).map(r => r.id));
  
-/* ---------- ⋯ menu: To-do, All items, Deleted ---------- */
+/* ---------- ⋯ menu: the sections you put in "More" (filled in by js/sections.js) ---------- */
 const moreB = $("#more-b"), moreM = $("#more-m");
 function closeMore(){ moreM.hidden = true; moreB.setAttribute("aria-expanded", "false"); }
 moreB.addEventListener("click", e => {
@@ -798,26 +798,27 @@ moreB.addEventListener("click", e => {
   const r = moreB.getBoundingClientRect();
   moreM.style.top = Math.round(r.bottom + 8) + "px";
   moreM.style.left = Math.round(Math.max(12, Math.min(r.left, document.documentElement.clientWidth - moreM.offsetWidth - 12))) + "px";
-  moreM.querySelector("a").focus();
+  const first = moreM.querySelector("a,button"); if (first) first.focus();
 });
 document.addEventListener("click", e => { if (!moreM.hidden && !e.target.closest("#more-m")) closeMore(); });
 document.addEventListener("keydown", e => { if (e.key === "Escape" && !moreM.hidden){ closeMore(); moreB.focus(); } });
 addEventListener("resize", closeMore);
  
-/* ---------- pages (hash routing) ---------- */
-const PAGES = ["home","todo","notes","items","deleted","grocery"];
+/* ---------- pages (hash routing) ----------
+   #home, #notes, … are the built-in sections; #s/<id> is a section of your own (js/sections.js). */
+const PAGES = ["home","todo","notes","items","deleted","grocery","lifts"];
 let page = "home";
 function route(){
   const [p, sub] = location.hash.slice(1).split("/");
   if (ready && checkSetupLink()) return;
   if (p === "link" && sub && ready) setTimeout(() => openLink(decodeURIComponent(sub), true), 0);
   if (p === "item" && sub && ready){ history.replaceState(null, "", "#home"); setTimeout(() => openDetail(decodeURIComponent(sub)), 0); }
-  page = PAGES.includes(p) ? p : "home";
+  page = p === "s" && sub ? "sec" : PAGES.includes(p) ? p : "home";
   if (page === "todo" && sub) todoState.list = (sub === "history" || SMART.some(s => s.k === sub)) ? sub : "all";
   document.body.className = "pg-" + page;
+  if (page !== "sec" && page !== "lifts") document.title = "Homebase";
   $$("[data-pagebox]").forEach(el => el.hidden = el.dataset.pagebox !== page);
-  $$(".tabs a, #more-m a").forEach(a => a.dataset.page === page ? a.setAttribute("aria-current","page") : a.removeAttribute("aria-current"));
-  $("#more-b").classList.toggle("on", ["todo","items","deleted"].includes(page)); closeMore();
+  Sections.markCurrent(page === "sec" ? decodeURIComponent(sub) : page); closeMore();
   if (ready) renderAll();
   if (page === "todo" || page === "notes") requestAnimationFrame(fitTodo);
 }
@@ -828,10 +829,9 @@ function renderAll(){
   $("#courses").innerHTML = allCourses().map(c => `<option value="${esc(c)}">`).join("");
   $("#clear-samples").hidden = !Store.all().some(r => r.sample);
   const urgent = smartCount("today") + smartCount("overdue");
-  $("#nav-todo").textContent = urgent || ""; $("#nav-todo").hidden = !urgent;
-  $("#more-dot").textContent = urgent || ""; $("#more-dot").hidden = !urgent;
-  $("#more-b").title = urgent ? `To-do (${urgent} due today or overdue), All items, Deleted` : "To-do, All items, Deleted";
+  setNavCount("todo", urgent, true);   // due today or overdue: red dot on ⋯ when To-do is in More
   Home.render();
+  Sections.renderPage();
   updateDelCount();
   $("#store-note").textContent = Store.persistent ? Sync.statusText() : "This browser is blocking storage, so changes last until you close the page.";
 }

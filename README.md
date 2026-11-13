@@ -19,6 +19,8 @@ css/home.css          Home screens: the tile grid, edit mode, the widget panel, 
 css/week.css          The This Week widget (tasks by day, weekly goals).
 css/grocery.css       The Grocery page, its item sheet, the Grocery home widget, Settings → Grocery.
 css/settings.css      Links row and link pop-up, Daily facts, Reminders, Types, Settings layout, Sync.
+css/sections.css      Sections: the tabs' symbols and counts, the ⋯ menu list, a section's page, the Lifts page,
+                      Settings → Sections and the section editor.
 css/viewer.css        Files in Notes: the document viewer, file cards (badge, thumbnail), the
                       "Import files" dialog.
 js/storage.js         Loads first. The local cache in the browser's IndexedDB (HBStore), the
@@ -44,6 +46,9 @@ js/facts.js           Daily facts (from your local Ollama model).
 js/week.js            This Week widget (tasks due this week by day, weekly goals; kind "weekgoal").
 js/grocery.js         Grocery list: quick add ("2 milk"), aisles, stores and look-up links, In cart,
                       the home widget, Settings → Grocery. Kinds "grocitem", "grocprod", "grocstore", "grocaisle".
+js/sections.js        Sections: the tabs in the top bar and the ⋯ menu, your own sections (#s/<id>) and what they
+                      hold, the Lifts page (#lifts), Settings → Sections. Kind "section". Sections.list() is what a
+                      future sidebar should draw from.
 js/reminders.js       Reminders pushed to your iPhone through ntfy.
 js/files.js           Files kept in Supabase Storage (Files.upload / getUrl / open / delete)
                       and Settings → Storage (usage meters, files list).
@@ -111,6 +116,9 @@ supabase-storage-setup.sql  SQL to paste into Supabase once: the private hb-file
 | This Week widget (tasks by day, weekly goals) | `js/week.js` + `css/week.css` |
 | Reminders (ntfy) | `js/reminders.js` |
 | Grocery list, stores, aisles, aisle-guessing words | `js/grocery.js` + `css/grocery.css` |
+| Which tabs are in the top bar / ⋯ menu, your own sections | Settings → Sections in the app; code in `js/sections.js` + `css/sections.css` |
+| Add a built-in section (e.g. Calorie tracker) | `BUILTIN` in `js/sections.js`, a `<section data-pagebox="…">` in `index.html`, the page name in `PAGES` in `js/home.js` |
+| Add a kind of part or a widget for your own sections | `Sections.registerBlock(...)` / `Sections.registerWidget(...)` in `js/sections.js` |
 | Offline copy of the site | `sw.js` (in the top folder, next to `index.html`) |
 | Sync & account settings | `js/app.js` |
 | Any page markup, buttons or dialogs | `index.html` |
@@ -149,3 +157,15 @@ supabase-storage-setup.sql  SQL to paste into Supabase once: the private hb-file
   `grocaisle`, `groctpl`. `src` on an item and the `grocprod` records are there for the coming Recipe book and Pantry.
 - **New kinds of data and sync:** a device that meets a kind it didn't know before fetches all of it once
   (`fillNewKinds` in `js/core.js`), so adding a feature never leaves older records behind on another device.
+## Sections
+
+- **Change the tabs:** Settings → **Sections** (or ⋯ → **Edit sections…**). For each section pick **Bar** (top bar),
+  **More** (the ⋯ menu) or **Hidden**, and drag ⋮⋮ or use ↑ ↓ to change the order. Home always stays in the bar.
+  "Show symbols in the top bar" adds each section's symbol to its tab.
+- **Your own section:** the **+** in Settings → Sections. Give it a name, a symbol and a color, then add parts:
+  a **Notes folder** (its notes, newest first; tap one to open it in Notes), **Links**, an **Embedded app** (Lifts, an
+  uploaded HTML app, or a web page that allows it), a **Widget** (Due soon, Grocery list) or **Text**. Its address is
+  `#s/<id>`. The **Edit** button on its page changes it; **Delete** is in the editor (with Undo).
+- **Lifts** is a section too: `#lifts` shows the app full size. The Lifts button in the Links row still opens the pop-up.
+- **Saved as:** kind `section`, one record per section. Built-in sections only get a record once you change them.
+  The numbers on tabs come from `setNavCount(id, n)` (To-do, Deleted, Grocery call it).
