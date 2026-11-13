@@ -11,7 +11,7 @@
 <link rel="stylesheet" href="css/notes.css">
 <link rel="stylesheet" href="css/home.css">
 <link rel="stylesheet" href="css/week.css">
-<link rel="stylesheet" href="css/grocery.css">
+<link rel="stylesheet" href="css/grocery.css?v=2">
 <link rel="stylesheet" href="css/settings.css">
 <link rel="stylesheet" href="css/viewer.css">
 <script>/* set the theme before first paint (same rules as the Settings module). The theme is copied to
@@ -229,10 +229,12 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
         <div class="gr-ht"><h2 class="cal-title gr-title">Grocery</h2><span class="note" id="gr-sub"></span><span class="gr-off" id="gr-off" hidden>Offline · saved on this device</span></div>
         <div class="gr-tools">
           <button class="btn small ghost" id="gr-share" type="button" title="Share or copy the list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg><span class="gr-tl">Share</span></button>
+          <button class="btn small ghost" id="gr-lists" type="button" title="Saved lists, like your weekly staples"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1 1 2-2M3.5 12l1 1 2-2M3.5 18l1 1 2-2"/></svg><span class="gr-tl">Lists</span></button>
           <button class="btn small ghost" id="gr-set" type="button" title="Stores and aisles"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg><span class="gr-tl">Stores &amp; aisles</span></button>
         </div>
       </div>
       <div class="gr-stores" id="gr-stores" role="group" aria-label="Store" hidden></div>
+      <div class="gr-tpls" id="gr-tpls" role="group" aria-label="Add a saved list" hidden></div>
       <div class="gr-addbar">
         <form class="gr-add" id="gr-add-form" autocomplete="off">
           <input id="gr-add" type="text" enterkeyhint="done" autocomplete="off" autocorrect="on" autocapitalize="sentences" spellcheck="true" maxlength="200"
@@ -610,12 +612,20 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
       <div class="gi-qty"><button type="button" class="gi-step" data-gstep="-1" aria-label="One less">−</button><input id="gi-qty" type="text" inputmode="decimal" placeholder="1" aria-label="Amount" enterkeyhint="done"><button type="button" class="gi-step" data-gstep="1" aria-label="One more">+</button><select id="gi-unit" aria-label="Unit"></select></div></div>
     <div class="field"><label>Aisle</label><div class="gi-chips" id="gi-cats" role="group" aria-label="Aisle"></div><p class="note" id="gi-cat-n"></p></div>
     <div class="field" id="gi-store-f"><label>Store</label><div class="gi-chips" id="gi-stores" role="group" aria-label="Store"></div></div>
+    <div class="field" id="gi-row-f" hidden><label for="gi-row" id="gi-row-l">Where</label><select id="gi-row"></select></div>
     <div class="field"><label for="gi-note">Note</label><input id="gi-note" placeholder="Brand, size, “only if on sale”…" maxlength="200" enterkeyhint="done"></div>
     <a class="btn small gi-look" id="gi-look" target="_blank" rel="noopener" hidden></a>
     <p class="note" id="gi-meta"></p>
   </div>
   <div class="dlg-f"><button class="btn danger" type="button" id="gi-del">Delete</button><span class="sp"></span><button class="btn" type="button" id="gi-chk"></button><button class="btn primary" type="submit">Done</button></div>
 </form></dialog>
+
+<!-- saved grocery lists (js/grocery.js) -->
+<dialog id="dlg-gtpl" aria-labelledby="gt-h"><div class="dlg">
+  <div class="dlg-h"><h3 id="gt-h">Saved lists</h3><button class="x" type="button" data-close aria-label="Close">×</button></div>
+  <div class="dlg-b" id="gt-body"></div>
+  <div class="dlg-f" id="gt-foot"></div>
+</div></dialog>
 
 <div class="tp-menu" id="tp-menu" role="menu" aria-label="Type" hidden></div>
 <dialog id="dlg-type" aria-labelledby="ty-h"><form class="dlg" id="form-type" novalidate autocomplete="off">
@@ -648,9 +658,9 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
      Order matters: app.js (BOOT) must be last. To add a file, add it to this list. See README.md.
      "v" is added to each script's address so browsers fetch fresh copies instead of mixing old and new
      files after a push. Change it (any new text) whenever you change files in js/. -->
-<script src="js/storage.js?v=2026-11-12g"></script>
+<script src="js/storage.js?v=2026-11-12h"></script>
 <script>
-HBStore.boot("2026-11-12g", [
+HBStore.boot("2026-11-12h", [
   "js/import-core.js",
   "js/core.js",
   "js/ui.js",

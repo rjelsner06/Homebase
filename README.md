@@ -132,12 +132,20 @@ supabase-storage-setup.sql  SQL to paste into Supabase once: the private hb-file
 ## Grocery list
 
 - **Open it:** the **Grocery** tab (the number is how many items are left), or tap the Grocery widget on Home.
-- **Add:** type in the box and press Enter. `2 milk`, `1.5 lb chicken`, `2 cans of tuna`, `a dozen eggs`, `milk x2` all work;
-  several at once with commas (`milk, eggs, bread`). Suggestions come from things you've added before; with the box
-  empty you get **Buy again**.
-- **Aisles:** guessed from the name the first time (word lists in `GROC_WORDS` in `js/grocery.js`). Change an item's
-  aisle in its sheet (✎) and that choice is remembered for that item from then on.
-- **Stores:** Settings → Grocery. Each store can have a website and a **search link** with `{q}` where the search word
-  goes (paste the address of a search for "milk" and Homebase swaps in `{q}`). Items then get a 🔍 look-up link.
-- **Saved as:** four synced kinds (see the comment at the top of `js/grocery.js`). `src` on an item and the
-  `grocprod` records are there for the coming Recipe book and Pantry.
+- **Add:** type in the box and press Enter. `2 milk`, `1.5 lb chicken`, `2 cans of tuna`, `a dozen eggs`, `loaf of bread`,
+  `milk x2` all work; several at once with commas (`milk, eggs, bread`). With the box empty you get **Buy again**.
+- **Amounts:** every row has − n +. Tap the number to type one.
+- **Store map:** Settings → Grocery → a store → **Store map**, one row per line in walking order:
+  `19: Oils & condiments | ketchup, mustard, mayo` (words after `|` help place things). The list then sorts by row
+  (switch to **Aisles** at the top), and each item shows its row. A guess says "likely"; pick the real row in the item's
+  sheet (✎ → Where in …) and it's remembered.
+- **Saved lists:** **Lists** at the top. Save the things you get every trip ("Weekly staples"); one tap on its button adds
+  them all, skipping what's already on the list.
+- **Aisles:** guessed from the name the first time (word lists in `GROC_WORDS` in `js/grocery.js`); change it in the
+  item's sheet and it's remembered. Rename, reorder or hide aisles in Settings → Grocery.
+- **Look up:** a store's **search link** (paste the address of a search for "milk"; Homebase swaps in `{q}`) adds a
+  "Look up at …" button to each item's sheet.
+- **Saved as:** five synced kinds (see the comment at the top of `js/grocery.js`): `grocitem`, `grocprod`, `grocstore`,
+  `grocaisle`, `groctpl`. `src` on an item and the `grocprod` records are there for the coming Recipe book and Pantry.
+- **New kinds of data and sync:** a device that meets a kind it didn't know before fetches all of it once
+  (`fillNewKinds` in `js/core.js`), so adding a feature never leaves older records behind on another device.

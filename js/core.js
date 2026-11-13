@@ -207,6 +207,24 @@ const Sync = (() => {
     for (const r of out) if (!meta.lastPull || r.updated_at > meta.lastPull) meta.lastPull = r.updated_at;
     return out;
   }
+  /* A kind of record this device didn't know about when it last pulled (for example right after an update adds
+     the grocery list). pull() skips unknown kinds but still moves meta.lastPull past them, so their older records
+     would never arrive. The first time a device sees a new kind, it fetches everything of that kind once. */
+  async function fillNewKinds(){
+    const known = new Set(meta.kinds || []), miss = Object.keys(kinds).filter(k => !known.has(k));
+    if (!miss.length) return;
+    const rows = [];
+    for (let a = 0; a < 200000; a += 1000){
+      const {data, error} = await sb.from(T).select("kind,id,data,deleted,updated_at").in("kind", miss).order("updated_at", {ascending:true}).range(a, a + 999);
+      if (error) throw error;
+      rows.push(...data); if (data.length < 1000) break;
+    }
+    if (rows.length) receive(rows);
+    const remote = {};
+    for (const r of rows) (remote[r.kind] ||= new Map()).set(r.id, {m:+(r.data && r.data._m) || 0, deleted:r.deleted});
+    for (const k of miss) queueAll(k, remote[k] || new Map());   // and send up what only this device has
+    meta.kinds = [...known, ...miss]; wr(META, meta); wr(OUT, outbox);
+  }
   function flushSoon(ms = 600){ clearTimeout(flushT); flushT = setTimeout(flush, ms); }
   async function flush(){
     if (!sb || !user || busy) return;
@@ -255,6 +273,7 @@ const Sync = (() => {
       receive(rows, firstTime && remote.settings ? new Set(["settings"]) : null);   // on a new device the account's settings win
       for (const kind of Object.keys(kinds)) queueAll(kind, remote[kind] || new Map());
     }
+    meta.kinds = Object.keys(kinds);   // a full pull covers every kind this device knows
     wr(OUT, outbox);
   }
   /* "Merge" or "Use account data only" when a device with its own data signs in for the first time. */
@@ -278,7 +297,7 @@ const Sync = (() => {
   async function catchUp(){
     if (!sb || !user || catching || state === "syncing") return;
     catching = true;
-    try { const rows = await pull(meta.lastPull); if (rows.length) receive(rows); wr(META, meta); await flush(); if (state !== "saving") setState("ok"); }
+    try { await fillNewKinds(); const rows = await pull(meta.lastPull); if (rows.length) receive(rows); wr(META, meta); await flush(); if (state !== "saving") setState("ok"); }
     catch(e){ setState(navigator.onLine === false ? "offline" : "error", msg(e)); }
     finally { catching = false; }
   }
@@ -290,7 +309,7 @@ const Sync = (() => {
       const first = meta.userId !== u.id;
       if (first){ outbox = {}; wr(OUT, outbox); }
       if (first || meta.out || !meta.lastPull) await fullSync(first);
-      else { const rows = await pull(meta.lastPull); if (rows.length) receive(rows); }
+      else { const rows = await pull(meta.lastPull); if (rows.length) receive(rows); await fillNewKinds(); }
       meta.userId = u.id; meta.email = u.email; meta.out = false; wr(META, meta);
       runTouches(); wr(OUT, outbox);
       subscribeLive();
