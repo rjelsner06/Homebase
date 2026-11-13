@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="css/notes.css">
 <link rel="stylesheet" href="css/home.css">
 <link rel="stylesheet" href="css/week.css">
+<link rel="stylesheet" href="css/grocery.css">
 <link rel="stylesheet" href="css/settings.css">
 <link rel="stylesheet" href="css/viewer.css">
 <script>/* set the theme before first paint (same rules as the Settings module). The theme is copied to
@@ -28,6 +29,7 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
     <nav class="tabs" aria-label="Pages">
       <a href="#home" data-page="home">Home</a>
       <a href="#notes" data-page="notes">Notes</a>
+      <a href="#grocery" data-page="grocery">Grocery <span class="cnt" id="nav-groc" hidden></span></a>
       <button type="button" class="more-b" id="more-b" aria-haspopup="true" aria-expanded="false" aria-label="More pages" title="To-do, All items, Deleted">⋯<span class="more-dot" id="more-dot" hidden></span></button>
     </nav>
     <div class="more-m" id="more-m" role="menu" hidden>
@@ -220,6 +222,30 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
     <div class="nt-pop" id="nt-pop" hidden></div>
   </section>
  
+  <!-- ===== GROCERY (js/grocery.js fills it in) ===== -->
+  <section id="pg-grocery" data-pagebox="grocery" hidden>
+    <div class="tile gr-main">
+      <div class="gr-head">
+        <div class="gr-ht"><h2 class="cal-title gr-title">Grocery</h2><span class="note" id="gr-sub"></span><span class="gr-off" id="gr-off" hidden>Offline · saved on this device</span></div>
+        <div class="gr-tools">
+          <button class="btn small ghost" id="gr-share" type="button" title="Share or copy the list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg><span class="gr-tl">Share</span></button>
+          <button class="btn small ghost" id="gr-set" type="button" title="Stores and aisles"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg><span class="gr-tl">Stores &amp; aisles</span></button>
+        </div>
+      </div>
+      <div class="gr-stores" id="gr-stores" role="group" aria-label="Store" hidden></div>
+      <div class="gr-addbar">
+        <form class="gr-add" id="gr-add-form" autocomplete="off">
+          <input id="gr-add" type="text" enterkeyhint="done" autocomplete="off" autocorrect="on" autocapitalize="sentences" spellcheck="true" maxlength="200"
+            placeholder="Add an item, e.g. 2 milk" aria-label="Add an item. Start with a number for the amount" role="combobox" aria-autocomplete="list" aria-controls="gr-sug" aria-expanded="false">
+          <button type="submit" class="btn primary gr-go" aria-label="Add">Add</button>
+        </form>
+        <div class="gr-sug" id="gr-sug" hidden></div>
+      </div>
+      <div id="gr-list" class="gr-list" aria-live="polite"></div>
+      <div id="gr-cart" class="gr-cart" hidden></div>
+    </div>
+  </section>
+
   <!-- ===== RECENTLY DELETED ===== -->
   <section id="pg-deleted" data-pagebox="deleted" hidden>
     <div class="tile">
@@ -381,6 +407,22 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
         </div>
         <div class="rv-tools"><button type="button" class="btn small primary" id="fx-refill">Refill a month</button><button type="button" class="btn small ghost" id="fx-cancel" hidden>Stop</button><span class="note" id="fx-st"></span></div>
         <p class="note">Refill asks the Ollama model on this laptop (server URL under AI-assisted import) for about 30 days of facts and saves them with your synced data, so your phone keeps showing them when the laptop is off. Run it on the laptop. Facts from a local model can be wrong. Add the Daily facts widget with Edit home screen → + Add widget.</p>
+      </div>
+      <div class="st-sec" id="st-grocery">
+        <div class="st-h"><h4>Stores</h4><button type="button" class="btn small primary" id="gs-add" aria-label="Add a store" title="Add a store">+</button></div>
+        <div id="gs-stores" class="gs-stores"></div>
+        <details class="box gs-help"><summary><b>How to find a store's search link</b></summary>
+          <ol>
+            <li>Open the store's website (a laptop is easiest) and search for <b>milk</b>.</li>
+            <li>On the results page, copy the whole address from the address bar.</li>
+            <li>Paste it into <b>Search link</b> above. Homebase swaps the word “milk” for <code>{q}</code> by itself.</li>
+            <li>Tap <b>Test</b>: it should open that store's search for milk.</li>
+          </ol>
+          <p class="note">If the address doesn't change when you search (some store sites do that), that store can't have look-up links. Leave Search link empty. <b>Main</b> is the store used for items that aren't set to a store.</p>
+        </details>
+        <div class="st-h"><h4>Aisles</h4><button type="button" class="btn small primary" id="gc-add" aria-label="Add an aisle" title="Add an aisle">+</button></div>
+        <ul id="gc-list" class="gc-list"></ul>
+        <p class="note">The list is grouped in this order, so put it in the order you walk through your store. Hidden aisles aren't offered for new items. When you change an item's aisle, Homebase remembers it for next time.</p>
       </div>
       <div class="st-sec" id="st-remind">
         <h4>Reminders on your iPhone</h4>
@@ -559,6 +601,22 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
   <div class="dlg-f"><button class="btn" type="button" id="fx-settings">Topics and refill</button><span class="sp"></span><button class="btn primary" type="button" data-close>Done</button></div>
 </div></dialog>
  
+<!-- grocery item (js/grocery.js) -->
+<dialog id="dlg-groc" aria-labelledby="gi-h"><form class="dlg" id="form-groc" novalidate autocomplete="off">
+  <div class="dlg-h"><h3 id="gi-h"><span id="gi-emoji" aria-hidden="true"></span><span id="gi-h-t">Item</span></h3><button class="x" type="button" data-close aria-label="Close">×</button></div>
+  <div class="dlg-b">
+    <input id="gi-name" class="d-title" placeholder="Item name" aria-label="Item name" maxlength="120" enterkeyhint="done">
+    <div class="field"><label for="gi-qty">Amount</label>
+      <div class="gi-qty"><button type="button" class="gi-step" data-gstep="-1" aria-label="One less">−</button><input id="gi-qty" type="text" inputmode="decimal" placeholder="1" aria-label="Amount" enterkeyhint="done"><button type="button" class="gi-step" data-gstep="1" aria-label="One more">+</button><select id="gi-unit" aria-label="Unit"></select></div></div>
+    <div class="field"><label>Aisle</label><div class="gi-chips" id="gi-cats" role="group" aria-label="Aisle"></div><p class="note" id="gi-cat-n"></p></div>
+    <div class="field" id="gi-store-f"><label>Store</label><div class="gi-chips" id="gi-stores" role="group" aria-label="Store"></div></div>
+    <div class="field"><label for="gi-note">Note</label><input id="gi-note" placeholder="Brand, size, “only if on sale”…" maxlength="200" enterkeyhint="done"></div>
+    <a class="btn small gi-look" id="gi-look" target="_blank" rel="noopener" hidden></a>
+    <p class="note" id="gi-meta"></p>
+  </div>
+  <div class="dlg-f"><button class="btn danger" type="button" id="gi-del">Delete</button><span class="sp"></span><button class="btn" type="button" id="gi-chk"></button><button class="btn primary" type="submit">Done</button></div>
+</form></dialog>
+
 <div class="tp-menu" id="tp-menu" role="menu" aria-label="Type" hidden></div>
 <dialog id="dlg-type" aria-labelledby="ty-h"><form class="dlg" id="form-type" novalidate autocomplete="off">
   <div class="dlg-h"><h3 id="ty-h">New type</h3><button class="x" type="button" data-close aria-label="Close">×</button></div>
@@ -590,9 +648,9 @@ document.documentElement.dataset.theme=t;}catch(e){}</script>
      Order matters: app.js (BOOT) must be last. To add a file, add it to this list. See README.md.
      "v" is added to each script's address so browsers fetch fresh copies instead of mixing old and new
      files after a push. Change it (any new text) whenever you change files in js/. -->
-<script src="js/storage.js?v=2026-11-12e"></script>
+<script src="js/storage.js?v=2026-11-12g"></script>
 <script>
-HBStore.boot("2026-11-12e", [
+HBStore.boot("2026-11-12g", [
   "js/import-core.js",
   "js/core.js",
   "js/ui.js",
@@ -606,6 +664,7 @@ HBStore.boot("2026-11-12e", [
   "js/settings.js",
   "js/facts.js",
   "js/week.js",
+  "js/grocery.js",
   "js/reminders.js",
   "js/files.js",
   "js/notefiles.js",
@@ -613,4 +672,7 @@ HBStore.boot("2026-11-12e", [
   "js/app.js",
 ]);
 </script>
+<!-- Offline: sw.js keeps a copy of the page and its files, so Homebase still opens with no signal (e.g. in the store).
+     It always tries the network first, so you get new versions as soon as you're online. -->
+<script>if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(e => console.warn("Offline copy not set up:", e)));</script>
 </body></html>

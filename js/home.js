@@ -1,4 +1,4 @@
-/* Homebase: HOME SCREENS: tile grid and widget fitting, plus the ⋯ menu, page routing (#home, #notes…) and global events.
+/* Homebase: HOME SCREENS: tile grid and widget fitting, plus the ⋯ menu, page routing (#home, #notes, #grocery…) and global events.
    Plain script (no modules). Shares one global scope with the other js/ files; load order is set in index.html. */
 "use strict";
  
@@ -66,6 +66,7 @@ const Home = (() => {
     {k:"note",     type:"note",     name:"Note",            desc:"Any of your notes, live",      def:[2,2]},
     {k:"facts",    type:"facts",    name:"Daily facts",     desc:"A few facts a day from your topics", def:[2,2]},
     {k:"week",     type:"week",     name:"This Week",       desc:"Tasks due this week by day, plus weekly goals", def:[4,3]},
+    {k:"grocery",  type:"grocery",  name:"Grocery list",    desc:"How much is on your list. Tap it to open", def:[2,1]},
     {k:"import",   type:"import",   name:"Import schedule", desc:"Drop a PDF, CSV or .ics",      def:[2,2]},
   ];
   const kindOf = it => it.type === "inbox" ? KINDS.find(k => k.acct === (it.acct || "split")) : KINDS.find(k => k.type === it.type);
@@ -200,7 +201,7 @@ const Home = (() => {
       <div class="nt-body nw-body" data-nwid="${n.id}" spellcheck="true">${cleanHTML(n.html)}</div>
       ${can ? `<div class="nw-pick"><button type="button" class="btn small" data-wpick="${it.id}">${picked[it.id] ? "Pick again" : "Pick one for me"}</button><output>${esc(picked[it.id] || "")}</output></div>` : ""}</section>`;
   }
-  function multiHTML(it){ return it.type === "inbox" ? inboxHTML(it) : it.type === "note" ? noteHTML(it) : it.type === "facts" ? Facts.widget(it) : it.type === "week" ? ThisWeek.widget(it) : `<section class="tile mw"><p class="note">Unknown widget.</p></section>`; }
+  function multiHTML(it){ return it.type === "inbox" ? inboxHTML(it) : it.type === "note" ? noteHTML(it) : it.type === "facts" ? Facts.widget(it) : it.type === "week" ? ThisWeek.widget(it) : it.type === "grocery" ? Grocery.widget(it) : `<section class="tile mw"><p class="note">Unknown widget.</p></section>`; }
  
   /* ---------- building a grid (home or editor) ---------- */
   function build(grid, items, cols, editing){
@@ -784,7 +785,7 @@ document.addEventListener("change", e => {
   const fromHome = !!t.closest("#home-todo, .twk-w"), id = t.dataset.toggle, r = Store.update(id, {completed: t.checked});
   if (t.checked && fromHome) toast(`Done: "${trunc(r.title, 30)}"`, () => Store.update(id, {completed:false}));
 });
-$("#btn-add").onclick = () => openDetail(null, {date: defaultAddDate(), category: page === "todo" ? (todoState.cat || "Personal") : "School"});
+$("#btn-add").onclick = () => page === "grocery" ? Grocery.focusAdd() : openDetail(null, {date: defaultAddDate(), category: page === "todo" ? (todoState.cat || "Personal") : "School"});
 $("#clear-samples").onclick = () => softDelete(Store.all().filter(r => r.sample).map(r => r.id));
  
 /* ---------- ⋯ menu: To-do, All items, Deleted ---------- */
@@ -804,7 +805,7 @@ document.addEventListener("keydown", e => { if (e.key === "Escape" && !moreM.hid
 addEventListener("resize", closeMore);
  
 /* ---------- pages (hash routing) ---------- */
-const PAGES = ["home","todo","notes","items","deleted"];
+const PAGES = ["home","todo","notes","items","deleted","grocery"];
 let page = "home";
 function route(){
   const [p, sub] = location.hash.slice(1).split("/");
@@ -823,7 +824,7 @@ function route(){
 window.addEventListener("hashchange", () => { route(); window.scrollTo(0, 0); const sc = $("#todo-scroll"); if (sc) sc.scrollTop = 0; });
  
 function renderAll(){
-  renderCal(); renderHomeTodo(); renderTodoPage(); renderNotes(); renderItems(); renderDeleted();
+  renderCal(); renderHomeTodo(); renderTodoPage(); renderNotes(); renderItems(); renderDeleted(); Grocery.render();
   $("#courses").innerHTML = allCourses().map(c => `<option value="${esc(c)}">`).join("");
   $("#clear-samples").hidden = !Store.all().some(r => r.sample);
   const urgent = smartCount("today") + smartCount("overdue");

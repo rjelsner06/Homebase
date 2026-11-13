@@ -154,6 +154,7 @@ const ST_CATS = [
   {k:"links",  name:"Links",              ids:["st-links-sec"], icon:'<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>'},
   {k:"appear", name:"Appearance",         ids:["st-appear","st-ncol","st-ccol"], icon:'<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/>'},
   {k:"types",  name:"Types",              ids:["st-types"],  icon:'<path d="M4 4h7l9 9-7 7-9-9z"/><circle cx="8.5" cy="8.5" r="1.5"/>'},
+  {k:"grocery", name:"Grocery",           ids:["st-grocery"], icon:'<circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2 3h3l2.6 12.2a2 2 0 0 0 2 1.6h8.1a2 2 0 0 0 2-1.5L22 7H6"/>'},
   {k:"remind", name:"Reminders",          ids:["st-remind"], icon:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/>'},
   {k:"facts",  name:"Daily facts",        ids:["st-facts"],  icon:'<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/>'},
   {k:"ai",     name:"AI-assisted import", ids:["st-ai"],     icon:'<path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>'},

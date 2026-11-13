@@ -17,6 +17,7 @@ css/base.css          Layout, header, widgets (clock, weather, mail, to-do), cal
 css/notes.css         Notes page: folders, note cards, the editor, toolbar pop-ups, full screen.
 css/home.css          Home screens: the tile grid, edit mode, the widget panel, the ⋯ menu.
 css/week.css          The This Week widget (tasks by day, weekly goals).
+css/grocery.css       The Grocery page, its item sheet, the Grocery home widget, Settings → Grocery.
 css/settings.css      Links row and link pop-up, Daily facts, Reminders, Types, Settings layout, Sync.
 css/viewer.css        Files in Notes: the document viewer, file cards (badge, thumbnail), the
                       "Import files" dialog.
@@ -41,6 +42,8 @@ js/lifts.js           Connects Lifts to Homebase's synced storage and loads Apps
 js/settings.js        Settings → Links and Types, the type menu, the Settings dialog layout.
 js/facts.js           Daily facts (from your local Ollama model).
 js/week.js            This Week widget (tasks due this week by day, weekly goals; kind "weekgoal").
+js/grocery.js         Grocery list: quick add ("2 milk"), aisles, stores and look-up links, In cart,
+                      the home widget, Settings → Grocery. Kinds "grocitem", "grocprod", "grocstore", "grocaisle".
 js/reminders.js       Reminders pushed to your iPhone through ntfy.
 js/files.js           Files kept in Supabase Storage (Files.upload / getUrl / open / delete)
                       and Settings → Storage (usage meters, files list).
@@ -49,6 +52,8 @@ js/notefiles.js       Importing PDF / Word / PowerPoint files into Notes (the Im
 js/viewer.js          The document viewer for files in Notes: pages, zoom, thumbnails, search,
                       download.
 js/app.js             Settings → Sync & account, setup links, and BOOT (starts everything).
+sw.js                 Offline copy of the site (service worker): Homebase still opens with no signal.
+                      Network first, so you always get new files when online.
 Apps/lifts.html       The Lifts app itself (its own HTML, CSS and JS). Runs in its own frame.
 supabase-storage-setup.sql  SQL to paste into Supabase once: the private hb-files bucket, its
                       policies, and the hb_usage() function behind Settings → Storage.
@@ -105,6 +110,8 @@ supabase-storage-setup.sql  SQL to paste into Supabase once: the private hb-file
 | Daily facts | `js/facts.js` |
 | This Week widget (tasks by day, weekly goals) | `js/week.js` + `css/week.css` |
 | Reminders (ntfy) | `js/reminders.js` |
+| Grocery list, stores, aisles, aisle-guessing words | `js/grocery.js` + `css/grocery.css` |
+| Offline copy of the site | `sw.js` (in the top folder, next to `index.html`) |
 | Sync & account settings | `js/app.js` |
 | Any page markup, buttons or dialogs | `index.html` |
 
@@ -122,3 +129,15 @@ supabase-storage-setup.sql  SQL to paste into Supabase once: the private hb-file
    push, wait a few minutes and reload.
 7. **Saved data:** read and write it with `HBStore.get(key)` / `HBStore.set(key, value)` (or a `DocStore`),
    not `localStorage`, so it lands in IndexedDB.
+## Grocery list
+
+- **Open it:** the **Grocery** tab (the number is how many items are left), or tap the Grocery widget on Home.
+- **Add:** type in the box and press Enter. `2 milk`, `1.5 lb chicken`, `2 cans of tuna`, `a dozen eggs`, `milk x2` all work;
+  several at once with commas (`milk, eggs, bread`). Suggestions come from things you've added before; with the box
+  empty you get **Buy again**.
+- **Aisles:** guessed from the name the first time (word lists in `GROC_WORDS` in `js/grocery.js`). Change an item's
+  aisle in its sheet (✎) and that choice is remembered for that item from then on.
+- **Stores:** Settings → Grocery. Each store can have a website and a **search link** with `{q}` where the search word
+  goes (paste the address of a search for "milk" and Homebase swaps in `{q}`). Items then get a 🔍 look-up link.
+- **Saved as:** four synced kinds (see the comment at the top of `js/grocery.js`). `src` on an item and the
+  `grocprod` records are there for the coming Recipe book and Pantry.
